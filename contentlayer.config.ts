@@ -1,4 +1,6 @@
 import { defineDocumentType, makeSource } from 'contentlayer/source-files';
+import highlight from 'rehype-highlight';
+import rehypePrettyCode from 'rehype-pretty-code';
 
 const Post = defineDocumentType(() => ({
   name: 'Post',
@@ -15,6 +17,17 @@ const Post = defineDocumentType(() => ({
       description: 'The date of the post',
       required: true,
     },
+    id: {
+      type: 'string',
+      description: 'the id of the post',
+      required: true,
+    },
+    tag: {
+      type: 'list',
+      description: 'the tags of the post',
+      required: true,
+      of: { type: 'string' },
+    },
   },
   computedFields: {
     url: {
@@ -27,4 +40,16 @@ const Post = defineDocumentType(() => ({
 export default makeSource({
   contentDirPath: 'posts',
   documentTypes: [Post],
+  mdx: {
+    remarkPlugins: [],
+    rehypePlugins: [
+      [
+        rehypePrettyCode,
+        {
+          theme: 'github-dark', // 코드작성시 적용할 테마
+        },
+      ],
+      highlight,
+    ],
+  },
 });
