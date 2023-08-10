@@ -1,6 +1,9 @@
-import './globals.css';
+import '@/styles/globals.css';
 import type { Metadata } from 'next';
 import { nanum } from '@/font/font';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import NextThemeProvider from '@/components/ThemeProvider';
 
 export const metadata: Metadata = {
   title: "Son's blog",
@@ -87,7 +90,14 @@ export default function RootLayout({
           href="/favicon-16x16.png"
         />
       </head>
-      <body className={nanum.className}>{children}</body>
+      <body
+        className={`mx-auto max-w-3xl px-6 lg:max-w-6xl lg:px-8 ${nanum.className}`}>
+        <NextThemeProvider>
+          <Header />
+          <main>{children}</main>
+          <Footer />
+        </NextThemeProvider>
+      </body>
     </html>
   );
 }

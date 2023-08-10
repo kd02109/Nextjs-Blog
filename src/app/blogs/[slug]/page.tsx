@@ -23,9 +23,9 @@ const PostLayout = ({ params }: { params: { slug: string } }) => {
           {format(parseISO((post as Post).date), 'LLLL d, yyyy')}
         </time>
       </div>
-      <div className="prose">
+      <section className="prose lg:prose-xl md:prose-lg sm:prose-base prose-slate">
         <Content />
-      </div>
+      </section>
     </article>
   );
 };
