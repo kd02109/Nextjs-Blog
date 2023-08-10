@@ -6,7 +6,7 @@ export const siteConfig = {
   url: '#',
   title: `Son's blog`,
   description: '개발하면서 탐구한 것을 소소하게 기록하는 공간입니다.',
-  copyright: 'kd02109 © All rights reserved.',
+  copyright: 'kd02109 All rights reserved.',
   since: 2023,
   googleAnalyticsId: '',
   author: {
