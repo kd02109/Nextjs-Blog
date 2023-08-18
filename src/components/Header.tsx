@@ -8,7 +8,7 @@ export default function Header() {
 
   return (
     <header className="flex w-full select-none items-end pt-8 pb-12">
-      <nav className="flex gap-6">
+      <nav className="flex gap-6 max-sm:gap-1">
         <LinkItem href={'/'} isActive={pathName === '/'}>
           Home
         </LinkItem>

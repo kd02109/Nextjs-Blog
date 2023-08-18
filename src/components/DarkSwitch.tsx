@@ -21,18 +21,14 @@ export default function DarkSwitch() {
 
   return (
     <>
-      {!mounted ? (
-        <></>
-      ) : (
-        <button
-          className={
-            'w-10 h-10 rounded-full dark:bg-slate-200 bg-slate-600 left-1 top-1 flex items-center justify-center cursor-pointer'
-          }
-          onClick={handleDarkMode}>
-          {theme === ('light' || undefined) && <Moon />}
-          {theme === `dark` && <Sun />}
-        </button>
-      )}
+      <button
+        className={
+          'w-10 h-10 rounded-full dark:bg-slate-200 bg-slate-600 left-1 top-1 flex items-center justify-center cursor-pointer max-sm:w-7 max-sm:h-7'
+        }
+        onClick={handleDarkMode}>
+        {theme === ('light' || undefined) && <Moon />}
+        {theme === `dark` && <Sun />}
+      </button>
     </>
   );
 }

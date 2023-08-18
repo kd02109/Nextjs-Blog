@@ -3,3 +3,11 @@
     @apply rounded-lg px-2 py-1 content-none;
     @apply bg-neutral-200 dark:bg-[var(--prism-background)];
 }
+
+.prose strong{
+    @apply dark:text-yellow-200
+}
+
+.props blockquote {
+    @apply dark:text-yellow-200
+} 
