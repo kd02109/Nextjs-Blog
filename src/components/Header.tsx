@@ -3,7 +3,7 @@ import { usePathname } from 'next/navigation';
 import { siteConfig } from '@/config';
 import LinkItem from '@/components/LinkItem';
 import DarkSwitch from '@/components/DarkSwitch';
-export default function Header() {
+const Header = () => {
   const pathName = usePathname();
 
   return (
@@ -24,4 +24,5 @@ export default function Header() {
       </nav>
     </header>
   );
-}
+};
+export default Header;

@@ -4,7 +4,7 @@ import Tag from '@/components/Tag';
 import getPosts from '@/util/getPosts';
 import { useSearchParams } from 'next/navigation';
 
-export default function TagBox() {
+const TagBox = () => {
   const posts = getPosts();
   const obj: { [key: string]: number } = { all: posts.length };
 
@@ -37,4 +37,5 @@ export default function TagBox() {
       ))}
     </div>
   );
-}
+};
+export default TagBox;

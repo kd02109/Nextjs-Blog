@@ -1,6 +1,8 @@
 import { defineDocumentType, makeSource } from 'contentlayer/source-files';
 import highlight from 'rehype-highlight';
 import rehypePrettyCode from 'rehype-pretty-code';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
+import rehypeSlug from 'rehype-slug';
 
 const Post = defineDocumentType(() => ({
   name: 'Post',
@@ -43,12 +45,14 @@ export default makeSource({
   mdx: {
     remarkPlugins: [],
     rehypePlugins: [
+      rehypeSlug,
       [
         rehypePrettyCode,
         {
           theme: 'github-dark', // 코드작성시 적용할 테마
         },
       ],
+      rehypeAutolinkHeadings,
       highlight,
     ],
   },

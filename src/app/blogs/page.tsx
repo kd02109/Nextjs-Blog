@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import getPosts from '@/util/getPosts';
 import TagBox from '@/components/TagBox';
 
-export default function BlogPages() {
+const BlogPages = () => {
   const searchParams = useSearchParams();
   const search = searchParams.get('key') || 'all';
   const title = search.charAt(0).toUpperCase() + search.slice(1);
@@ -35,4 +35,6 @@ export default function BlogPages() {
       </div>
     </>
   );
-}
+};
+
+export default BlogPages;
