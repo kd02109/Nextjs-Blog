@@ -52,7 +52,15 @@ export default makeSource({
           theme: 'github-dark', // 코드작성시 적용할 테마
         },
       ],
-      rehypeAutolinkHeadings,
+      [
+        rehypeAutolinkHeadings,
+        {
+          properties: {
+            className: ['anchor'],
+            ariaLabel: 'anchor',
+          },
+        },
+      ],
       highlight,
     ],
   },
