@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useRef } from 'react';
-import { toast } from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 
-export default function CodeBlock({ children }: React.ComponentProps<'pre'>) {
+export default function CodeBlock({ children }: { children: React.ReactNode }) {
   const ref = useRef<HTMLPreElement>(null);
 
   const handleCopy = async () => {
@@ -12,7 +12,7 @@ export default function CodeBlock({ children }: React.ComponentProps<'pre'>) {
 
     try {
       await navigator.clipboard.writeText(text);
-      toast.success('코드를 복사했습니다.', { icon: '⌨️' });
+      toast.success('코드를 복사했습니다.', { icon: '🖥️' });
     } catch (e) {
       console.error(e);
       toast.error('코드 복사에 실패했습니다.');
@@ -38,6 +38,7 @@ export default function CodeBlock({ children }: React.ComponentProps<'pre'>) {
           <path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path>
         </svg>
       </button>
+      <Toaster position="top-right" />
     </div>
   );
 }
