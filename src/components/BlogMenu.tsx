@@ -60,7 +60,7 @@ const useScroll = (tableOfContents: Toc[]) => {
 
 export default function BlogMenu({ toc }: Prop) {
   const { currentSectionSlug } = useScroll(toc);
-  console.log(currentSectionSlug);
+
   return (
     <div className="overflow-hidden rounded-xl border-2 border-neutral-200 transition-all dark:border-neutral-800">
       <div className="p-3">

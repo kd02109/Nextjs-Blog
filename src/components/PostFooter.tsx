@@ -14,16 +14,20 @@ export default function PostFooter({ nextPost, prevPost }: Prop) {
   return (
     <div className="flex w-full justify-between my-10">
       {prevPost && (
-        <LinkHover url={prevPost.url}>
-          <LeftArrow />
-          {prevPost.title}
-        </LinkHover>
+        <div>
+          <LinkHover url={prevPost.url}>
+            <LeftArrow />
+            {prevPost.title}
+          </LinkHover>
+        </div>
       )}
       {nextPost && (
-        <LinkHover url={nextPost.url}>
-          {nextPost.title}
-          <RightArrow />
-        </LinkHover>
+        <div>
+          <LinkHover url={nextPost.url}>
+            {nextPost.title}
+            <RightArrow />
+          </LinkHover>
+        </div>
       )}
     </div>
   );

@@ -23,3 +23,15 @@
 .prose .source {
     @apply text-2xl text-yellow-400
 }
+
+.prose code {
+    font-family:  Consolas, Monaco, 'Andale Mono', monospace;
+}
+
+.prose pre::-webkit-scrollbar {
+display: none;
+}
+.prose pre {
+-ms-overflow-style: none; /* IE and Edge */
+scrollbar-width: none; /* Firefox */
+}

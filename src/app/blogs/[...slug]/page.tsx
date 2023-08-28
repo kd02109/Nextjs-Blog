@@ -6,6 +6,7 @@ import { toc } from '@/util/toc';
 import BlogMenu from '@/components/BlogMenu';
 import getPosts from '@/util/getPosts';
 import PostFooter from '@/components/PostFooter';
+import CodeBlock from '@/components/CodeBlock';
 
 export const generateMetadata = ({ params }: { params: any }) => {
   const post = allPosts.find(post => {
@@ -15,6 +16,10 @@ export const generateMetadata = ({ params }: { params: any }) => {
   });
 
   return { title: post?.title };
+};
+
+const mdxComponents = {
+  pre: CodeBlock,
 };
 
 const PostLayout = ({ params }: { params: { slug: string[] } }) => {
@@ -58,7 +63,7 @@ const PostLayout = ({ params }: { params: { slug: string[] } }) => {
         </div>
         <div className="flex justify-between">
           <section className="prose lg:prose-xl md:prose-lg sm:prose-base prose-slate dark:prose-invert  w-full max-w-3xl">
-            <Content />
+            <Content components={mdxComponents} />
           </section>
           <div className="sticky top-[50px] max-md:hidden min-w-[240px] max-w-[260px] self-start lg:block">
             <BlogMenu toc={slugMap} />

@@ -5,6 +5,7 @@ import { content } from '@/util/content';
 import { useSearchParams } from 'next/navigation';
 import getPosts from '@/util/getPosts';
 import TagBox from '@/components/TagBox';
+import Link from 'next/link';
 
 const BlogPages = () => {
   const searchParams = useSearchParams();
@@ -29,7 +30,9 @@ const BlogPages = () => {
         </h1>
         <div className="grid grid-rows-2 grid-cols-2 gap-3 max-sm:grid-rows-1 max-sm:grid-cols-1">
           {posts.map((post, idx) => (
-            <PostCard key={idx} {...post} />
+            <Link key={post.id} href={post.url}>
+              <PostCard {...post} />
+            </Link>
           ))}
         </div>
       </div>
