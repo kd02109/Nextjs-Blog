@@ -1,7 +1,7 @@
   
 .prose code:not(:where(pre *)) {
     @apply rounded-lg px-2 py-1 content-none;
-    @apply bg-neutral-200 dark:bg-[var(--prism-background)];
+    @apply bg-neutral-200 dark:bg-neutral-600;
 }
 
 .prose strong{
@@ -12,3 +12,14 @@
     @apply dark:text-yellow-200
 } 
 
+.prose th{
+    @apply bg-slate-200 px-1 py-2 dark:bg-slate-500 text-2xl text-center
+}
+
+.prose td {
+    @apply p-1 text-center
+}
+
+.prose .source {
+    @apply text-2xl text-yellow-400
+}
