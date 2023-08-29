@@ -7,6 +7,7 @@ import BlogMenu from '@/components/BlogMenu';
 import getPosts from '@/util/getPosts';
 import PostFooter from '@/components/PostFooter';
 import CodeBlock from '@/components/CodeBlock';
+import BlogComment from '@/components/svg/BlogComment';
 
 export const generateMetadata = ({ params }: { params: any }) => {
   const post = allPosts.find(post => {
@@ -71,6 +72,7 @@ const PostLayout = ({ params }: { params: { slug: string[] } }) => {
         </div>
         <PostFooter {...postFooter} />
       </article>
+      <BlogComment />
     </>
   );
 };
