@@ -33,8 +33,8 @@ export const siteConfig = {
       path: '/projects',
     },
     {
-      label: 'Archives',
-      path: '/archives',
+      label: 'Tag',
+      path: '/tags',
     },
   ],
 };

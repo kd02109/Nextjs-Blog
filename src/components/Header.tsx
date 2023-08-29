@@ -20,7 +20,6 @@ const Header = () => {
       </nav>
       <nav className="ml-auto flex items-center gap-2">
         <DarkSwitch />
-        <div>search</div>
       </nav>
     </header>
   );
