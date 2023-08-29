@@ -1,7 +1,7 @@
 import { allPosts } from 'contentlayer/generated';
 import { compareDesc } from 'date-fns';
 
-export default function getPosts(key?: string) {
+export default function getPosts(key?: string, search?: string) {
   let posts =
     key === undefined || key === 'all'
       ? allPosts
@@ -15,5 +15,11 @@ export default function getPosts(key?: string) {
             const tags = item.tag.map(item => item.trim());
             return tags.includes(key);
           });
+  if (search && search.trim() !== '') {
+    const fillterposts = posts.filter(item =>
+      item.title.toLowerCase().includes(search.toLowerCase()),
+    );
+    return fillterposts;
+  }
   return posts;
 }
