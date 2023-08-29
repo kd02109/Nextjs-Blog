@@ -7,7 +7,7 @@ import BlogMenu from '@/components/BlogMenu';
 import getPosts from '@/util/getPosts';
 import PostFooter from '@/components/PostFooter';
 import CodeBlock from '@/components/CodeBlock';
-import BlogComment from '@/components/svg/BlogComment';
+import BlogComment from '@/components/BlogComment';
 
 export const generateMetadata = ({ params }: { params: any }) => {
   const post = allPosts.find(post => {
@@ -51,7 +51,7 @@ const PostLayout = ({ params }: { params: { slug: string[] } }) => {
     <>
       <article className="py-8 max-2lg">
         <div className="mb-8 text-center">
-          <h1 className="text-5xl max-sm:text-3xl">{post?.title}</h1>
+          <h1 className="text-5xl max-sm:text-3xl mb-2">{post?.title}</h1>
           <div className="flex gap-2 justify-center m-1">
             {tags?.map(item => <Tag key={item} tag={item} />)}
           </div>

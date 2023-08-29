@@ -3,8 +3,13 @@ import Moon from '@/components/svg/Moon';
 import Sun from '@/components/svg/Sun';
 import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
+import CircleButton from '@/components/CustomButton';
 
-const DarkSwitch = () => {
+type Prop = {
+  className?: string;
+};
+
+const DarkSwitch = ({ className }: Prop) => {
   const [mounted, setMounted] = useState(false);
   const handleDarkMode = () => {
     theme === (undefined || 'light') ? setTheme('dark') : setTheme('light');
@@ -21,14 +26,10 @@ const DarkSwitch = () => {
 
   return (
     <>
-      <button
-        className={
-          'w-10 h-10 rounded-full dark:bg-slate-200 bg-slate-600 left-1 top-1 flex items-center justify-center cursor-pointer max-sm:w-7 max-sm:h-7'
-        }
-        onClick={handleDarkMode}>
+      <CircleButton fn={handleDarkMode} className={className}>
         {theme === ('light' || undefined) && <Moon />}
         {theme === `dark` && <Sun />}
-      </button>
+      </CircleButton>
     </>
   );
 };
