@@ -3,7 +3,7 @@
 import React, { useRef } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 
-export default function CodeBlock({ children }: { children: React.ReactNode }) {
+export default function CodeBlock({ children }: React.ComponentProps<'pre'>) {
   const ref = useRef<HTMLPreElement>(null);
 
   const handleCopy = async () => {

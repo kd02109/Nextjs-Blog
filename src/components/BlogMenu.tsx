@@ -63,13 +63,13 @@ export default function BlogMenu({ toc }: Prop) {
 
   return (
     <div className="overflow-hidden rounded-xl border-2 border-neutral-200 transition-all dark:border-neutral-800">
-      <div className="p-3">
-        <p
+      <div className="p-3 border-b-2 border-solid">
+        <div
           id="toc-header"
-          className="text-primary text-sm font-extrabold leading-6 mb-2">
+          className="text-base py-1 font-extrabold leading-6 mb-4 border-b-2 border-solid">
           Content Table
-        </p>
-        <div className="flex flex-col gap-3">
+        </div>
+        <div className="flex flex-col gap-3  ">
           {toc.map(({ title, slug }) => (
             <Link
               href={`#${slug}`}
@@ -77,11 +77,12 @@ export default function BlogMenu({ toc }: Prop) {
               className={`hover:text-yellow-400 ${
                 currentSectionSlug === slug && `text-yellow-400`
               }`}>
-              {title}
+              • {title}
             </Link>
           ))}
         </div>
       </div>
+      <div></div>
     </div>
   );
 }
