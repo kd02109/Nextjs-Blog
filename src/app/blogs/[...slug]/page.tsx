@@ -11,9 +11,8 @@ import BlogComment from '@/components/BlogComment';
 
 export const generateMetadata = ({ params }: { params: any }) => {
   const post = allPosts.find(post => {
-    const str = params.slug.join('/');
-
-    return post._raw.flattenedPath === str;
+    const str = params.slug.join('/').trim();
+    return `${post._raw.flattenedPath.trim()}` === str;
   });
 
   return { title: post?.title };
@@ -25,7 +24,8 @@ const mdxComponents = {
 
 const PostLayout = ({ params }: { params: { slug: string[] } }) => {
   const str = params.slug.join('/');
-  const allPostsSort = getPosts('all');
+
+  const allPostsSort = getPosts('blog');
   let postIndex = Infinity;
   const post = allPostsSort.find((post, index) => {
     if (post._raw.flattenedPath === str) {
@@ -43,7 +43,6 @@ const PostLayout = ({ params }: { params: { slug: string[] } }) => {
       ? allPostsSort.at(postIndex + 1)
       : undefined,
   };
-
   const tags = post?.tag;
   const Content = getMDXComponent((post as Post).body.code);
   const slugMap = toc(post?.body.raw as string);
