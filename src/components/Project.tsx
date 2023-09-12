@@ -16,9 +16,13 @@ export default function Project(prop: ProjectType) {
           style={{ imageRendering: '-webkit-optimize-contrast' }}
         />
       }
-      <div className="absolute top-0 right-0 w-full h-full hover:opacity-0 duration-500 transition bg-transparent bg-black opacity-80 flex items-center py-10 flex-col">
-        <h1 className="text-yellow-600 text-3xl font-black mb-10">{name}</h1>
-        <p className="text-yellow-600 text-md font-black">{description}</p>
+      <div
+        className="px-10 absolute top-0 right-0 w-full h-full hover:opacity-0 duration-500 transition flex items-center py-10 flex-col
+      after:content-[ ] after:absolute after:top-0 after:left-0 after:right-0 after:bottom-0 after:bg-black after:opacity-50">
+        <h1 className="text-yellow-400 text-3xl font-black mb-10 z-10">
+          {name}
+        </h1>
+        <p className="text-yellow-400 text-md font-black z-10">{description}</p>
       </div>
     </article>
   );

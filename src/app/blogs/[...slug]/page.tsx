@@ -48,7 +48,7 @@ const PostLayout = ({ params }: { params: { slug: string[] } }) => {
   const slugMap = toc(post?.body.raw as string);
   return (
     <>
-      <article className="py-8 max-2lg">
+      <article className="py-8">
         <div className="mb-8 text-center">
           <h1 className="text-5xl max-sm:text-3xl mb-2">{post?.title}</h1>
           <div className="flex gap-2 justify-center m-1">
