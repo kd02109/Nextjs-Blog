@@ -1,7 +1,6 @@
 import Tag from '@/components/Tag';
 import { Post } from 'contentlayer/generated';
 import { format, parseISO } from 'date-fns';
-import Link from 'next/link';
 
 export default function PostCard(post: Post) {
   return (

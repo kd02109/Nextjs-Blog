@@ -3,20 +3,29 @@
 import PostCard from '@/components/PostCard';
 import { content } from '@/util/content';
 import getPosts from '@/util/getPosts';
-import TagBox from '@/components/TagBox';
 import Link from 'next/link';
-import { useState, ChangeEvent } from 'react';
+import { useState, ChangeEvent, useEffect } from 'react';
 import { Post } from 'contentlayer/generated';
+import Spiner from '@/components/Spiner';
+import { motion } from 'framer-motion';
 
 const BlogPages = () => {
-  const [searchValue, setSearchValue] = useState<string | undefined>();
-  const [posts, setPosts] = useState<Post[]>(getPosts);
+  const [searchValue, setSearchValue] = useState<string | undefined>('');
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const handleSearchvalue = (e: ChangeEvent<HTMLInputElement>) => {
     const inputSearch = e.target.value;
     setSearchValue(inputSearch);
-    const posts = getPosts(undefined, inputSearch);
+    const posts = getPosts('blog', undefined, inputSearch);
     setPosts(posts);
   };
+
+  useEffect(() => {
+    setPosts(() => getPosts('blog'));
+    setLoading(false);
+  }, []);
+
   return (
     <>
       <div className="py-4">
@@ -48,16 +57,33 @@ const BlogPages = () => {
         </svg>
       </div>
       <div className="py-4">
-        <div className="grid grid-rows-2 grid-cols-2 gap-3 max-sm:grid-rows-1 max-sm:grid-cols-1">
-          {posts.map(post => (
-            <Link key={post.id} href={post.url}>
-              <PostCard {...post} />
-            </Link>
-          ))}
-          {(posts.length === 0 || !posts) && (
-            <h1 className="text-3xl mt-4">검색 결과가 없습니다🥲.</h1>
-          )}
-        </div>
+        {loading && (
+          <motion.div
+            className="w-full flex justify-center items-center my-10"
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -300, opacity: 0 }}
+            transition={{ type: 'just' }}
+            layoutId="change">
+            <Spiner />
+          </motion.div>
+        )}
+        {!loading && (
+          <motion.div
+            className="grid grid-rows-2 grid-cols-2 gap-3 max-sm:grid-rows-1 max-sm:grid-cols-1"
+            layoutId="change"
+            initial={{ y: 300, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.5 }}>
+            {posts.map(post => (
+              <Link key={post.id} href={`blogs/${post.url}`}>
+                <PostCard {...post} />
+              </Link>
+            ))}
+            {(posts.length === 0 || !posts) && (
+              <h1 className="text-3xl mt-4">검색 결과가 없습니다🥲.</h1>
+            )}
+          </motion.div>
+        )}
       </div>
     </>
   );
