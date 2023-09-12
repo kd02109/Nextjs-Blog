@@ -5,4 +5,5 @@ export type ProjectType = {
   href: string;
   github: string;
   link: string;
+  date: string;
 };
