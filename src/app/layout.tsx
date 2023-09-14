@@ -94,7 +94,7 @@ export default function RootLayout({
         className={`mx-auto max-w-3xl px-6 lg:max-w-6xl lg:px-8 ${nanum.className}`}>
         <NextThemeProvider>
           <Header />
-          <main>{children}</main>
+          <main className="mt-20">{children}</main>
           <Footer />
         </NextThemeProvider>
       </body>
