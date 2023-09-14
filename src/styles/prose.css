@@ -23,6 +23,9 @@
 .prose .source {
     @apply text-2xl text-yellow-400
 }
+.prose .anchor {
+    @apply my-20
+}
 
 .prose code {
     font-family:  Consolas, Monaco, 'Andale Mono', monospace;

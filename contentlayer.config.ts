@@ -40,7 +40,12 @@ const Post = defineDocumentType(() => ({
   computedFields: {
     url: {
       type: 'string',
-      resolve: doc => `${doc._raw.flattenedPath}`,
+      resolve: doc => {
+        if (doc._raw.flattenedPath.includes('project')) {
+          return `${doc._raw.flattenedPath.replace('project/', '')}`;
+        }
+        return `${doc._raw.flattenedPath}`;
+      },
     },
   },
 }));

@@ -9,6 +9,15 @@ export const projectObj: ProjectType[] = [
     github: 'https://github.com/kd02109/ShoppingApp',
     link: 'solo-project',
     date: '2023-05-12 ~ 2023-05-18',
+    stack: [
+      'react',
+      'typescript',
+      'redux',
+      'eslint',
+      'vite',
+      'reactRouter',
+      'reactQuery',
+    ],
   },
   {
     name: 'SharePetment',
@@ -19,6 +28,17 @@ export const projectObj: ProjectType[] = [
     github: 'https://github.com/SharePetment/SharePetment',
     link: 'sharepetment',
     date: '2023-06-28 ~ 2023-09-09',
+    stack: [
+      'typescript',
+      'react',
+      'tailwindcss',
+      'eslint',
+      'reactRouter',
+      'reactQuery',
+      'vite',
+      'reactHookForm',
+      'netlify',
+    ],
   },
   {
     name: 'NextJS Blog',
@@ -28,5 +48,13 @@ export const projectObj: ProjectType[] = [
     github: 'https://github.com/kd02109/Nextjs-Blog',
     link: 'nextjs-blog',
     date: '2023-08-30 ~ 2023-09-20',
+    stack: [
+      'react',
+      'typescript',
+      'nextJs',
+      'mdx',
+      'contentlayer',
+      'tailwindcss',
+    ],
   },
 ];

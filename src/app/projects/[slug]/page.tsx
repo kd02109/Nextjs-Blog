@@ -1,4 +1,6 @@
 import LinkCopy from '@/components/LinkCopy';
+import StakList from '@/components/StakList';
+import WritingList from '@/components/WritingList';
 import CopyUrl from '@/components/svg/CopyUrl';
 import Github from '@/components/svg/Github';
 import { projectObj } from '@/util/project';
@@ -23,13 +25,13 @@ export default function ProjectDetailPages({ params }: Props) {
           src={oneProject!.image}
           alt={oneProject!.name}
           fill={false}
-          width={800}
-          height={800}
+          width={600}
+          height={600}
           style={{ width: 'auto', height: 'auto' }}
           priority={true}
-          className="rounded-2xl border-solid border-2"
+          className="rounded-2xl border-solid border-2 basis-3/4"
         />
-        <div className="border-solid border-2 rounded-2xl px-3 py-5">
+        <div className="border-solid border-2 rounded-2xl px-3 py-5  basis-1/4">
           <h2 className="font-bold text-xl mb-3">About</h2>
           <nav>
             <ul>
@@ -65,6 +67,8 @@ export default function ProjectDetailPages({ params }: Props) {
           </nav>
         </div>
       </div>
+      <StakList name={oneProject!.name} list={oneProject!.stack} />
+      <WritingList tag={oneProject!.link} />
     </article>
   );
 }
