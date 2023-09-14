@@ -31,11 +31,21 @@ const Post = defineDocumentType(() => ({
       required: true,
       of: { type: 'string' },
     },
+    brand: {
+      type: 'string',
+      description: 'the type of text',
+      required: true,
+    },
   },
   computedFields: {
     url: {
       type: 'string',
-      resolve: doc => `/blogs/${doc._raw.flattenedPath}`,
+      resolve: doc => {
+        if (doc._raw.flattenedPath.includes('project')) {
+          return `${doc._raw.flattenedPath.replace('project/', '')}`;
+        }
+        return `${doc._raw.flattenedPath}`;
+      },
     },
   },
 }));

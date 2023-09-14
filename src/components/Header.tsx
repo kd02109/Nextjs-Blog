@@ -7,7 +7,7 @@ const Header = () => {
   const pathName = usePathname();
 
   return (
-    <header className="flex w-full select-none items-end pt-8 pb-12">
+    <header className="flex justify-between items-center w-full h-10 select-none  pt-8 pb-12 sticky z-20 bg-white top-0 left-0">
       <nav className="flex gap-6 max-sm:gap-1">
         <LinkItem href={'/'} isActive={pathName === '/'}>
           Home
