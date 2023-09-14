@@ -2,9 +2,9 @@ import { ProjectType } from '@/types/projectType';
 import Image from 'next/image';
 
 export default function Project(prop: ProjectType) {
-  const { name, image, href, description, github, link } = prop;
+  const { name, image, description } = prop;
   return (
-    <article
+    <div
       className={`relative h-96 mb-10 rounded-lg border-gray-300 border-solid border-2 `}>
       {
         <Image
@@ -24,6 +24,6 @@ export default function Project(prop: ProjectType) {
         </h1>
         <p className="text-yellow-400 text-md font-black z-10">{description}</p>
       </div>
-    </article>
+    </div>
   );
 }

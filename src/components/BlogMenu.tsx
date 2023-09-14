@@ -35,7 +35,7 @@ const useScroll = (tableOfContents: Toc[]) => {
     function onScroll() {
       if (!headings) return;
 
-      const top = window.scrollY + 150;
+      const top = window.scrollY + 250;
 
       let current: typeof currentSectionSlug = undefined;
       for (let i = 0; i < headings.length; i++) {

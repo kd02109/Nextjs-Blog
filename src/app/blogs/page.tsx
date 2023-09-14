@@ -75,9 +75,7 @@ const BlogPages = () => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5 }}>
             {posts.map(post => (
-              <Link key={post.id} href={`blogs/${post.url}`}>
-                <PostCard {...post} />
-              </Link>
+              <PostCard key={post.id} {...post} />
             ))}
             {(posts.length === 0 || !posts) && (
               <h1 className="text-3xl mt-4">검색 결과가 없습니다🥲.</h1>

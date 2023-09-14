@@ -1,3 +1,5 @@
+import { MarkdownKey } from '@/util/markdownBadge';
+
 export type ProjectType = {
   name: string;
   image: string;
@@ -6,4 +8,5 @@ export type ProjectType = {
   github: string;
   link: string;
   date: string;
+  stack: MarkdownKey[];
 };

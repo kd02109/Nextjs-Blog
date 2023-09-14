@@ -25,7 +25,13 @@ const TagPages = () => {
         </h1>
         <div className="grid grid-rows-2 grid-cols-2 gap-3 max-sm:grid-rows-1 max-sm:grid-cols-1">
           {posts.map(post => (
-            <Link key={post.id} href={`blogs/${post.url}`}>
+            <Link
+              key={post.id}
+              href={
+                post.brand.trim() === 'project'
+                  ? `projects/${post.url}`
+                  : `blogs/${post.url}`
+              }>
               <PostCard {...post} />
             </Link>
           ))}
