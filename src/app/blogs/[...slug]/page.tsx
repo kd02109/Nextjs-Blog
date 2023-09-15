@@ -22,7 +22,7 @@ const PostLayout = ({ params }: { params: { slug: string[] } }) => {
       return true;
     }
   });
-
+  console.log(str, post?.title);
   const postFooter = {
     prevPost: allPostsSort.at(postIndex - 1)
       ? allPostsSort.at(postIndex - 1)
