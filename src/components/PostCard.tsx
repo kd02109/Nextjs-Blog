@@ -6,7 +6,12 @@ import Link from 'next/link';
 export default function PostCard(post: Post) {
   return (
     <div className="mb-4 p-2 dark:bg-slate-50 dark:text-black border-solded border-2 border-indigo-100 rounded-lg">
-      <Link href={`blogs/${post.url}`}>
+      <Link
+        href={
+          post.brand.trim() === 'project'
+            ? `projects/${post.url}`
+            : `blogs/${post.url}`
+        }>
         <h2 className="text-xl font-bold m-1 hover:text-yellow-400 dark:hover:text-yellow-400">
           {post.title}
         </h2>

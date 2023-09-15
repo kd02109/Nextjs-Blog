@@ -12,7 +12,7 @@ const TagPages = () => {
   const title = search.charAt(0).toUpperCase() + search.slice(1);
 
   let posts = getPosts(undefined, search);
-
+  console.log(posts[0].brand, '{true}', posts[0].brand.trim() === 'project');
   return (
     <>
       <div className="py-4">
@@ -25,15 +25,7 @@ const TagPages = () => {
         </h1>
         <div className="grid grid-rows-2 grid-cols-2 gap-3 max-sm:grid-rows-1 max-sm:grid-cols-1">
           {posts.map(post => (
-            <Link
-              key={post.id}
-              href={
-                post.brand.trim() === 'project'
-                  ? `projects/${post.url}`
-                  : `blogs/${post.url}`
-              }>
-              <PostCard {...post} />
-            </Link>
+            <PostCard key={post.id} {...post} />
           ))}
         </div>
       </div>
