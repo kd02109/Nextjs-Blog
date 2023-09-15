@@ -12,7 +12,7 @@ const TagPages = () => {
   const title = search.charAt(0).toUpperCase() + search.slice(1);
 
   let posts = getPosts(undefined, search);
-  console.log(posts[0].brand, '{true}', posts[0].brand.trim() === 'project');
+
   return (
     <>
       <div className="py-4">
