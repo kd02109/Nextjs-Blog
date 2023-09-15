@@ -49,7 +49,7 @@ export default function DetailPage({ post, tags, postFooter }: Prop) {
           <section className="prose lg:prose-xl md:prose-lg sm:prose-base prose-slate dark:prose-invert  w-full max-w-3xl">
             <Content components={mdxComponents} />
           </section>
-          <div className="sticky top-[50px] max-md:hidden min-w-[240px] max-w-[260px] self-start lg:block">
+          <div className="sticky top-[135px] max-md:hidden min-w-[240px] max-w-[260px] self-start lg:block">
             <BlogMenu toc={slugMap} />
           </div>
         </div>
