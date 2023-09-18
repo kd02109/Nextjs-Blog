@@ -1,15 +1,23 @@
 import { allPosts } from 'contentlayer/generated';
 import getPosts from '@/util/getPosts';
 import DetailPage from '@/components/DetailPage';
-import HeadOG from '@/components/HeadOG';
+import { Metadata } from 'next';
 
-export const generateMetadata = ({ params }: { params: any }) => {
+export const generateMetadata = ({ params }: { params: any }): Metadata => {
   const post = allPosts.find(post => {
     const str = params.slug.join('/').trim();
     return `${post._raw.flattenedPath.trim()}` === str;
   });
 
-  return { title: post?.title, description: post?.description };
+  return {
+    title: post?.title,
+    description: post?.description,
+    openGraph: {
+      title: post?.title,
+      images: 'https://source.unsplash.com/random/300×300',
+      description: post?.description,
+    },
+  };
 };
 
 const PostLayout = ({ params }: { params: { slug: string[] } }) => {
@@ -36,7 +44,6 @@ const PostLayout = ({ params }: { params: { slug: string[] } }) => {
   const tags = post?.tag;
   return (
     <>
-      <HeadOG title={post!.title} description={post?.description} />
       <DetailPage postFooter={postFooter} post={post} tags={tags} />
     </>
   );
