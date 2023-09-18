@@ -1,6 +1,7 @@
 import { allPosts } from 'contentlayer/generated';
 import getPosts from '@/util/getPosts';
 import DetailPage from '@/components/DetailPage';
+import HeadOG from '@/components/HeadOG';
 
 export const generateMetadata = ({ params }: { params: any }) => {
   const post = allPosts.find(post => {
@@ -35,6 +36,7 @@ const PostLayout = ({ params }: { params: { slug: string[] } }) => {
   const tags = post?.tag;
   return (
     <>
+      <HeadOG title={post!.title} description={post?.description} />
       <DetailPage postFooter={postFooter} post={post} tags={tags} />
     </>
   );

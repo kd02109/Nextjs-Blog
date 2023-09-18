@@ -1,3 +1,4 @@
+import HeadOG from '@/components/HeadOG';
 import LinkCopy from '@/components/LinkCopy';
 import StakList from '@/components/StakList';
 import WritingList from '@/components/WritingList';
@@ -20,6 +21,7 @@ export default function ProjectDetailPages({ params }: Props) {
   const oneProject = projectObj.find(item => item.link === params.slug);
   return (
     <article className="py-4">
+      <HeadOG title={oneProject!.name} description={oneProject?.description} />
       <div className="flex relyativy gap-2 items-center">
         <h1 className="font-black mb-5 text-3xl">{oneProject!.name}</h1>
         <LinkCopy />
