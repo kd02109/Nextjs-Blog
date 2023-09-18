@@ -26,6 +26,15 @@ export default function RootLayout({
           name="naver-site-verification"
           content="ef16034ef27e71574bf1c4ae39576acc4e17b002"
         />
+        <meta name="title" content="Son Blog" />
+        <meta
+          name="description"
+          content="개발하면서 느낀점, 배운점을 기록합니다."
+        />
+        <meta
+          name="keywords"
+          content="react, typescript, javascript, codingTest, next.js"
+        />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link
           rel="apple-touch-icon"

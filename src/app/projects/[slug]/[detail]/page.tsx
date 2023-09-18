@@ -13,7 +13,8 @@ export const generateMetadata = ({ params }: Props) => {
     const str = params.slug.trim() + '/' + params.detail.trim();
     return `${post.url}` === str;
   });
-  return { title: post?.title };
+
+  return { title: post?.title, description: post?.description };
 };
 
 export default function ProjectDetailPage({ params }: Props) {

@@ -8,7 +8,7 @@ export const generateMetadata = ({ params }: { params: any }) => {
     return `${post._raw.flattenedPath.trim()}` === str;
   });
 
-  return { title: post?.title };
+  return { title: post?.title, description: post?.description };
 };
 
 const PostLayout = ({ params }: { params: { slug: string[] } }) => {
