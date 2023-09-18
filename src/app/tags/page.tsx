@@ -1,33 +1,18 @@
-'use client';
+import type { Metadata } from 'next';
+import TagPage from '@/components/page/TagPage';
 
-import PostCard from '@/components/PostCard';
-import { useSearchParams } from 'next/navigation';
-import getPosts from '@/util/getPosts';
-import TagBox from '@/components/TagBox';
+export const metadata: Metadata = {
+  openGraph: {
+    title: 'SON의 개발 블로그 Tag',
+    description: 'tag를 통해 주제별로 글을 확인할 수 있습니다.',
+    images: 'https://source.unsplash.com/random/300×300',
+  },
+};
 
 const TagPages = () => {
-  const searchParams = useSearchParams();
-  const search = searchParams.get('key') || 'all';
-  const title = search.charAt(0).toUpperCase() + search.slice(1);
-
-  let posts = getPosts(undefined, search);
-
   return (
     <>
-      <div className="py-4">
-        <h1 className="mb-3 text-3xl font-bold">Tags</h1>
-        <TagBox />
-      </div>
-      <div className="py-4">
-        <h1 className="mb-3 text-3xl font-bold">
-          {`${title} (${posts.length})`}
-        </h1>
-        <div className="grid grid-rows-2 grid-cols-2 gap-3 max-sm:grid-rows-1 max-sm:grid-cols-1">
-          {posts.map(post => (
-            <PostCard key={post.id} {...post} />
-          ))}
-        </div>
-      </div>
+      <TagPage />
     </>
   );
 };

@@ -1,6 +1,5 @@
 import { allPosts } from 'contentlayer/generated';
 import DetailPage from '@/components/DetailPage';
-import HeadOG from '@/components/HeadOG';
 
 type Props = {
   params: {
@@ -15,7 +14,15 @@ export const generateMetadata = ({ params }: Props) => {
     return `${post.url}` === str;
   });
 
-  return { title: post?.title, description: post?.description };
+  return {
+    title: post?.title,
+    description: post?.description,
+    openGraph: {
+      title: post?.title,
+      images: 'https://source.unsplash.com/random/300×300',
+      description: post?.description,
+    },
+  };
 };
 
 export default function ProjectDetailPage({ params }: Props) {
@@ -27,7 +34,6 @@ export default function ProjectDetailPage({ params }: Props) {
 
   return (
     <>
-      <HeadOG title={post!.title} description={post?.description} />
       <DetailPage post={post} tags={tags} />
     </>
   );
