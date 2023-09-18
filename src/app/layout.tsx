@@ -18,6 +18,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <meta
+          name="google-site-verification"
+          content="vX5KRBC3xVzJD7VebebY5_AuQq9VHZHdA4jom0Q2y9c"
+        />
+        <meta
+          name="naver-site-verification"
+          content="ef16034ef27e71574bf1c4ae39576acc4e17b002"
+        />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link
           rel="apple-touch-icon"

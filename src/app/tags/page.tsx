@@ -4,7 +4,6 @@ import PostCard from '@/components/PostCard';
 import { useSearchParams } from 'next/navigation';
 import getPosts from '@/util/getPosts';
 import TagBox from '@/components/TagBox';
-import Link from 'next/link';
 
 const TagPages = () => {
   const searchParams = useSearchParams();
