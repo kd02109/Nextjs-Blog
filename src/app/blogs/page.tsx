@@ -3,7 +3,6 @@
 import PostCard from '@/components/PostCard';
 import { content } from '@/util/content';
 import getPosts from '@/util/getPosts';
-import Link from 'next/link';
 import { useState, ChangeEvent, useEffect } from 'react';
 import { Post } from 'contentlayer/generated';
 import Spiner from '@/components/Spiner';
