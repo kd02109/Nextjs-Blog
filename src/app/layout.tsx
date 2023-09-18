@@ -35,6 +35,16 @@ export default function RootLayout({
           name="keywords"
           content="react, typescript, javascript, codingTest, next.js"
         />
+        <meta property="og:title" content="SON의 개발 블로그" />
+        <meta
+          property="og:description"
+          content="개발하면서 느낀점, 배운점을 기록합니다."
+        />
+        <meta
+          property="og:image"
+          content="https://source.unsplash.com/random/300×300"
+        />
+        <meta property="og:site_name" content="Son's Blog" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link
           rel="apple-touch-icon"

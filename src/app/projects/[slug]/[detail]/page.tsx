@@ -1,5 +1,6 @@
 import { allPosts } from 'contentlayer/generated';
 import DetailPage from '@/components/DetailPage';
+import HeadOG from '@/components/HeadOG';
 
 type Props = {
   params: {
@@ -24,5 +25,10 @@ export default function ProjectDetailPage({ params }: Props) {
   });
   const tags = post?.tag.map(item => item.trim());
 
-  return <DetailPage post={post} tags={tags} />;
+  return (
+    <>
+      <HeadOG title={post!.title} description={post?.description} />
+      <DetailPage post={post} tags={tags} />
+    </>
+  );
 }
