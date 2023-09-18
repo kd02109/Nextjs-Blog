@@ -11,6 +11,11 @@ type Props = {
   };
 };
 
+export const generateMetadata = ({ params }: Props) => {
+  const oneProject = projectObj.find(item => item.link === params.slug);
+  return { title: oneProject!.name, description: oneProject!.description };
+};
+
 export default function ProjectDetailPages({ params }: Props) {
   const oneProject = projectObj.find(item => item.link === params.slug);
   return (
