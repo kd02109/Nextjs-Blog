@@ -36,6 +36,11 @@ const Post = defineDocumentType(() => ({
       description: 'the type of text',
       required: true,
     },
+    description: {
+      type: 'string',
+      description: 'description about each mdx',
+      required: false,
+    },
   },
   computedFields: {
     url: {
