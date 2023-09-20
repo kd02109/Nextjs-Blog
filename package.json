@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build" : "npm run sitemap && next build",
+    "build" : "next build && npm run sitemap",
     "sitemap" : "ts-node --project tsconfig.node.json ./sitemap.config.ts",
     "start": "next start",
     "lint": "next lint",
