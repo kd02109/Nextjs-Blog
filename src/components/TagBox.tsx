@@ -23,7 +23,7 @@ const TagBox = () => {
   const values = Object.values(obj);
 
   const searchParams = useSearchParams();
-  const search = searchParams.get('key') || 'all';
+  const search = searchParams!.get('key') || 'all';
 
   return (
     <div className="flex gap-2 mb-4 flex-wrap">

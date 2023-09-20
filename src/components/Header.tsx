@@ -13,14 +13,14 @@ const Header = () => {
       <Hamburger
         isOpened={isOpened}
         setIsOpened={setIsOpened}
-        pathName={pathName}
+        pathName={pathName!}
       />
       <nav className="flex gap-6 max-md:hidden">
         <LinkItem href={'/'} isActive={pathName === '/'}>
           Home
         </LinkItem>
         {siteConfig.menus.map(({ path, label }) => (
-          <LinkItem key={label} href={path} isActive={pathName.includes(path)}>
+          <LinkItem key={label} href={path} isActive={pathName!.includes(path)}>
             {label}
           </LinkItem>
         ))}
