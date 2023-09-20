@@ -2,6 +2,7 @@ import { compareDesc } from 'date-fns';
 import { allPosts } from 'contentlayer/generated';
 import PostCard from '@/components/PostCard';
 import type { Metadata } from 'next';
+import { GA_TRACKING_ID } from '@/lib/gtag';
 
 export const metadata: Metadata = {
   openGraph: {
