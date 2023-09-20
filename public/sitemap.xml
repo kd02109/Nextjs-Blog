@@ -1,4 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<sitemap><loc>https://nextjs-blog-kd02109.vercel.app/sitemap-0.xml</loc></sitemap>
-</sitemapindex>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+<url><loc>https://nextjs-blog-kd02109.vercel.app</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nextjs-blog-kd02109.vercel.app/blogs</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nextjs-blog-kd02109.vercel.app/projects</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nextjs-blog-kd02109.vercel.app/tags</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nextjs-blog-kd02109.vercel.appblogs/blog/coding-test/check-prime</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nextjs-blog-kd02109.vercel.appblogs/blog/coding-test/line</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nextjs-blog-kd02109.vercel.appblogs/blog/coding-test/parallel</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nextjs-blog-kd02109.vercel.appblogs/blog/coding-test/prime-factorization</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nextjs-blog-kd02109.vercel.appblogs/blog/coding-test/prime-number</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nextjs-blog-kd02109.vercel.appblogs/blog/coding-test/safe-region</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nextjs-blog-kd02109.vercel.appblogs/blog/coding-test/strange-dict</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nextjs-blog-kd02109.vercel.appblogs/blog/coding-test/strange-sort</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nextjs-blog-kd02109.vercel.appblogs/blog/coding-test/vowels</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nextjs-blog-kd02109.vercel.appblogs/blog/react/react-children</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nextjs-blog-kd02109.vercel.appblogs/blog/react/react-design-pattern</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nextjs-blog-kd02109.vercel.appblogs/blog/react/ref</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nextjs-blog-kd02109.vercel.appblogs/blog/react/reference-value-with-refs</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nextjs-blog-kd02109.vercel.appblogs/blog/FE-quiz/post-04</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nextjs-blog-kd02109.vercel.appblogs/nextjs-blog/nextjs1</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nextjs-blog-kd02109.vercel.appprojects/solo-project/solo1</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nextjs-blog-kd02109.vercel.appprojects/solo-project/solo2</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://nextjs-blog-kd02109.vercel.appprojects/solo-project/solo3</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+</urlset>
