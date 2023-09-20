@@ -7,7 +7,7 @@ import TagBox from '@/components/TagBox';
 
 export default function TagPage() {
   const searchParams = useSearchParams();
-  const search = searchParams.get('key') || 'all';
+  const search = searchParams!.get('key') || 'all';
   const title = search.charAt(0).toUpperCase() + search.slice(1);
 
   let posts = getPosts(undefined, search);
