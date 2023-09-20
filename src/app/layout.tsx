@@ -4,6 +4,7 @@ import { nanum } from '@/font/font';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import NextThemeProvider from '@/components/ThemeProvider';
+import GoogleAnalytics from '@/components/GoogleAnalytics';
 
 export const metadata: Metadata = {
   title: "Son's blog",
@@ -110,6 +111,7 @@ export default function RootLayout({
       </head>
       <body
         className={`mx-auto max-w-3xl px-6 lg:max-w-6xl lg:px-8 ${nanum.className}`}>
+        <GoogleAnalytics />
         <NextThemeProvider>
           <Header />
           <main className="px-2">{children}</main>
