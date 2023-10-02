@@ -10,7 +10,7 @@ export default async function stiempaConfig() {
 ${siteConfig.menus
   .map(
     url =>
-      `<url><loc>${SITE_URL}/${url.path}</loc><changefreq>daily</changefreq><priority>0.7</priority></url>`,
+      `<url><loc>${SITE_URL}${url.path}</loc><changefreq>daily</changefreq><priority>0.7</priority></url>`,
   )
   .join('\n')}
 ${postJson
