@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import getPosts from '@/util/getPosts';
-import CardCarousel from '@/components/CardCarosuel';
+import CardCarousel from '@/components/layout/CardCarosuel';
 import getCaruselPosts from '@/util/getCaruselPosts';
 import Link from 'next/link';
 
