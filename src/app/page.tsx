@@ -1,7 +1,8 @@
-import { compareDesc } from 'date-fns';
-import { allPosts } from 'contentlayer/generated';
-import PostCard from '@/components/PostCard';
 import type { Metadata } from 'next';
+import getPosts from '@/util/getPosts';
+import CardCarousel from '@/components/CardCarosuel';
+import getCaruselPosts from '@/util/getCaruselPosts';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   openGraph: {
@@ -12,17 +13,22 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
-  const posts = allPosts.sort((a, b) =>
-    compareDesc(new Date(a.date), new Date(b.date)),
-  );
-
+  const posts = getPosts();
+  const carosuelPosts = getCaruselPosts(posts);
   return (
-    <div className="max-w-xl py-8 mx-auto">
-      <h1 className="mb-8 text-3xl font-bold text-center">Next.js Example</h1>
-
-      {posts.map((post, idx) => (
-        <PostCard key={idx} {...post} />
-      ))}
-    </div>
+    <section className="max-w-xl py-8 mx-auto">
+      <div>
+        <h3 className="font-bold text-3xl">kd02109</h3>
+        <p className="my-4">Frontend Developer</p>
+        <p className="text-sm opacity-80">
+          Wanting to help to society and people through Next.js, Ract,
+          Typescript
+        </p>
+        <p>
+          <Link href={'#'}></Link>
+        </p>
+      </div>
+      <CardCarousel posts={carosuelPosts} />
+    </section>
   );
 }
