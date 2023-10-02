@@ -41,6 +41,11 @@ const Post = defineDocumentType(() => ({
       description: 'description about each mdx',
       required: false,
     },
+    carousel: {
+      type: 'string',
+      description: '글의 케러셀 포함 여부를 결정',
+      required: false,
+    },
   },
   computedFields: {
     url: {
