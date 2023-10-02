@@ -12,6 +12,9 @@ module.exports = {
           '0%': { opacity: 0, transform: 'translate3d(0, 10%, 0)' },
           '100%': { opacity: 1, transform: 'translateZ(0)' },
         },
+        dropShadow: {
+          dark: `drop-shadow(0 10px 8px rgba(255, 255, 255, 0.4))`,
+        },
       },
       animation: {
         displayPage: 'displayPage 1s ease-in-out',
