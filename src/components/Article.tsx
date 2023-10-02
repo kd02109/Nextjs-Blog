@@ -9,7 +9,7 @@ export default function Article(prop: carouselType) {
     <article className="rounded-md overflow-hidden shadow-lg hover:scale-110 transition">
       <Link href={brand === 'blog' ? `/blogs/${url}` : `/projects/${url}`}>
         <Image
-          className="w-full max-h-20"
+          className="w-full max-h-40"
           src={`https://source.unsplash.com/collection/${index}/300×300`}
           alt={title}
           width={300}
