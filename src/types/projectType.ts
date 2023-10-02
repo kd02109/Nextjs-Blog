@@ -1,4 +1,5 @@
 import { MarkdownKey } from '@/util/markdownBadge';
+import { Post } from 'contentlayer/generated';
 
 export type ProjectType = {
   name: string;
@@ -10,3 +11,5 @@ export type ProjectType = {
   date: string;
   stack: MarkdownKey[];
 };
+
+export type carouselType = Post & { index: number };

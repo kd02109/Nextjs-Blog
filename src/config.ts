@@ -8,7 +8,6 @@ export const siteConfig = {
   description: '개발하면서 탐구한 것을 소소하게 기록하는 공간입니다.',
   copyright: 'kd02109 All rights reserved.',
   since: 2023,
-  googleAnalyticsId: '',
   author: {
     name: 'Junseok Son',
     photo: '#',
@@ -16,7 +15,6 @@ export const siteConfig = {
     contacts: {
       email: 'kd02109@naver.com',
       github: 'kd02109',
-      twitter: '__pyungan',
       velog: '@kd02109',
       linkedin: '',
       youtube: '',
@@ -35,6 +33,10 @@ export const siteConfig = {
     {
       label: 'Tag',
       path: '/tags',
+    },
+    {
+      label: 'Contact',
+      path: '/contact',
     },
   ],
 };
