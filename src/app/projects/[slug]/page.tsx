@@ -1,6 +1,6 @@
 import LinkCopy from '@/components/LinkCopy';
 import StakList from '@/components/StakList';
-import WritingList from '@/components/WritingList';
+import WritingList from '@/components/layout/WritingList';
 import CopyUrl from '@/components/svg/CopyUrl';
 import Github from '@/components/svg/Github';
 import { projectObj } from '@/util/project';
