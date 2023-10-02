@@ -4,10 +4,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 export default function Article(prop: carouselType) {
-  const { title, description, date, url, tag, index } = prop;
+  const { title, description, date, url, tag, index, brand } = prop;
   return (
     <article className="rounded-md overflow-hidden shadow-lg hover:scale-110 transition">
-      <Link href={`/posts/${url}`}>
+      <Link href={brand === 'blog' ? `/blogs/${url}` : `/projects/${url}`}>
         <Image
           className="w-full max-h-20"
           src={`https://source.unsplash.com/collection/${index}/300×300`}
