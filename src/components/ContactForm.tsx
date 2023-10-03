@@ -1,18 +1,17 @@
 'use client';
 
+import LoadingIcon from '@/components/svg/Loading';
 import { $ } from '@/lib/core';
+import { Form } from '@/types/email';
+import contactEmail from '@/util/contact';
 import { ChangeEvent, useState } from 'react';
-
-type Form = {
-  from: string;
-  subject: string;
-  message: string;
-};
+import toast, { Toaster } from 'react-hot-toast';
 
 const LABEL_STYLE = 'my-4 text-2xl font-bold';
 const INPUT_STYLE = 'px-4 py-2 rounded-lg';
 
 export default function ContactForm() {
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState<Form>({
     from: '',
     subject: '',
@@ -26,9 +25,19 @@ export default function ContactForm() {
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: ChangeEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(form);
+    setLoading(true);
+    await contactEmail(form)
+      .then(() => {
+        toast.success('메일 발송에 성공했습니다.', { icon: '❤️' });
+      })
+      .catch(() => {
+        toast.error('메일 발송에 실패했습니다.', { icon: '😥' });
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
   return (
     <>
@@ -73,10 +82,14 @@ export default function ContactForm() {
           onChange={handleForm}
           className={$(INPUT_STYLE, 'resize-none')}
         />
-        <button className="bg-green-600 text-2xl text-white font-bold py-2 rounded-lg hover:scale-95 transition">
-          Submit
+        <button
+          className="bg-green-600 text-2xl text-wh font-bold py-2 rounded-lg hover:scale-95 transition flex justify-center items-center"
+          disabled={loading ? true : false}>
+          {!loading && 'Submit'}
+          {loading && <LoadingIcon width="30px" height="30px" />}
         </button>
       </form>
+      <Toaster position="top-right" />
     </>
   );
 }

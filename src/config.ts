@@ -13,12 +13,11 @@ export const siteConfig = {
     photo: '#',
     bio: 'Junior Frontend Engineer',
     contacts: {
-      email: 'kd02109@naver.com',
-      github: 'kd02109',
-      velog: '@kd02109',
-      linkedin: '',
-      youtube: '',
-      instagram: '',
+      email: 'kd02109@gmail.com',
+      github: 'https://github.com/kd02109',
+      notion:
+        'https://nostalgic-marquis-7af.notion.site/Front-End-f0f3b7fcec3045c482c1cd33dfcf2abc?pvs=4',
+      instagram: 'https://www.instagram.com/junseok.son.90/',
     },
   },
   menus: [
