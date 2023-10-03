@@ -1,0 +1,303 @@
+---
+title: 이미지 파일을 다루어 보자! (Base64, Blob, File)
+date : 2023-07-14
+id : image
+tag: 
+   - react
+   - image
+   - project
+   - sharepetment
+brand: project
+description: project에서 이미지 파일 업로드 및 자르기를 구현하는 과정을 정리했습니다. 
+---
+
+## 목표
+
+이전 프로젝트에서 FileReader와 File을 활용해서 서버와 이미지를 전송하는 과정을 가졌습니다. 당시에는 큰 고민 사항 없이 파일을 주고 받는 것에 만족을 하였는데, 이번에는 **이미지 자르기, 파일 변환, 파일 압축 등을 고려해서 코드를 작성해보고자 하였습니다. 이때 Base64 인코딩, File, Blob에 대한 이해가 더 필요하다 여겨 정리를 하게 되었습니다.** 
+
+프리 프로젝트시 정리한 사항은 해당 페이지에  있습니다. [image 파일 서버로 전송 및 미리보기](https://www.notion.so/image-4f5a08572e8144fc91d50b74d22f5310?pvs=21) 
+
+## Base64 인코딩
+
+![BASE64](/images/pet-image/base64.png)
+
+- base64 인코딩은 버퍼의 왼쪽부터 **6bit 단위로 잘라서 Base64 테이블의 ACII 문자로 변환**합니다.
+
+![BASE64-2](/images/pet-image/base64-2.png)
+
+- ASCII 코드는 8bit를 사용하지만, base64 인코딩은 6bit 만을 사용합니다. 6bit 당 2bit의 OverHead가 발생하여 33% 가량 데이터의 크기가 증가하게 됩니다. 그렇다면 효율성에서 좋지 않은데 이를 사용하는 이유가 무엇일까요? 이는 **Binary 데이터를 손실 없이 모두 영문자로 변환하기 위함**입니다.
+- 기본적으로 HTML은 ASCII 코드로 되어있습니다. HTML에서 표현할 수 없는 Binary 데이터(이미지, 비디오)를 표현시키기 위하여 Base64 인코딩을 진행하게 됩니다. 이를 통해 **총량이 늘어나더라도 데이터를 한번에 요청**할 수 있습니다.
+- 더불어 JSON, HTML은 모두 문자열로 데이터를 주고받습니다. 이때 Base64로 값을 주고 받을 수 있습니다.
+- 만약 Base64가 6자리로 나누어 떨어지지 않을 경우, Padding 값을 넣어서 강제로 6자리로 맞춥니다. 이때 끝 자리는 ‘=’ 표시 됩니다.
+
+## Blob
+
+JavaScript에서 Blob(Binary Large Object)은 이미지, 사운드, 비디오와 같은 멀티미디어 데이터를 다룰 때 사용할 수 있습니다.  Blob은 Binary 데이터로 되어 있으며, size 값과 type 값을 가지고 있습니다. type은 MIME 타입으로 해당 파일의 형식을 알려주고 있습니다. 
+
+![Blob](/images/pet-image/blob.png)
+
+## File
+
+JavaScript에서 File 형식은 prototype으로 Blob을 받고 있습니다. 즉 Blob 형식의 확장자라고 할 수 있습니다. 따라서 Blob을 사용할 수 있는 모든 맥락에서 사용할 수 있습니다. `FileReader`, `URL.createObjectURL()`,는 Blob과 File을 모두 허용합니다.
+
+![File](/images/pet-image/file.png)
+
+## 코드 구현하기
+
+- 이미지 자르기 기능은 React-cropper을 활용해서 구현하였습니다.
+- 이미지 압축은 browser-image-compression을 활용하여 구현하였습니다.
+
+```tsx
+
+const handleProfile = (e: ChangeEvent<HTMLInputElement>) => {
+    let file: File | undefined;
+    if (e.target.files) {
+			// input의 이미지 파일을 가지고 옵니다.
+      file = e.target.files[0];
+			// Cropper 라이브러리를 활성화 시키는 state 값을 true로 변경합니다.
+      setIsViewImageCropper(true);
+      const reader = new FileReader();
+			// file 객체를 Base64로 인코딩을 진행하여 web 상에서 이미지 파일을 볼 수 있도록 합니다.
+      reader.readAsDataURL(file);
+      return new Promise<void>(resolve => {
+        reader.onload = () => {
+          setImage(reader.result as string); // 파일의 컨텐츠
+          resolve();
+        };
+        reader.onerror = () => {
+          setIsError(true);
+        };
+      });
+    }
+  };
+```
+
+Cropper 라이브러리를 활용해서 자른 이미지를 file로 가지고 오는 코드를 작성합니다. 
+
+```tsx
+const getCropData = async () => {
+    try {
+      const cropper = cropperRef.current?.cropper;
+      if (cropper) {
+				// 파일 변환 과정 동안 loding 창을 보여줍니다.
+        setIsLoading(true);
+
+				// cropper Canvas img를 base64로 변환합니다.
+        const image = cropper.getCroppedCanvas().toDataURL();
+
+				// fileRedear를 통해 보여주는 이미지를 state로 저장합니다.
+        setImage(image);
+
+        // file 형태로 변환
+        const cropfile = await fetch(cropper.getCroppedCanvas().toDataURL())
+          .then(res => res.blob())
+          .then(async blob => {
+            const file = new File([blob], 'newAvatar.jpeg', {
+              type: 'image/jpeg',
+            });
+						// 변환한 파일을 browser-image-compression을 활용하여 압축합니다.
+            const compressedFile = await imageCompression(file, option);
+            return compressedFile;
+          })
+          .catch(() => {
+            setIsError(true);
+          });
+        if (cropfile) {
+          setFile(cropfile);
+          setIsLoading(false);
+        }
+      }
+      setIsViewImageCropper(false);
+    } catch (err) {
+      console.error(err);
+      setIsError(true);
+      setIsLoading(false);
+    }
+  };
+```
+
+### 전체 코드
+
+```tsx
+import imageCompression from 'browser-image-compression';
+import { ChangeEvent, useState, useRef } from 'react';
+import Cropper, { ReactCropperElement } from 'react-cropper';
+import Button from '../../../common/button/Button.tsx';
+import Popup from '../../../common/popup/Popup.tsx';
+import Profile from '../../../common/profile/Profile.tsx';
+import { option } from '../../../util/imageCompressOption.ts';
+import Spin from '../../spin/Spin.tsx';
+import {
+  ButtonBox,
+  CropDiv,
+  Label,
+  PetProfileDiv,
+  ProfileHeader,
+  ProfileTail,
+  ProfileText,
+} from './petProfile.styled';
+import 'cropperjs/dist/cropper.css';
+
+type Prop = {
+  baseImage: string;
+  image: string | undefined;
+  setImage: React.Dispatch<React.SetStateAction<string | undefined>>;
+  setFile: React.Dispatch<React.SetStateAction<File | null>>;
+};
+
+export default function PetProfile({
+  image,
+  setImage,
+  baseImage,
+  setFile,
+}: Prop) {
+  const [isViewImageCropper, setIsViewImageCropper] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  // 이미지 처리
+  const handleProfile = (e: ChangeEvent<HTMLInputElement>) => {
+    let file: File | undefined;
+    if (e.target.files) {
+      file = e.target.files[0];
+      setIsViewImageCropper(true);
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      return new Promise<void>(resolve => {
+        reader.onload = () => {
+          setImage(reader.result as string); // 파일의 컨텐츠
+          resolve();
+        };
+        reader.onerror = () => {
+          setIsError(true);
+        };
+      });
+    }
+  };
+  // cropper 함수
+  const cropperRef = useRef<ReactCropperElement>(null);
+  // cropper 채택
+  const getCropData = async () => {
+    try {
+      const cropper = cropperRef.current?.cropper;
+      if (cropper) {
+        setIsLoading(true);
+        const image = cropper.getCroppedCanvas().toDataURL();
+        setImage(image);
+        // string을 file 형태로 변환
+        const cropfile = await fetch(cropper.getCroppedCanvas().toDataURL())
+          .then(res => res.blob())
+          .then(async blob => {
+            const file = new File([blob], 'newAvatar.jpeg', {
+              type: 'image/jpeg',
+            });
+            const compressedFile = await imageCompression(file, option);
+            return compressedFile;
+          })
+          .catch(() => {
+            setIsError(true);
+          });
+        if (cropfile) {
+          setFile(cropfile);
+          setIsLoading(false);
+        }
+      }
+      setIsViewImageCropper(false);
+    } catch (err) {
+      console.error(err);
+      setIsError(true);
+      setIsLoading(false);
+    }
+  };
+
+  // cropa 실패
+  const handleCancle = () => {
+    setImage(baseImage);
+    setIsViewImageCropper(false);
+  };
+
+  return (
+    <>
+      <PetProfileDiv>
+        <ProfileHeader>
+          <Profile isgreen="false" size="md" url={image} />
+          <ProfileText>
+            반려동물 이미지를
+            <br /> 사용해주세요!
+          </ProfileText>
+        </ProfileHeader>
+        <ProfileTail>
+          <input
+            type="file"
+            accept="image/*"
+            id="petImage"
+            onChange={handleProfile}
+            className="hidden"
+          />
+          <Label htmlFor="petImage">프로필 등록</Label>
+        </ProfileTail>
+      </PetProfileDiv>
+      {isViewImageCropper && (
+        <CropDiv>
+          <Cropper
+            ref={cropperRef}
+            src={image}
+            viewMode={1}
+            background={false}
+            responsive
+            autoCropArea={1}
+            checkOrientation={false}
+            guides
+            className="w-[400px] h-[400px] max-sm:w-[300px] max-sm:h-[300px]"
+          />
+          {!isLoading && (
+            <ButtonBox>
+              <Button
+                text="선택"
+                isgreen="true"
+                handler={getCropData}
+                size="sm"
+              />
+              <Button
+                text="취소"
+                isgreen="false"
+                handler={handleCancle}
+                size="sm"
+              />
+            </ButtonBox>
+          )}
+          {isLoading && <Spin></Spin>}
+        </CropDiv>
+      )}
+      {isError && (
+        <Popup
+          title={'이미지 변환 과정에서 오류가 발생했습니다.'}
+          handler={[
+            () => {
+              setIsError(false);
+            },
+          ]}
+          isgreen={['true']}
+          btnsize={['md']}
+          buttontext={['확인']}
+          countbtn={1}
+          popupcontrol={() => setIsError(false)}
+        />
+      )}
+    </>
+  );
+}
+```
+
+## 아쉬운 점
+
+- 휴대폰에서 사진을 업로드 하는 과정에서 대부분의 이미지가 5mb를 넘기 때문에 browser-image-compression 라이브러리를 적용해서 이미지의 크기를 약 10% 줄일 수 있었습니다. 추가로 jpeg 확장자를 사용하여 손실 압축 방식을 통해 이미지 크기를 줄일 수 있었습니다. 하지만 이미지 손실을 감안해야 하는 부분과 이미지 크기를 효율적으로 줄이지 못한다는 부분이 아쉬웠습니다. 이에 대한 해결책으로 **Google에서 개발한 WebP를 적용해서 이미지 크기를 줄이는 방법을 도입하고자 합니다**.
+
+## 참조
+
+[File - Web API | MDN](https://developer.mozilla.org/ko/docs/Web/API/File)
+
+[개발자라면 알아야 할! base64 인코딩 원리](https://www.youtube.com/watch?v=A8tO4D1Gtc0)
+
+[Blob(블랍) 이해하기](https://heropy.blog/2019/02/28/blob/)
+
+[Blob - Web API | MDN](https://developer.mozilla.org/ko/docs/Web/API/Blob)

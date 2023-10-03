@@ -1,0 +1,217 @@
+---
+title: 행정동 select Tag 만들기
+date : 2023-07-05
+id : select
+tag: 
+   - react
+   - project
+   - sharepetment
+brand: project
+description: select Tag를 활용해서 행정동을 순차적으로 선택할 수 있는 UI 작업을 수행합니다.
+---
+
+
+## 목표
+
+- 회원 가입 시 사용자의 광역시,도 - 시,군,구 - 읍,면,동 주소 및 산책 게시글 검색 시에 광역시,도 - 시,군,구 - 읍,면,동에 따라서 생성된 산책 게시글을 불러오고자 하였습니다.
+- 특정 시, 군. 구. 읍, 면. 동을 제외하면 안되는 상황에서 저희에게는 두 개의 선택지가 있었습니다.
+    1. **광역시, 도 - 시,군,구 - 읍,면,동에 관한 데이터를 수집후 클라이언트 내에 보관해서 사용을 한다.** 
+    2. **행정동 관련 API를 활용하여 데이터 활용하기** 
+    
+    첫 번째 방법은 초기 데이터 수집과 그에 따른 자료구조 구축에 시간을 필요로 했습니다. 하지만 자료를 수집한 이후에는 별다른 비동기 처리 없이 UI 작업을 진행할 수 있기 때문에, 더 원할한 UI 처리가 가능하다고 판단했습니다. 또한 언제나 저희 팀이 원하는 형식으로 자료 수정을 쉽게 할 수 있다는 장점이 있습니다. 
+    
+    두 번째 방법은 해당 API를 활용하여 행정동을 처리하는 것입니다. API를 활용하면 따로 자료를 정리할 필요는 없지만, 해당 API에 대한 이해와 불필요한 API 호출을 최대한 지양하는 방식을 고안해야 했습니다. 
+    
+    저의 선택은 두 번째 방법이었습니다. 첫 번째 방법이 더욱 매력적이라고 느끼긴 했습니다. API 의존의 문제는 해당 API 서비스가 종료될 수 도 있으며, API에 의존할 만큼 데이터의 크기가 방대하지도 않기에 첫 번째가 더욱 좋았지만, 당시에는 데이터 정리와 자료구조 작성에 부담감을 느꼈습니다. 더불어 처음으로 react query를 활용하는 프로젝트 이기에 react query 학습에도 많은 도움이 된다고 느껴 API를 적용했습니다. 
+    
+
+## 필요기능
+
+1. **순차별로 데이터를 불러와야 합니다**. 각 광역시, 도별로 속한 자치구역이 다르기 때문에 변동이 있을 때 마다 새롭게 데이터를 불러오도록 작성을 해야 했습니다. 
+2. **데이터를 캐싱하여 사용**해야 했습니다. 해당 데이터는 변동이 거의 없는 데이터이기 때문에 한번 불러온 데이터를 재활용해도 문제가 없다고 판단했습니다.
+3. **서버와 데이터 형식을 일치** 시켜야 했습니다. 유저 주소 저장, 주소 검색 시에 클라이언트에서 전달해야 하는 데이터 형식이 서버 데이터 형식과 일치 시키도록 하였습니다. 
+4. 두 개의 페이지에서 같은 형식으로 사용되어야 하기 때문에 이를 고려해서 Component를 작성해야 합니다. 
+
+## 기능 구현하기
+
+React Query를 활용하여 Server State 값을 조절해야 했기에, useQuery의 Query Key 지정 방식과 순차적 API 호출 방식을 고민하여야 했습니다. 이는 useQuery의 **option enabled를 활용**하여 진행하였습니다. Query Key는 API 데이터에 행정동 명 과 zipCode 값이 함께 제공되어 zipCode를 고유 key값으로 활용하였습니다.
+
+최초로 받아오는 광역시, 도 데이터는 서울을 default로 하여 받아오도록 하였으며, 이외에는 상위 행정동 정보를 받아와야 작동이 되도록 하였습니다.
+
+```tsx
+const { data: counrtyData, isLoading: countryLoading } = useQuery<getData>({
+    queryKey: ['country'],
+    queryFn: () => getLocal(BASE_PATTERN),
+    staleTime: 1000 * 60 * 60,
+    cacheTime: 1000 * 60 * 60,
+  });
+  const { data: cityData, isLoading: cityLdading } = useZipCode({
+    zipPattern: countryCode as string,
+    stoped: true,
+    key: countryCode,
+  });
+  const { data: villageData, isLoading: villageLoading } = useZipCode({
+    zipPattern: cityCode as string,
+    stoped: true,
+    key: cityCode,
+  });
+```
+
+```tsx
+//useZipCode
+import { useQuery } from '@tanstack/react-query';
+import { getLocal } from '../api/queryfn.ts';
+
+export interface Record {
+  code: string;
+  name: string;
+}
+export interface getData {
+  regcodes: Record[];
+}
+interface Prop {
+  key?: string;
+  stoped?: boolean;
+  zipPattern: string;
+}
+
+const useZipCode = ({ key, stoped, zipPattern }: Prop) => {
+  const { data, isLoading } = useQuery<getData>({
+    queryKey: key ? ['country', key] : ['country'],
+    queryFn: () => getLocal(zipPattern),
+    enabled: stoped ? !!zipPattern : false,
+    staleTime: 1000 * 60 * 60,
+    cacheTime: 1000 * 60 * 60,
+  });
+  return { data, isLoading };
+};
+
+export default useZipCode;
+```
+
+**staleTime을 60분으로 일괄적으로 설정해서 stale 데이터가 되어 refatch를 발생시키지 않도록 하였으며, cacheTime 또한 60분으로 설정하여 60분 간은 캐싱된 데이터를 활용**하도록 하였습니다. 추가적으로 query 전역 설정에서 탭 이동시, 네트워크 재연결시 refetch를 발생시키지 않도록 해서 필요없는 API 호출을 최소화 하였습니다.
+
+```tsx
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      retry: 2,
+    },
+  },
+});
+```
+
+## UI 작업
+
+대부분 자체 제작한 select를 사용합니다. 하지만 API와 커스텀 select를 연동시키는 것에서 어려움을 겪었으며, 반응형 디자인을 고려하는 것에 어려움을 느꼈습니다. 가장 큰 문제는 3개의 커스텀 select를 유기적으로 활용하는 것이었습니다. 하나의 커스텀 select를 클릭 했을 때 다른 커스텀 select에 열려 있는 options를 닫는 것을 고려 해야 했으며, 화면의 다른 곳을 클릭했을 때에도 해당 select가 닫히도록 하여야 했습니다. 이러한 문제로 Custom Select를 사용하지 않고 내장 select와 option tag를 활용하여 작업을 하였습니다. (추후 도전을 해야 할 문제인 것 같습니다. 주어진 시간 내에서 커스텀 select 구현은 시간이 부족하다고 느꼈습니다..)
+
+```tsx
+useEffect(() => {
+    if (!countryLoading) {
+      setCountryCode(changeCountryCode(cityData?.regcodes[0].code as string));
+      setZipNameCountry(BASE_CODE.서울특별시);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [countryLoading]);
+
+  useEffect(() => {
+    setZip(zipRef.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [zipRef.current, setZip]);
+
+  return (
+    <SelectContainer direction={direction}>
+      <SelectInput
+        name="country"
+        id="country"
+        selectsize={size}
+        direction={direction}
+        onChange={e => {
+          const valueArr = e.target.value.split(' ');
+          setCountryCode(changeCountryCode(valueArr[0]));
+          setCityCode('');
+          setZipNameCountry(BASE_CODE[valueArr[1]]);
+          setZipNameCity('');
+          setZipNameVillage('');
+        }}>
+        {counrtyData &&
+          counrtyData?.regcodes.map(({ code, name }) => (
+            <option key={code} value={`${code} ${name}`}>
+              {BASE_CODE[name] === '제주특별자치도'
+                ? '제주'
+                : BASE_CODE[name] === '강원특별자치도'
+                ? '강원도'
+                : BASE_CODE[name]}
+            </option>
+          ))}
+      </SelectInput>
+
+      <SelectInput
+        name="city"
+        selectsize={size}
+        direction={direction}
+        id="city"
+        onChange={e => {
+          const valueArr = e.target.value.split(' ');
+          setCityCode(changeCityCode(valueArr[0]));
+          setZipNameCity(valueArr[1] !== 'undefined' ? valueArr[1] : '');
+          setZipNameVillage(' ');
+        }}>
+        <option value={' '}>선택</option>
+        {!cityLdading &&
+          cityData?.regcodes.slice(1).map(({ code, name }) => (
+            <option key={code} value={`${code} ${name.split(' ')[1]}`}>
+              {name.split(' ')[1]}
+            </option>
+          ))}
+      </SelectInput>
+
+      <SelectInput
+        name="city"
+        id="city"
+        selectsize={size}
+        direction={direction}
+        onChange={e => {
+          setZipNameVillage(e.target.value);
+        }}>
+        <option value={' '}>선택</option>
+        {!villageLoading &&
+          villageData?.regcodes.slice(1).map(({ code, name }) => (
+            <option
+              key={code}
+              value={
+                name.split(' ').length === 3
+                  ? name.split(' ')[2]
+                  : name.split(' ').length === 4
+                  ? `${name.split(' ')[2]} ${name.split(' ')[3]}`
+                  : ''
+              }>
+              {name.split(' ').length === 3
+                ? name.split(' ')[2]
+                : name.split(' ').length === 4
+                ? `${name.split(' ')[2]} ${name.split(' ')[3]}`
+                : ''}
+            </option>
+          ))}
+      </SelectInput>
+    </SelectContainer>
+```
+
+## 구현 결과
+
+![login-select](/images/select-tag/test.gif)
+
+
+![map-select](/images/select-tag/Untitled.gif)
+
+## 아쉬운점
+
+- 코드 분리가 적절하게 되지 못했습니다. Component 구성에서 select를 컴포넌트화 하여 중복된   로직을 제거할 수 있었는데 이 부분을 해결하지 못한 채 다음 작업을 진행하였습니다.
+- API의 한계로 유저가 입력한 주소 정보에 맞추어 자동으로 select 값을 매칭하지 못했습니다. 그 결과 유저가 주소 수정시 일일히 select 값을 선택해야 하는 문제가 발생했습니다.
+- 커스텀 Select를 적용하지 못한 점이 아쉬웠습니다. 이 부분 또한 다시 고려해서 작업을 하면 더 편의성 있는 select를 만들 수 있을 것 같습니다.
+
+## 참조
+
+[useQuery | TanStack Query Docs](https://tanstack.com/query/v4/docs/react/reference/useQuery)
