@@ -4,6 +4,7 @@ import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeSlug from 'rehype-slug';
 import remarkGfm from 'remark-gfm';
+import rehypeImgSize from 'rehype-img-size';
 
 const Post = defineDocumentType(() => ({
   name: 'Post',
@@ -83,6 +84,8 @@ export default makeSource({
         },
       ],
       highlight,
+      // @ts-ignore
+      [rehypeImgSize, { dir: 'public' }],
     ],
   },
 });
