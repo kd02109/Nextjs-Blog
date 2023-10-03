@@ -15,7 +15,7 @@ ${siteConfig.menus
   .join('\n')}
 ${postJson
   .map(post => {
-    if (post.url.includes('blog'))
+    if (post.brand.trim() === 'blog')
       return `<url><loc>${SITE_URL}/blogs/${post.url}</loc><changefreq>daily</changefreq><priority>0.7</priority></url>`;
     return `<url><loc>${SITE_URL}/projects/${post.url}</loc><changefreq>daily</changefreq><priority>0.7</priority></url>`;
   })
