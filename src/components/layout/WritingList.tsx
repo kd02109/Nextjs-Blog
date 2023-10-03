@@ -1,12 +1,13 @@
 import ProjectWitingList from '@/components/ProjectWitingList';
-import { allPosts } from 'contentlayer/generated';
+import getPosts from '@/util/getPosts';
 
 type Prop = {
   tag: string;
 };
 export default function WritingList({ tag }: Prop) {
-  const posts = allPosts.filter(post => post.url.includes(tag));
-
+  const posts = getPosts()
+    .filter(post => post.url.includes(tag))
+    .reverse();
   return (
     <section className="mt-10">
       <h2 className="font-bold text-2xl mb-2">프로젝트 회고</h2>
