@@ -1,10 +1,10 @@
 import '@/styles/globals.css';
 import type { Metadata } from 'next';
 import { nanum } from '@/font/font';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
 import NextThemeProvider from '@/components/ThemeProvider';
-import GoogleAnalytics from '@/components/GoogleAnalytics';
+import GoogleAnalytics from '@/components/layout/GoogleAnalytics';
 
 export const metadata: Metadata = {
   title: "Son's blog",

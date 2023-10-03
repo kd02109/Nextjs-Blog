@@ -1,6 +1,6 @@
 'use client';
 
-import { SetStateAction, useEffect, useRef } from 'react';
+import { SetStateAction, useEffect } from 'react';
 import { siteConfig } from '@/config';
 import HambugerIcon from '@/components/svg/HamburgerIcon';
 import LinkItem from '@/components/LinkItem';
@@ -20,7 +20,7 @@ export default function Hamburger({ pathName, isOpened, setIsOpened }: Prop) {
   const handleOpen = () => {
     setIsOpened(true);
   };
-  const ref = useRef<HTMLDivElement>(null);
+
   // 화면 이전시 UI 초기화
   useEffect(() => {
     setIsOpened(false);
