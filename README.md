@@ -1,22 +1,5 @@
 # 블로그 작성
 
-0.  ~~library 및 lint, prettier 설정~~ 
-1. ~~metadata, font 설정~~ 
-2. 라우터 설정 
-    - / -> 기본 블로그 소개
-    - /blogs/[slug] 
-        - 글은 태그로 관리 (HTML, CSS, JavaScript, TypeScript, React, Node.js, CS, CodingTest)
-        - pagenation
-    - /projects
-        - 프로젝트에서 도입한 기술, 진행과정, 리펙토링, 아쉬움에 대한 정리
-        - 프로젝트 별로 route 관리, 프로젝트 별 태그 추가 
-    - /tags
-        - 태그별로 글 살펴보기
-    - /aboutme
-        - 나에 대한 간략한 자기 소개 
-3. 기본 페이지 골격 짜기 
-4. header, footer 만들기 
-5. mdx 적용한 포스팅 페이지 생성하기 
-6. notFound 설정
-7. 검색 기능 
-8. 댓글 기능 
+- NEXTJS, Contentlayer, typescript, react, tailwindcss를 활용해서 기본적인 블로그를 만들었습니다.
+- 해당 블로그는 serverless 블로그로서 개발 관련 글을 포스팅 하기 위해서 만들어 졌습니다. 
+- 블로그에 관한 자세한 글들은 [블로그](https://nextjs-blog-kd02109.vercel.app/projects/nextjs-blog)에서 확인할 수 있습니다. 
