@@ -43,6 +43,6 @@ scrollbar-width: none; /* Firefox */
     @apply w-full border-l-red-600 border-l-2 inline-block bg-gray-700
 
 }
-.prose span:first-child {
+.prose span[data-line]{
     @apply px-2
 }
