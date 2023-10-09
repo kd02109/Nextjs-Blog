@@ -14,7 +14,7 @@ export default function LoadingIcon({ width, height }: Prop) {
       width={width}
       height={height}
       viewBox="0 0 40 40"
-      enable-background="new 0 0 40 40"
+      enableBackground="new 0 0 40 40"
       fill="currentColor">
       <path
         opacity="0.4"
