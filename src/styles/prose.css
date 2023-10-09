@@ -39,3 +39,10 @@ display: none;
 scrollbar-width: none; /* Firefox */
 }
 
+.prose span[data-highlighted-line] {
+    @apply w-full border-l-red-600 border-l-2 inline-block bg-gray-700
+
+}
+.prose span:first-child {
+    @apply px-2
+}

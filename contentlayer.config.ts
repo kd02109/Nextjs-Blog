@@ -83,7 +83,7 @@ export default makeSource({
           },
         },
       ],
-      highlight,
+      [highlight],
       // @ts-ignore
       [rehypeImgSize, { dir: 'public' }],
     ],
