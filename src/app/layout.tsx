@@ -5,6 +5,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import NextThemeProvider from '@/components/ThemeProvider';
 import GoogleAnalytics from '@/components/layout/GoogleAnalytics';
+import dynamic from 'next/dynamic';
 
 export const metadata: Metadata = {
   title: "Son's blog",
@@ -16,6 +17,9 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const HeaderDynamic = dynamic(() => import('@/components/layout/Header'), {
+    ssr: false,
+  });
   return (
     <html lang="en">
       <head>
@@ -113,7 +117,7 @@ export default function RootLayout({
         className={`mx-auto max-w-3xl px-6 lg:max-w-6xl lg:px-8 ${nanum.className}`}>
         <GoogleAnalytics />
         <NextThemeProvider>
-          <Header />
+          <HeaderDynamic />
           <main className="px-2">{children}</main>
           <Footer />
         </NextThemeProvider>
