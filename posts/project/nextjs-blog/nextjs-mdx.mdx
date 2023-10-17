@@ -23,7 +23,7 @@ npm i next-mdx-remote
 
 해당 라이브러리 또한 앞서 소개한 remark와 rehype을 활용합니다. **Remark는 AST를 사용해 마크다운을 구문 분석하고 컴파일합니다. 구문 강조 표시를 추가하고 목차를 생성하는 등의 작업을 할 수 있는 플러그인으로 구동됩니다. 따라서 remark, rehype 플러그인을 등록하고 커스텀 설정을 할 수 있습니다.**
 
-next-mdx-remote 라이브러리는 **함수와 컴포넌트인 serialize와 `<MDXRemote />`를 노출**합니다. 이 두 컴포넌트는 의도적으로 자체 파일로 분리되어 있습니다**. serialize는 서버 측에서 실행**되도록 설계되었으므로 서버에서/빌드 시 실행되는 getStaticProps 내에서 실행됩니다. **반면에 `<MDXRemote />`는 클라이언트 측, 즉 브라우저에서 실행되도록 설계**되었습니다.
+next-mdx-remote 라이브러리는 **함수와 컴포넌트인 serialize와 `<MDXRemote />`를 노출**합니다. 이 두 컴포넌트는 의도적으로 자체 파일로 분리되어 있습니다. **serialize는 서버 측에서 실행**되도록 설계되었으므로 서버에서/빌드 시 실행되는 getStaticProps 내에서 실행됩니다. **반면에 `<MDXRemote />`는 클라이언트 측, 즉 브라우저에서 실행되도록 설계**되었습니다.
 
 ### serialize
 
