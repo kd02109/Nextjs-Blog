@@ -39,5 +39,5 @@ Host: ${siteUrl}
   writeFileSync('public/robots.txt', text.trim(), 'utf-8');
 };
 
-void createRobotsTxt();
+//void createRobotsTxt();
 void stiempaConfig();
