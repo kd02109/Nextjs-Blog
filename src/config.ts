@@ -3,7 +3,7 @@ import { DefaultSeoProps } from 'next-seo';
 export const headerConfig = {};
 
 export const siteConfig = {
-  url: 'https://nextjs-blog-kd02109.vercel.app/',
+  url: 'https://sonblog.vercel.app/',
   title: `Son's blog`,
   description: '개발하면서 탐구한 것을 소소하게 기록하는 공간입니다.',
   copyright: 'kd02109 All rights reserved.',
