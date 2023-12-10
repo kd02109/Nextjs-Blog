@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-Sitemap: https://nextjs-blog-kd02109.vercel.app//sitemap.xml
-Host: https://nextjs-blog-kd02109.vercel.app/
