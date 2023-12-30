@@ -11,14 +11,12 @@ const bodySchema = yup.object().shape({
 export async function POST(req: Request) {
   const text = await req.json();
   if (!bodySchema.isValidSync(text)) {
-    console.log('test');
     return new Response(
       JSON.stringify({ message: '모든 입력 요청을 채우셔야 합니다.' }),
       { status: 400 },
     );
   }
 
-  console.log(text);
   return senaEmail(text)
     .then(
       () =>
@@ -28,7 +26,6 @@ export async function POST(req: Request) {
         ),
     )
     .catch(error => {
-      console.error(error);
       return new Response(
         JSON.stringify({ message: '메일 수신에 실패했습니다.' }),
         { status: 500 },
