@@ -13,7 +13,6 @@ const transporter = nodemailer.createTransport({
 
 export async function senaEmail(data: Form) {
   // send mail with defined transport object
-  console.log(data);
   const mailData = {
     to: process.env.NEXT_EMAIL_ID,
     from: process.env.NEXT_EMAIL_ID,

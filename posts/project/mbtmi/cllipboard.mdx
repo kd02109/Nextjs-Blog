@@ -1,0 +1,70 @@
+---
+title: clipboard
+date : 2023-12-04
+id : clipboard
+tag: 
+   - project
+   - nextJs
+   - clipboard
+   - mbtmi
+brand: project
+
+description: 링크 복사 기능 구현을 위한 clipboard 활용
+---
+
+## ClipBoard
+**Clipboard API**는 클립보드 명령(잘라내기, 복사, 붙여넣기)에 응답하거나 시스템 클립보드에 비동기적으로 접근하고 쓸 수 있는 기능을 제공합니다. 커스텀 share box에서 링크 복사 기능을 구현하기 위해서 활용을 했습니다. 
+
+> 해당 클립보드 기능은 `https`, `localhost`에서만 정상적으로 동작합니다.
+> 
+
+## 사용하기
+
+클립보드를 사용하기 위해서는 Clipboard 객체의 인스턴스를 생성하지 않고 전역 `Navigator.clipboard` (en-US)를 사용합니다. 이러한 클립보드 기능은 데이터 읽기 쓰기 기능을 모두 제공합니다.  이러한 클립보드 api는 비동기로 데이터 읽기 쓰기를 수행합니다.  즉 반환 되는 데이터의 형태는 `Promise`로 감싸게 됩니다. 추가적으로 해당 API를 사용하기 위해서는 사용자의 접근 허용(Permissions API)가 필요합니다.
+
+### 메서드
+
+- [read](https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/read) : image를 복사할 때 사용. 프로미스가 해결되면 반환된 프로미스에 데이터를 전달합니다.
+- [readText](https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/readText) :  text를 복사할 때 사용.
+- [write](https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/write) : 이미지와 같은 임의의 데이터를 클립보드에 씁니다. 잘라내기 및 복사 기능을 구현하는 데 사용할 수 있습니다.
+- [writeText](https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/writeText) : 클립보드 인터페이스의 writeText() 속성은 지정된 텍스트 문자열을 시스템 클립보드에 씁니다. 텍스트는 read() 또는 readText()를 사용하여 다시 읽을 수 있습니다.
+
+## 사용 예시
+
+저는 해당 클립보드를 공유 url을 작성하기 위해서 사용했습니다. 
+
+```tsx
+'use client';
+import { useState, useEffect } from 'react';
+export default function Clipboard({ link }: { link: string }) {
+  const [isSucess, setIsSucess] = useState(false);
+  const handleClipBoard = () => {
+    navigator.clipboard
+      .writeText(link)
+      .then(() => {
+        setIsSucess(true);
+      })
+      .catch(() => {
+        alert('복사에 실패했습니다. 다시 시도해 주세요.');
+      });
+  };
+
+  useEffect(() => {
+    const id = setTimeout(() => {
+      if (isSucess) {
+        setIsSucess(false);
+      }
+    }, 2000);
+    return () => clearTimeout(id);
+  }, [isSucess]);
+
+  return (
+    <button
+      onClick={handleClipBoard}
+      disabled={isSucess ? true : false}
+      className="px-4 py-2 font-bold text-xl bg-bgChating text-black rounded-2xl">
+      링크 복사하기{isSucess ? '✅' : '🗒️'}
+    </button>
+  );
+}
+```
