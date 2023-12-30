@@ -26,6 +26,7 @@ export const generateMetadata = ({ params }: Props) => {
 
 export default function ProjectDetailPages({ params }: Props) {
   const oneProject = projectObj.find(item => item.link === params.slug);
+
   return (
     <article className="py-4">
       <div className="flex relyativy gap-2 items-center">

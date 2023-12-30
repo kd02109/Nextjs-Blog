@@ -1,0 +1,89 @@
+---
+title: a.download는 모두 지원이 되는 거 아니었나요?
+date : 2023-12-03
+id : a-tag
+tag: 
+   - project
+   - nextJs
+   - mbtmi
+   - javascript
+brand: project
+
+description: a.download 기능이 safari에서 제대로 지원하지 않는 점에 대해서 정리해보았습니다.
+---
+
+## 문제 발생 계기
+
+실제 웹을 배포하고 난 후 이미지 다운로드 기능이 정상적으로 동작하지 않는 경우가 있었습니다. 제가 **이미지 다운로드 기능을 구현한 방법은 `a` tag에 img src를 연결하고 download attribute를 활용하는 방법**이었습니다. 
+
+```tsx
+'use client';
+import { useEffect, useState } from 'react';
+export default function useImageDownload(src: string, name: string) {
+  const [isDownload, setIsDownload] = useState(false);
+
+	/* 버튼에 해당 함수를 연결해서 state를 변경한후 
+	   이를 trigger삼아서 useEffect 내부의 코드를 실행합니다. */
+  const handleImgDownload = () => {
+    setIsDownload(true);
+  };
+
+  useEffect(() => {
+    if (isDownload) {
+      const a = document.createElement('a');
+      a.href = src;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setIsDownload(false);
+    }
+  }, [isDownload, src, name]);
+  return handleImgDownload;
+}
+```
+
+해당 방법은 FE환경에서 매우 많이 쓰이는 방법이고 전형화된 trick과 같았습니다.  또한 현재 최신 브라우저 버전에서 대부분 download attribute를 지원해주고 있는 상황이었습니다. 
+
+![지원 범위](/images/a-download/Untitled.png)
+
+하지만 IOS 환경에서 카카오 인앱에서 이미지 다운로드를 클릭할 경우, 해당 기능이 정상적으로 동작하지 않는 문제가 있었습니다. 다운로드 버튼을 클릭 한 경우 이미지가 다운로드 되지 않고 해당 이미지 파일을 새 창으로 띄우게 됩니다. 
+
+IOS 환경에서 크롬 웹, 사파리에서도 테스트를 진행해본 결과.. 오직 카카오 인앱에서만 발생하는 문제였습니다. 해당 원인이 무엇인지 파악해본 결과, 원인은 다음과 같았습니다.  카카오 IOS 인앱 브라우저는 웹 뷰를 사용합니다. 웹 뷰는 무엇일까? 
+
+**WebView란 프레임워크에 내장된 웹 브라우저 컴포넌트로 View의 형태로 앱에 임베딩하는 것을 의미합니다.** IOS에서 제공하는 웹뷰는 ****당연히 apple에서 제공해줍니다. 여기서 제공하는 webView는 총 3가지가 있다고 합니다. 
+
+- **UIWebView**
+- **WKWebView**
+- **SFSafariView**
+
+## UIWebView
+
+UIWebView는 ios 2.0에 출시됐습니다. 따라서 성능 측면에서 많이 부족하고, 사용하지 않는 것을 추천합니다.
+
+## WKWebView
+
+WKWebView는 ios 8.0부터 가장 많이 사용되고 있습니다.  오래전에 나온 UIWebView 보다 성능이 좋습니다. WKWebView에는 큰 장점이 하나 있는데,
+
+> **웹 페이지에서 할당하는 메모리는 앱과 별도의 스레드에서 관리합니다.**
+> 
+
+ 웹 페이지는 앱의 메모리와 별도로 동작하기 때문에 웹 페이지의 메모리가 아무리 크더라도 앱이 죽지 않는다는 것을 의미합니다.
+
+**카카오톡 IOS 인앱은 해당 WKWebView로 구현이 되어 있었습니다.**
+
+## SFSafariView
+
+SFSafariView 는 ios 9.0부터 사용되었으며, Safari를 이용하는 웹 뷰입니다. 사용자가 웹 뷰를 통해 웹 페이지에 들어가면, Safari와 동일한 화면이 구현됩니다.
+
+WKWebView가 단순히 웹 페이지 하나 만을 보여준다면, SFSafariView는 사파리의 기능을 이용할 수가 있어 다양한 동작이 가능해집니다. 추가로 기존 아이폰의 Safari 쿠키, 데이터 등을 공유할 수 있다는 장점이 있습니다. 
+
+이러한 환경에서 **WKWebView의 현재 버전은 14.0이라고 합니다. a tag의 download attribute의 경우 ios 14.5 이상부터 지원이 된다고 합니다.** (어디서 확인할 수 있지?) 올해 말에 바꾼다고 하는데, 여전히 12월 17일 현재 상황 위의 기능을 실행하면, img 다운로드가 아닌 해당 이미지를 새 창에 띄우게 됩니다. 아무튼 마땅한 해결 방법이 결국 없다는 것을 확인한 매우 답답한 상황이 되었습니다… 
+
+다시 확인해보니 몇몇 IOS에서는 카카오 인앱에서 다운로드가 되고, 어떤 환경에서는 다운로드가 안되는 상황입니다. 생각보다 다양한 기기에서 모든 기능이 정상적으로 동작하는지 확인하기 매우 어렵다는 것을 확인할 수 있었습니다.. 
+
+### Reference
+
+[a - HTML: Hypertext Markup Language | MDN](https://developer.mozilla.org/ko/docs/Web/HTML/Element/a#브라우저_호환성)
+
+[카카오톡 인앱브라우저에서 파일다운로드 기능이 지원안되는건가요?](https://devtalk.kakao.com/t/topic/128291/6)

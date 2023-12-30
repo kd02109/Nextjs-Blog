@@ -57,4 +57,15 @@ export const projectObj: ProjectType[] = [
       'tailwindcss',
     ],
   },
+  {
+    name: 'Mbti Test Project',
+    image: 'https://i.imgur.com/A7BAUbv.png',
+    description:
+      '기존의 O,X 선택지에서 벗어나 정확도가 높은 대화형 mbti web app 구현합니다.',
+    href: 'https://mbtmi.xyz',
+    github: 'https://github.com/kd02109/mbtmi',
+    link: 'mbtmi',
+    date: '2023-10-30 ~ 2023-12-21',
+    stack: ['react', 'typescript', 'nextJs'],
+  },
 ];

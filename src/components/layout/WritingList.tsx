@@ -8,6 +8,7 @@ export default function WritingList({ tag }: Prop) {
   const posts = getPosts()
     .filter(post => post.url.includes(tag))
     .reverse();
+
   return (
     <section className="mt-10">
       <h2 className="font-bold text-2xl mb-2">프로젝트 회고</h2>
