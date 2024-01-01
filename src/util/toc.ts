@@ -3,13 +3,13 @@ export const toc = (data: string) => {
 
   const rawMap = raw.map(item => {
     const title = item
-      .replace(/^##*\s/, '')
+      .replace(/^##\s/, '')
+      .replace(/^###\s/, '')
       .replace(/[\*,\~]{2,}/g, '')
       .replace(/(?<=\])\((.*?)\)/g, '')
       .replace(/(?<!\S)((http)(s?):\/\/|www\.).+?(?=\s)/g, '');
 
     const slug = title
-      .trim()
       .toLowerCase()
       .replace(/[^a-z0-9ㄱ-ㅎ|ㅏ-ㅣ|가-힣 -]/g, '')
       .replace(/\s/g, '-');

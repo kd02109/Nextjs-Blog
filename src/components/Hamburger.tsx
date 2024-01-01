@@ -67,24 +67,26 @@ export default function Hamburger({ pathName, isOpened, setIsOpened }: Prop) {
             <div className="flex justify-between my-4">
               <nav>
                 <ol>
-                  <li
-                    className={`py-4 border-b-2 border-solid w-40 ${
-                      pathName === '/' && 'border-yellow-400'
-                    }`}>
-                    <LinkItem href={'/'} isActive={pathName === '/'}>
-                      Home
-                    </LinkItem>
-                  </li>
-                  {menus.map(({ path, label }) => (
+                  <LinkItem href={'/'} isActive={pathName === '/'}>
                     <li
-                      key={label}
                       className={`py-4 border-b-2 border-solid w-40 ${
-                        pathName.includes(path) && 'border-yellow-400'
+                        pathName === '/' && 'border-yellow-400'
                       }`}>
-                      <LinkItem href={path} isActive={pathName.includes(path)}>
-                        {label}
-                      </LinkItem>
+                      Home
                     </li>
+                  </LinkItem>
+                  {menus.map(({ path, label }) => (
+                    <LinkItem
+                      href={path}
+                      key={label}
+                      isActive={pathName.includes(path)}>
+                      <li
+                        className={`py-4 border-b-2 border-solid w-40 ${
+                          pathName.includes(path) && 'border-yellow-400'
+                        }`}>
+                        {label}
+                      </li>
+                    </LinkItem>
                   ))}
                 </ol>
               </nav>

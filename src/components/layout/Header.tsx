@@ -14,7 +14,7 @@ const Header = () => {
 
   return (
     <header
-      className={`flex justify-between items-center select-none pt-8 pb-12 sticky z-20 bg-white top-0 ${
+      className={`flex justify-between items-center select-none pt-4 pb-12 sticky z-20 bg-white top-0 max-sm:w-[100%] ${
         browserUser === 'Mozilla Firefox'
           ? 'dark:bg-[#1C1B22]'
           : 'dark:bg-[#121212]'
