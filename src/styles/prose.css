@@ -26,6 +26,9 @@
 .prose .anchor {
     @apply my-20
 }
+.prose h3  {
+    @apply text-2xl
+}
 
 .prose code {
     font-family:  Consolas, Monaco, 'Andale Mono', monospace;
@@ -46,3 +49,4 @@ scrollbar-width: none; /* Firefox */
 .prose span[data-line]{
     @apply px-2
 }
+

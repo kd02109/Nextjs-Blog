@@ -118,7 +118,7 @@ export default function RootLayout({
         <GoogleAnalytics />
         <NextThemeProvider>
           <HeaderDynamic />
-          <main className="px-2">{children}</main>
+          <main>{children}</main>
           <Footer />
         </NextThemeProvider>
       </body>

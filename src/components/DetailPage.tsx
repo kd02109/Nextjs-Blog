@@ -3,11 +3,13 @@ import BlogMenu from '@/components/BlogMenu';
 import CodeBlock from '@/components/CodeBlock';
 import PostFooter from '@/components/PostFooter';
 import Tag from '@/components/Tag';
+import { findH } from '@/util/findH';
 import { toc } from '@/util/toc';
 import { Post } from 'contentlayer/generated';
 import { format, parseISO } from 'date-fns';
-import { getMDXComponent, useMDXComponent } from 'next-contentlayer/hooks';
+import { useMDXComponent } from 'next-contentlayer/hooks';
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 type Prop = {
   post: Post | undefined;
@@ -29,16 +31,17 @@ const mdxComponents = {
 
 export default function DetailPage({ post, tags, postFooter }: Prop) {
   const Content = useMDXComponent((post as Post).body.code);
-  const slugMap = toc(post?.body.raw as string);
+  const slugMap = findH(post?.body.raw as string);
+
   return (
     <>
       <article className="py-8">
         <div className="mb-8 text-center">
           <h1 className="text-5xl max-sm:text-3xl mb-2">{post?.title}</h1>
           <nav className="my-3">
-            <ul className="flex justify-center gap-2 py-2">
+            <ul className="flex justify-center gap-2 py-2 max-md:flex-wrap">
               {tags?.map(item => (
-                <li key={item}>
+                <li key={item} className="max-md:my-2">
                   <Tag tag={item} />
                 </li>
               ))}
