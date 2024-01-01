@@ -2,67 +2,16 @@
 
 import CircleButton from '@/components/CustomButton';
 import DarkSwitch from '@/components/DarkSwitch';
+import useScroll from '@/components/hook/useScroll';
 import Comment from '@/components/svg/Comment';
 import CopyUrl from '@/components/svg/CopyUrl';
 import Top from '@/components/svg/Top';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 
-type Toc = { title: string; slug: string };
+export type Toc = { title: string; slug: string; id: 'sub' | 'title' };
 type Prop = {
   toc: Toc[];
-};
-
-const useScroll = (tableOfContents: Toc[]) => {
-  const [currentSectionSlug, setCurrentSectionSlug] = useState<
-    string | undefined
-  >();
-
-  useEffect(() => {
-    if (tableOfContents.length === 0) return;
-
-    let headings: { id: string; top: number }[];
-
-    function onResize() {
-      headings = Array.from(
-        document.querySelectorAll<HTMLElement>(
-          '.prose h2:not(#table-of-contents),h3:not(#table-of-contents)',
-        ),
-      ).map(element => ({ id: element.id, top: element.offsetTop }));
-    }
-
-    function onScroll() {
-      if (!headings) return;
-
-      const top = window.scrollY + 250;
-
-      let current: typeof currentSectionSlug = undefined;
-      for (let i = 0; i < headings.length; i++) {
-        if (top >= headings[i].top) {
-          current = headings[i].id;
-        }
-      }
-      setCurrentSectionSlug(current);
-    }
-
-    onResize();
-    onScroll();
-    window.addEventListener('scroll', onScroll, {
-      capture: true,
-      passive: true,
-    });
-    window.addEventListener('resize', onResize, {
-      capture: true,
-      passive: true,
-    });
-    return () => {
-      window.removeEventListener('scroll', onScroll, { capture: true });
-      window.removeEventListener('resize', onResize, { capture: true });
-    };
-  }, [tableOfContents]);
-
-  return { tableOfContents, currentSectionSlug };
 };
 
 export default function BlogMenu({ toc }: Prop) {
@@ -87,15 +36,35 @@ export default function BlogMenu({ toc }: Prop) {
           className="text-base py-1 font-extrabold leading-6 mb-4 border-b-2 border-solid">
           Content Table
         </div>
-        <div className="flex flex-col gap-3  ">
-          {toc.map(({ title, slug }) => (
+        <div className="flex flex-col gap-3">
+          {toc.map(({ title, slug, id }) => (
             <Link
               href={`#${slug}`}
               key={slug}
+              onClick={e => {
+                e.preventDefault();
+
+                const element = document.getElementById(slug);
+
+                const offset = 100;
+                const elementPosition = element
+                  ? element.getBoundingClientRect().top + window.scrollY
+                  : 0;
+                const offsetPosition = elementPosition - offset;
+
+                window.scrollTo({
+                  top: offsetPosition,
+                  behavior: 'smooth',
+                });
+              }}
               className={`hover:text-yellow-400 ${
                 currentSectionSlug === slug && `text-yellow-400`
               }`}>
-              • {title}
+              {id === 'title' ? (
+                <span>{title}</span>
+              ) : (
+                <span className="text-sm">&nbsp;&nbsp; - {title}</span>
+              )}
             </Link>
           ))}
         </div>
