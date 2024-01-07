@@ -1,0 +1,421 @@
+---
+title: ESlint
+date : 2023-04-28
+id : ESlint
+tag: 
+   - ESlint
+   - javascript
+brand: blog
+description: ESlint의 개념, 활용 방법에 대해 정리합니다.
+---
+
+## ESLint
+<img src="/images/eslint/eslint.png" alt="ESlint" width="500" height="700" />
+
+list는 직물의 보푸라기 실이라는 뜻을 가지고 있습니다. 코드에서도 보푸라기가 있습니다. 
+코드에서의 보푸라기는 들여쓰기, 사용하지 않는 변수 등이 있습니다. 
+보푸라기가 있어도 옷을 입지 못하는 것이 아니듯, 코드에서도 보푸라기가 있어도 동작하는 것에는 문제가 없다. 
+하지만 코드에 많은 보푸라기가 있다면, 코드의 가독성을 헤치거나, 유지보수를 어렵게 만든다. 
+
+ESlint는 이러한 코드의 보푸라기를 제거하는 기능을 가지고 있다. 
+ESLint가 검사하는 항목은 크게 **포맷팅, 코드 품질** 두 가지이다.
+
+- **포맷팅**은 일관된 코드 스타일을 유지하도록 하고 개발자로 하여금 쉽게 읽히는 코드를 만들어 준다. 이를 테면 "들여쓰기 규칙", "코드 라인의 최대 너비 규칙"을 따르는 코드가 가독성이 더 좋다.
+- **코드 품질**은 어플리케이션의 잠재적인 오류나 버그를 예방하기 위함이다. 사용하지 않는 변수 쓰지 않기, 글로벌 스코프 함부로 다루지 않기 등이 오류 발생 확률을 줄여 준다.
+
+---
+
+## ESLint의 구성 요소
+
+#### Rules
+
+**규칙은 ESLint의 핵심 구성 요소**이다. **규칙은 코드가 특정 기대치를 충족하는지, 그리고 기대치를 충족하지 못할 경우 어떻게 해야 하는지 검증**한다. 규칙에는 해당 규칙과 관련된 추가 구성 옵션도 포함될 수 있다.
+
+예를 들어 [semi](https://eslint.org/docs/latest/rules/semi) 규칙을 사용하면 JavaScript 문이 세미콜론(;)으로 끝나야 하는지 여부를 지정할 수 있다. 항상 세미콜론이 필요하거나 문이 세미콜론으로 끝나지 않도록 규칙을 설정할 수 있다. 
+
+ESLint에는 사용할 수 있는 수백 개의 기본 제공 규칙이 포함되어 있다. 사용자 지정 규칙을 만들거나 다른 사람이 플러그인으로 만든 규칙을 사용할 수도 있다.
+
+#### Configuration Files
+
+**ESLint 구성 파일은 프로젝트에서 ESLint에 대한 구성을 저장하는 곳**입니다. 기본 제공 규칙, 규칙 적용 방법, 사용자 지정 규칙이 있는 플러그인, 공유 가능한 구성, 규칙을 적용할 파일 등을 포함할 수 있다.
+
+#### Plugins
+
+**ESLint 플러그인은 ESLint 규칙, 구성, 프로세서 및 환경 집합을 포함할 수 있는 npm 모듈이다.** 종종 플러그인에는 사용자 정의 규칙이 포함된다. 플러그인은 스타일 가이드를 적용하고 JavaScript 확장(예: TypeScript), 라이브러리(예: React), 프레임워크(예: Angular)를 지원하는 데 사용할 수 있다.
+
+플러그인의 일반적인 사용 사례는 프레임워크에 대한 모범 사례를 적용하는 것입니다. 예를 들어, [@angular-eslint/eslint-plugin](https://www.npmjs.com/package/@angular-eslint/eslint-plugin)에는 Angular 프레임워크 사용에 대한 모범 사례가 포함되어 있다.
+
+- **대표적인 플러그인 소개**
+
+| 플러그인 | 설명 |
+| --- | --- |
+| https://www.npmjs.com/package/eslint-config-airbnb-base | Airbnb의 style guide를 eslint의 설정 파일인 .eslintrc.json에 확장해 주는 플러그인(React 관련 플러그인 미포함) |
+| https://www.npmjs.com/package/eslint-plugin-import | ES6+ import/export 지원 플러그인 |
+| https://www.npmjs.com/package/eslint-plugin-html | HTML 파일에 포함된 인라인 자바스크립트 지원 플러그인 |
+| https://github.com/gajus/eslint-plugin-jsdoc | JSDoc을 활용하면 소스코드의 문서화를 쉽게 할 수 있다. 이 플러그인은 JSDoc을 정적 분석하는 역할을 한다. 플러그인의 규칙을 통해 JSDoc을 항상 사용하도록 설정할 수도 있고, 작성이 되어있을 경우에만 JSDoc의 포맷, 스타일 검사를 할 수도 있다. |
+| https://github.com/typescript-eslint/typescript-eslint | TS(TypeScript)에 대한 정적 분석을 지원하는 플러그인이다. 기존에 TS의 정적 분석 도구로는 TSLint 가 많이 쓰였지만 https://palantir.github.io/tslint/ 되었다.  |
+| https://github.com/eslint/eslint-plugin-markdown | 마크다운에 있는 코드 블록을 대상으로 ESLint를 실행할 수 있는 플러그인이다. ESLint의 custom processor를 이용해 마크다운의 코드 블록에 대해서만 정적 분석을 한다. 이 플러그인을 이용하면 마크다운에도 린팅(lint)을 적용할 수 있어 스타일 가이드, 튜토리얼과 같이 코드가 많이 들어가는 문서에 유용하게 쓸 수 있다. |
+| https://github.com/standard/eslint-config-standard | standard 설정은 https://standardjs.com/을 사용 |
+
+#### ****Parsers****
+
+ESLint parser는 코드를 ESLint가 평가할 수 있는 추상 구문 트리로 변환합니다. 기본적으로 ESLint는 표준 JavaScript 런타임 및 버전과 호환되는 기본 제공 [Espree](https://github.com/eslint/espree) parser를 사용합니다.
+
+(추상 구문에 관한 간단한 설명은 [Babel](https://www.notion.so/Babel-8261da816b984e2eb7d4b0c19d41fd1d?pvs=21) 페이지에서 확인할 수 있습니다.)
+
+#### ****Custom Processors****
+
+다른 종류의 파일에서 자바스크립트 코드를 추출한 다음 ESLint가 자바스크립트 코드를 린팅(lint)하도록 합니다.
+
+## ESLint 동작 방식
+
+<img src="/images/eslint/eslint1.png" alt="ESlint" width="1000" height="400" />
+
+[https://tech.kakao.com/2019/12/05/make-better-use-of-eslint/](https://tech.kakao.com/2019/12/05/make-better-use-of-eslint/) 자세한 내용은 해당 링크에서 확인할 수 있습니다. 
+
+```jsx
+const foo = 5 + bar();
+```
+
+1. parser를 통해 자바스크립트 코드를 추상화 하여 구문트리(AST)를 생성한다.
+2. AST는 컴파일러에서 사용 되는 자료구조로 소스 코드 구조를 트리 형태로 표현한다. 
+
+<img src="/images/eslint/eslint2.png" alt="ESlint" width="1000" height="400" />
+
+AST(Abstract Syntax Tree)를 단순하게 표현
+
+1. Linter는 설정(.eslintrc.json)파일에 있는 규칙들을 생성하여 AST를 순회하며 AST 노드 타입과 같은 이름의 이벤트를 발생시킨다. 발생한 이벤트는 규칙(Rule)에게 전달되어, 해당 노드가 규칙을 지키고 있는지 검사한다. 규칙에 맞지 않는 경우 이에 대해 보고(Report) 하며 가능한 경우 코드를 알아서 규칙에 맞게 수정해주는 Fixer를 생성할 수 있다.
+2. **Report는 어떤 규칙을 어겼는지, 어떤 부분이 문제인지를 전달해 주는 역할**을 한다. **Fixer는 에러 발생 시 코드를 규칙에 맞게 수정하는 역할**을 한다.
+
+## 설치 및 사용하기
+
+```
+npm i -D eslint
+```
+
+```
+// .eslintrc.js, .eslintrc.json, 혹은 package.json에 eslint 설정파일을 작성한다. 
+```
+
+```jsx
+//eslintrc.js
+module.exports = {
+}
+```
+
+```json
+package.json에서 eslint 실행 scripts를 작성합니다. 
+{
+	"scripts": {
+			"lint" : "eslint src"  //src 파일을 eslint가 검사하고 실행시켜줘
+	}
+}
+```
+
+```jsx
+// src/index.js
+console.log()
+```
+
+세미클론을 제외하고 코드를 작성하였다. 이 코드를 현재 lint 설정으로 검사하면, 아무런 결과 없이 eslint가 통과 되는 것을 확인할 수 있다. 
+
+<img src="/images/eslint/eslint3.png" alt="ESlint" width="1000" height="400" />
+
+ESLint에서 정상적으로 검사를 진행하기 위해서는 rules(규칙)을 작성해주어야 한다. rules의 종류는 해당 사이트에서 상세하게 확인할 수 있다. ([링크](https://eslint.org/docs/latest/rules/)) **정말 많은 규칙들이 있지만, 이 규칙들을 직접 커스텀 해서 사용하는 경우는 거의 없다고 합니다**. babel에서 preset을 적용하듯이 ESLint에서도 여러 플러그인을 통해서 이미 만들어진 규칙 set을 활용합니다. 우선 세미클론을 적용하는 규칙을 작성하겠습니다. 
+
+규칙에 설정하는 값은 세 가지다. **"off"나 0은 끔, "warn"이나 1은 경고, "error"나 2는 오류. 설정한 규칙에 어긋나는 코드를 발견하면 오류를 출력하도록 할 수 있습니다**.
+
+```jsx
+//eslintrc.js
+module.exports = {
+	"rules": {
+		"semi" : "error"							
+	}
+}
+```
+
+<img src="/images/eslint/eslint4.png" alt="ESlint" width="1000" height="400" />
+
+다음과 같은 error를 eslint에서 보여줍니다. semi에서에러를 찾았고 세미클론이 없다는 것을 알려 주고 있습니다. 이를 `—fix` 옵션으로 자동 수정할 수 있다고 설명해줍니다. 공식 홈페이지에서는 각 규칙에 대한 설명을 다음과 같이 보여주고 있습니다.
+
+<img src="/images/eslint/eslint5.png" alt="ESlint" width="1000" height="400" />
+
+- ✅ 표시는 설정파일의 extends에 **"eslint:recommended”**에 이미 있는 규칙을 의미합니다.
+- 🔧 표시는 자동으로 ESLint가 해당 rules에서 발견된 규칙을 자동으로 고쳐줄 수 있다는 것을 의미합니다.
+- 💡 이 규칙에 의해 보고된 일부 문제는 편집자 제안을 통해 수동으로 수정할 수 있습니다.
+
+**semi 규칙을 살펴보도록 하겠습니다.** 
+
+<img src="/images/eslint/eslint6.png" alt="ESlint" width="1000" height="400" />
+
+- semi는 —fix를 제공하는 규칙이고 **eslint:recommended**에는 없는 규칙이라고 합니다. 따라서 —fix를 package.json의 scripts에 추가하고 실행 시켜 보겠습니다.
+
+```json
+package.json에서 eslint 실행 scripts를 작성합니다. 
+{
+	"scripts": {
+			"lint" : "eslint src --fix"  //src 파일을 eslint가 검사하고 실행시켜줘
+	}
+}
+```
+
+```jsx
+console.log(); //다음과 같이 semiclone이 추가 되었습니다. 
+```
+
+#### **Extensible Config**
+
+ `extends` 옵션은 다른 ESLint 설정을 확장해서 사용할 때 사용합니다. 여기서는 ESLint에서 추천하는 규칙들이 적용된 `eslint:recommended`라는 설정이 사용되었습니다. 참고로, 실제 프로젝트에서는 ESLint 기본 설정보다는 `airbnb`와 `prettier`의 설정을 많이 확장해서 사용한다.
+
+```jsx
+// .eslintrc.js
+module.exports = {
+  extends: [
+    "eslint:recommended", // 미리 설정된 규칙 세트을 사용한다
+  ],
+}
+```
+
+이때 다음과 같이 예상치 못한 에러를 ESLint가 잡고 있습니다.
+
+<img src="/images/eslint/eslint7.png" alt="ESlint" width="1000" height="400" />
+
+이를 해결하기 위해서 eslint가 설정된 환경을 명시해서 작성합니다.
+
+```jsx
+module.exports = {
+  env: {
+    browser: true,
+    node: true
+  },
+  extends: [
+    "eslint:recommended", // 미리 설정된 규칙 세트을 사용한다
+  ],
+}
+```
+
+### ESLint 프로젝트 자동 셋업
+
+```
+$ npm init -y
+$ npm i -D eslint
+$ node_modules/.bin/eslint --init
+```
+
+```json
+{
+    "env": {
+        "browser": true,
+        "commonjs": true,
+        "es2021": true
+    },
+    "extends": "eslint:recommended",
+    "overrides": [
+    ],
+    "parserOptions": {
+        "ecmaVersion": "latest"
+    },
+    "rules": {
+    }
+}
+```
+
+다음과 같이 base가 적용된 ESlint가 자동으로 설치가 됩니다. 
+
+## ESLint 강제 하기
+
+모든 개발자가 ESLint를 실행하고 문제를 해결 후 코드 push를 하면 좋겠지만, 사람인 이상 깜빡하고 넘길 수도 있습니다. 따라서 ESLint를 소스코드 커밋 전에 강제로 실행하게 할 수 있습니다. 
+
+- `husky`
+
+**허스키는 프로젝트에서 Git 훅을 쉽게 구성할 수 있는 도구입니다. Git 훅은 변경 사항을 커밋하거나 푸시하기 전과 같이 Git 워크플로우의 특정 지점에서 자동으로 실행되는 스크립트**입니다. 허스키를 사용하면 자체 스크립트를 실행하는 사용자 지정 후크를 정의하여 팀의 코드가 리포지토리에 커밋되거나 푸시되기 전에 특정 표준을 충족하는지 확인할 수 있습니다.
+
+<img src="/images/eslint/eslint8.png" alt="ESlint" width="1000" height="400" />
+
+- `lint-staged`
+
+**Lint-staged는 Husky와 함께 작동하는 도구로, 커밋을 위해 스테이징된 특정 파일에 대해 린터(잠재적인 문제 및 오류가 있는지 코드를 분석하는 도구)를 실행하는 데 사용됩니다.** 린트 스테이지는 코드가 커밋되기 전에 코드의 유효성을 검사하고 올바른 형식을 지정하여 실수를 방지하고 코드 품질을 개선합니다. 또한 테스트 실행 또는 프로젝트 빌드와 같은 추가 스크립트를 실행하도록 Lint-staged를 구성할 수도 있습니다.
+
+```
+// 설치하기
+npm i -D lint-staged husky
+```
+
+### husky
+
+우선 husky 설정을 먼저 진행하겠습니다. 찾아본 자료의 설정 방법은 husky v4 형태 였기에 현재 v6 에 맞게 이를 변경해야 합니다.
+
+```json
+// 다음을 package.json에 추가합니다.
+"scripts": {
+    "prepare": "husky install"
+ }
+```
+
+다음으로 “prepare” 명령어를 실행합니다. 그러면 .hook 디렉토리가 생성 된 것을 확인 할 수 있습니다. 그리고 이후에 git에 푸쉬하거나 커밋할때, 이 prepare 스크립트를 통해 깃 훅이 자동적으로 실행 될 수 있습니다. 
+
+이후 깃 커밋 단계 이전에 실행할 명령을  CLI를 통해 husky에 입력합니다. 
+
+```
+// 명령어 입력
+npx husky add .husky/pre-commit "npm run lint"
+```
+
+<img src="/images/eslint/eslint9.png" alt="ESlint" width="1000" height="400" />
+
+
+commit 단계에서 다음과 같이 설정한 eslint가 실행되는 것을 확인할 수 있습니다.
+
+### lint-staged
+
+husky에 lint-staged를 적용시켜 보겠습니다.  `package.json` 에 lint-staged와 이를 수행하는 스크립트를 추가합니다. 
+
+```json
+{
+	"scripts" : {
+		"list-staged": "lint-staged"
+	}
+	"lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "git add"
+    ]
+  }
+}
+```
+
+husky에 pre-commit 파일에 가서 명령어를 수정합니다. 
+
+```json
+// !/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+npm run lint-staged
+```
+
+**이제 ESlint 규칙이 고쳐지지 않은 파일을 commit을 해보면 commit이 진행되지 않고 `고쳐야하는 ESlint 부분 설명과 함께 경고`를 나타내줍니다!**
+
+## Prettier
+
+프리티어는 코드를 더 예쁘게 만든다. **ESLint의 역할 중 포매팅과 겹치는 부분이 있지만 프리티터는 좀 더 일관적인 스타일로 코드를 다듬는다. 반면 코드 품질과 관련된 기능은 하지 않는 것이 ESLint와 다른 점이다.**
+
+```
+// 설치하기
+npm i -D prettier
+```
+
+```jsx
+// test.js
+console.log("hello world")
+```
+
+다음과 같이 코드를 작성하고 prettier 검사를 진행한다.
+
+ 
+
+```
+npx prettier test.js --write
+```
+
+코드가 다음과 같이 변경 되는 것을 확인할 수 있다. `**--write` 옵션을 추가하면 파일을 재작성한다. 그렇지 않을 경우 결과를 터미널에 출력**한다.
+
+```jsx
+//test.js
+console.log("hello world");
+```
+
+- prettier 또한 설정 파일을 통해 특정 옵션을 수정할 수 있다. ([Configuring Prettier](https://prettier.io/docs/en/configuration.html))
+
+```json
+// .prettierrc.json
+{
+  "singleQuote": true,
+  "bracketSpacing": true,
+  "bracketSameLine": true,
+  "arrowParens": "avoid",
+  "printWidth": 120
+}
+```
+
+### prettier eslint에  통합하기
+
+우선 해당 패키지를 설치합니다.  **[eslint-plugin-prettier](https://github.com/prettier/eslint-plugin-prettier)는 프리티어 규칙을 ESLint 규칙으로 추가하는 플러그인이다.** 프리티어의 모든 규칙이 ESLint로 들어오기 때문에 ESLint만 실행하면 된다. **[eslint-config-prettier](https://github.com/prettier/eslint-config-prettier) 는 프리티어와 충돌하는 ESLint 규칙을 끄는 역할을 한다. 둘 다 사용하는 경우 규칙이 충돌하기 때문**이다.
+
+```
+npm i -D eslint-config-prettier eslint-plugin-prettier
+```
+
+설정 파일의 extends 배열에 추가합니다. eslint-config-prettier를 extends 하면 중복되는 ESLint 규칙을 비활성화 됩니다.
+
+```json
+// .eslintrc.js
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:prettier/recommended"
+  ]
+}
+```
+
+```jsx
+var foo = "" // 사용하지 않은 변수. ESLint가 검사
+console.log() // 중복 세미콜론 사용. 프리티어가 자동 수정
+```
+
+## 에디터 확장 도구
+
+#### ESLint
+
+<img src="/images/eslint/eslint10.png" alt="ESlint" width="1000" height="400" />
+
+설치를 마친 뒤 eslint를 활성화 설정을 추가한다.
+
+```json
+// .vscode/settings.json:
+{
+  "eslint.enable": true
+}
+```
+
+설치하면 자동으로 ESLint 설정 파일을 읽고 파일을 검사한다.
+
+#### Prettier
+
+<img src="/images/eslint/eslint11.png" alt="ESlint" width="1000" height="400" />
+
+vs코드의 setting의 .json 파일에서 다음 프로퍼티를 추가해서 전역에 prettier 설정을 관리할 수 있습니다. ([링크](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode))
+
+```json
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode", // 모든 언어에 적용
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode" //자바스크립트에만 적용
+  }
+	"editor.formatOnSave": true, 
+// vsCode Editor에서의 defaultFormatter에 맞추어 자동 변경 허용
+}
+```
+
+## 참조
+
+- [PoiemaWeb](https://poiemaweb.com/eslint)
+
+- [프론트엔드 개발환경의 이해: 린트](https://jeonghwan-kim.github.io/series/2019/12/30/frontend-dev-env-lint.html)
+
+- [Rules Reference - ESLint - Pluggable JavaScript Linter](https://eslint.org/docs/latest/rules/)
+
+- [코드를 깔끔하게 짜고 싶다고? 코딩 인생템 'ESLint' (Must USE! linting Utility for JS and JSX)](https://www.youtube.com/watch?v=h1pd2iyrN08)
+
+- [린트(ESLint)와 프리티어(Prettier)로 협업 환경 세팅하기](https://www.youtube.com/watch?v=Y3kjHM7d3Zo)
+
+- [Prettier · Opinionated Code Formatter](https://prettier.io/)
+
+- [ESLint 조금 더 잘 활용하기](https://tech.kakao.com/2019/12/05/make-better-use-of-eslint/)
+
+- [ESLint 상세 설정 가이드](https://www.daleseo.com/eslint-config/)
+
+- [[자바스크립트] Prettier로 코딩 스타일 통일하기](https://www.daleseo.com/js-prettier/)
+
+- [https://github.com/okonet/lint-staged](https://github.com/okonet/lint-staged)
+
+- [Husky - Git hooks](https://typicode.github.io/husky/#/)
