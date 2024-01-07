@@ -1,0 +1,223 @@
+---
+title: 유사 배열 객체
+date : 2023-03-06
+id : array-like-object
+tag: 
+   - javascript
+brand: blog
+description: 자바스크립트에서 유사배열 객체와 배열의 차이에 대해서 알아봅니다. 
+---
+
+## 유사 배열 객체?
+
+- 유사 배열 객체는 객체는 객체인데, 객체 내부에 키가 length이고 벨류가 정수인 값을 가지고 있는 객체를 말합니다.
+- 배열을 만들고 이를 확인해보겠습니다! 배열을 `typeof` 를 통해 확인해 보면 `object` 임을 확인 할 수 있습니다. 즉 배열 또한 결국에는 객체의 한 종류임을 알 수 있습니다. 더불어 배열에 관한 상세내역을 확인해보겠습니다.
+
+```jsx
+const arr = [1,2,3,4,5]
+console.log(typeof arr) // 'object'
+console.dir(arr)
+```
+<img src="/images/array-like-object/array-like-object.png" alt="img" width="700" height="700" />
+
+- 배열의 [[prototype]]은 Array이고 인덱스를 키값으로 가지고 value를 1,2,3,4,5를 가지고 있습니다. 더불어 length를 키 값으로 가지고 value로 5를 가진 프로퍼티를 갖고 있다는 것을 알 수 있습니다.
+
+### 객체? 유사 배열 객체?
+
+유사 배열 객체는 객체 이지만 length를 키로 가지고 value로 정수를 가진 프로퍼티를 갖는 모든 객체를 유사 배열 객체라고 할 수 있습니다. 
+
+```jsx
+/* 
+객체를 만들면, 자동으로 length를 키로 가진 프로퍼티가 할당 되지 않습니다. 
+하지만 임으로 length를 키로 가지고 벨류로 수를 입력하여 프로퍼티를 만들면 유사 배열 객체를 
+만들 수 있습니다.
+*/ 
+const obj = {name: "Son", age: 27}
+console.log(obj.length) // undefined 
+obj.length = 2
+console.log(obj) //{name: 'Son', age: 27, length: 2}
+// 이제 obj이는 객체 이면서, 유사 배열 객체가 되었습니다. 
+console.dir(obj)
+```
+
+<img src="/images/array-like-object/array-like-object1.png" alt="img" width="700" height="400" />
+
+- 여기서 유사 배열 객체 또한 객체입니다. [[prototype]]으로 객체를 가지고 있으니까요. 다만 객체 중에 length를 키 값으로 가진 프로퍼티를 가진 특별한 객체입니다.
+
+
+## 유사 배열 객체를 배열로!
+
+- 이제는 유사 배열을 객체로 만들어 보겠습니다. `for … in` 을 통해 모든 객체를 배열로 만들 수는 있습니다. 하지만 이보다 더 쉬운 방법이 있죠 `Array.from()` 입니다.
+
+### `Array.from()`
+
+- MDN에서 정의한 `Array.from()` 메서드의 설명은 다음과 같습니다.
+    - **`Array.from()` 메서드는 유사 배열 객체(array-like object)나 반복 가능한 객체(iterable object)를 얕게 복사해 새로운`Array` 객체를 만듭니다. (MDN)**
+- 즉 얕은 복사를 통해 위에서 살펴본 유사 객체를 배열로 만든다는 것입니다. 그렇다면 위에서 유사 배열 객체로 만든 obj를 `Array.from()` 을 통해 배열로 만들어 보겠습니다!
+    
+    ```jsx
+    const obj = {name: "Son", age: 27, length: 2}
+    const arr = Array.from(obj)
+    console.log(arr) // [undefined, undefined]
+    ```
+    
+- 길이는 2이고 각 인덱스의 값은 undefined입니다. 왜 undefined일까요? 저희가 만든 Array의 형태를 보면 알 수 있습니다.
+    
+    ```jsx
+    const arr = [1,2,3,4,5]
+    console.log(typeof arr) // 'object'
+    console.dir(arr)
+    ```
+    
+    <img src="/images/array-like-object/array-like-object.png" alt="img" width="700" height="700" />
+    
+    - 배열의 키 값은 각각의 인덱스입니다. 즉 키 값이 올바른 인덱스 위치를 따른다면, 각각의 value를 배열의 원소로 넣을 수 있습니다!
+    
+    ```jsx
+    const obj = {0: "hi", 1:"hello", 2:"bye", length:3}
+    const arr = Array.from(obj)
+    console.log(arr) // ['hi', 'hello', 'bye']
+    // 각 벨류 값이 정상적으로 출력 된다는 것을 확인할 수 있습니다. 
+    
+    const obj2 = {1: "hi", 2: "hello", 3: "bye", length:3}
+    const arr2 = Array.from(obj2)
+    console.log(arr2) // [undefined, 'hi', 'hello']
+    /* 
+    키 값이 0인 index가 없기 때문에 undefined가 출력이 되고 length의 길이를 3으로 지정했기에
+    키가 3인 'bye'는 배열로 만들 때 포함이 되지 않았습니다. 
+    즉 유사 배열 객체 에서 배열의 형태를 결정하는 가장 중요한 것은 length 입니다..!!!
+    */
+    ```
+    
+
+---
+
+## Function’s arguments
+
+- 자바스크립트에서 함수는 모두 객체입니다. 그중 일급 객체라고 부릅니다.
+    
+   
+    > **💡 일급객체?**
+    >
+    >   - 일급 객체는 다음과 같은 조건을 만족하면 됩니다.
+    >   1. 무명의 리터럴로 생성할 수 있다. 즉 런타임에 생성이 가능하다.
+    >   2. 변수나 자료구조(객체, 배열 등)에 저장할 수 있다.
+    >   3.  함수의 매개변수에 전달할 수 있다.
+    >   4. 함수의 반환값으로 사용할 수 있다.
+
+    
+- 즉 함수 또한 객체입니다. 그렇다면 함수를 만들고 이를 출력해보면 저희가 만들지 않은 키와 벨류로 이루어진 값(프로퍼티)이 있다는 것을 확인할 수 있습니다.
+    
+    ```jsx
+    function foo(){}
+    console.dir(foo)
+    /*
+    foo 함수는 arcuments, caller, length, name, prototype를 객체로서 프로퍼티로 가지고 
+    있습니다 
+    */
+    ```
+    
+    <img src="/images/array-like-object/array-like-object2.png" alt="img" width="700" height="700" />
+    
+
+### arguments
+
+- 함수의 프로퍼티 중 arguments는 함수에 전달되는 인수를 객체로 만들어 가지고 있습니다.  함수 내부에서 arguments를 반환해 보겠습니다.
+    
+    ```jsx
+    function foo(){
+    	console.log(typeof arguments) // object
+    	return arguments
+    }
+    console.dir(foo('one', 'two', 'three', 'four'))
+    ```
+    
+    <img src="/images/array-like-object/array-like-object3.png" alt="img" width="700" height="700" />
+    
+- arguments의 `typeof` 는 `object` , 객체이고 생김새는 위에서 본 유사 배열 객체와 같습니다. 그래서 얘를 배열로 만든다면, 다음과 같이 만들어집니다!
+    
+    ```jsx
+    Array.from(foo('one', 'two', 'three', 'four')) // ['one', 'two', 'three', 'four']
+    ```
+    
+
+### 함수도 유사 배열 객체?
+
+- 자바스크립트에서 함수는 length라는 프로퍼티를 가지고 있습니다! 이는 매개변수의 개수를 의미합니다. 매개 변수의 개수만큼 자동으로 할당이 됩니다.
+    
+    ```jsx
+    function foo(a,b,c){}
+    console.dir(foo)
+    
+    ```
+    
+    <img src="/images/array-like-object/array-like-object4.png" alt="img" width="700" height="700" />
+    
+    - 매개 변수 3개를 임으로 만들고 출력해보니 `length:3`이 되었습니다. 그렇다면, 함수도 객체니까 “`Array.from()` 메서드로 배열을 생성할 수 있지 않을까?” 싶어 해보니….. 길이 3의 배열이 만들어집니다!..?!
+    
+    ```jsx
+    Array.from(foo) // [undefined, undefined, undefined]
+    ```
+    
+
+## 문자열과 래퍼 객체!
+
+- 기억을 더듬어 보면 문자열도 `length` 를 통해 문자열의 길이를 출력할 수 있었습니다!
+    
+    ```jsx
+    const str = "Hello"
+    console.log(str.length) // 5
+    ```
+    
+- 그런데, 문자열은 원시 값인데, **어떻게 객체처럼 접근이 가능한가**라는 질문이 들었습니다. 그래서 생성자 함수 String을 통해 “Hello”를 인자로 넘겨주고 만들어 보았습니다.
+    
+    ```jsx
+    const hello = new String("Hello")
+    typeof hello // object
+    console.dir(hello)
+    ```
+    
+    <img src="/images/array-like-object/array-like-object5.png" alt="img" width="700" height="700" />
+    
+    - 얘도 `typeof`의 형태는 `object`이고 유사 배열 객체와 같은 생김새를 가지고 있습니다.
+    
+    ```jsx
+    Object.getOwnPropertyDescriptors(hello)
+    /*
+    0:{value: 'H', writable: false, enumerable: true, configurable: false}
+    1:{value: 'e', writable: false, enumerable: true, configurable: false}
+    2:{value: 'l', writable: false, enumerable: true, configurable: false}
+    3:{value: 'l', writable: false, enumerable: true, configurable: false}
+    4:{value: 'o', writable: false, enumerable: true, configurable: false}
+    length:{value: 5, writable: false, enumerable: false, configurable: false}
+    [[Prototype]]:Object
+    */
+    ```
+    
+    - hello의 프로퍼티 어트리뷰트를 출력해보면 writable, configurable이 모두 **false**로 되어있습니다. 따라서 삭제나 값의 변경이 불가능합니다.!
+그렇다면 리터럴 표현식으로 만든 문자열을 객체와 같이`str.length` 접근 할 때, 출력이 되는 이유는 무엇일까? 그 이유는 원시 값을 객체와 유사한 방법으로 접근할 때 **래퍼 객체**를 만들어 값을 반환하기 때문입니다. 그 이후에 바로 객체는 가비지 컬렉션으로 보내집니다!
+    
+    ```jsx
+    const str = "Hello"
+    console.log(str.length) // new String(str).length -> 5 
+    ```
+    
+그렇다면 문자열 또한 유사 배열 객체로서 `Array.from()` 메서드를 통해 배열로 만들 수 있습니다.
+    
+    ```jsx
+    Array.from("Hello")
+    // Array.from(new String("Hello"))가 실행이 됩니다. 
+    // 반환 값은 ['H', 'e', 'l', 'l', 'o']입니다.
+    ```
+    
+
+# 참조
+
+- [Array.from() - JavaScript | MDN](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Array/from)
+
+- [Object - JavaScript | MDN](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Object)
+
+- [String](https://www.notion.so/String-0d96f3c419eb4ef5bfc4be1fffcf13cb?pvs=21)
+
+- [프로퍼티 어트리뷰트](https://www.notion.so/f9986689d4d5419d957912207533de51?pvs=21)
+

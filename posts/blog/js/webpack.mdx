@@ -1,0 +1,601 @@
+---
+title: webpack
+date : 2023-04-08
+id : webpack
+tag: 
+   - webpack
+   - javascript
+brand: blog
+description: webpack의 개념과 간단한 활용방법을 정리합니다.
+---
+
+## 태생적인 자바스크립트의 한계 (모듈화)
+
+- ES6에서 import 모듈화가 등장하기 전까지 **공식적으로 브라우저 상의 자바스크립트에는 모듈화를 지원하지 않았습니다**. 다만 Node.js에는 CommonJs 방식의 모듈화를 지원하고 있었습니다. **commonJS는 동기적으로 동작하는 것을 특징**으로 합니다. 하지만 이를 브라우저 상에 호환하기에는 많은 문제점을 가지고 있었습니다.  **특히 비동기 문제를 해결할 수 없었습니다**.
+
+1. **script 파일 로딩시 blocking이 발생하는 브라우저 환경에서는 성능 저하 발생.**
+2. **변수 할당의 불편함** 
+    
+    모듈화를 생각하는 방식으로 **“하나의 HTML 파일에 여러 개의 Script를 할당하면 되지 않을까 ?”**라고 생각할 수도 있습니다. 하지만 이는 엄밀한 의미의 모듈화라고 할 수 없습니다. HTML을 파싱하는 과정에서 모듈화를 거치지 않은 자바스크립트 파일은 **하나의 전역 객체만을 가지기 때문**입니다. 따라서 **변수가 오염될 위험이 높습니다**.
+    
+    ```html
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+      </head>
+      <body>
+        <script src="./ex/ex1.js"></script>
+        <script src="./ex/ex2.js"></script>
+        <script src="./ex/ex3.js"></script>
+      </body>
+    </html>
+    ```
+    
+    ```jsx
+    //ex1.js
+    const one = 1;
+    ```
+    
+    ```jsx
+    //ex2.js
+    const one = 1;
+    ```
+    
+    ```jsx
+    //ex3.js
+    const one = 1;
+    ```
+    <img src="/images/webpack/webpack.png" width="800" height="300" alt="img" />
+    
+    모듈화를 하지 않았기 때문에 이미 선언된 변수를 다시 호출하고 있다는 에러가 출력 되고 있는 것을 확인할 수 있습니다. 즉 같은 전역을 공유하고 있습니다.
+    
+3. **브라우저에서의 ES6 모듈 지원의 한계**
+    
+    막 ES6(ES2015)가 등장했을 때, 모든 브라우저가 호환이 되는 시기가 아니었다. 즉 **브라우저 마다 상이한 모듈 처리를 해야 하는 불편함**을 겪어야 했다. 이러한 문제로 등장한 것이 바로 **webpack**이다! 웹펙에서 Modules에 대해 정리한 개념을 보면 웹펙의 등장 배경을 더 쉽게 알 수 있다.
+    
+    In [modular programming](https://en.wikipedia.org/wiki/Modular_programming), developers break programs up into discrete chunks of functionality called a *module*.
+    
+    > 모듈식 프로그래밍에서 개발자는 프로그램을 모듈이라고 하는 개별 기능 덩어리로 나눕니다.
+    > 
+    
+    Each module has a smaller surface area than a full program, making verification, debugging, and testing trivial. Well-written *modules* provide solid abstractions and encapsulation boundaries, so that each module has a coherent design and a clear purpose within the overall application.
+    
+    > 각 모듈은 전체 프로그램보다 표면적이 작기 때문에 검증, 디버깅 및 테스트가 간단합니다. 잘 작성된 모듈은 견고한 추상화 및 캡슐화 경계를 제공하므로 각 모듈은 전체 애플리케이션 내에서 일관된 디자인과 명확한 목적을 갖습니다.
+    > 
+    
+    Node.js has supported modular programming almost since its inception. On the web, however, support for *modules* has been slow to arrive. Multiple tools exist that support modular JavaScript on the web, with a variety of benefits and limitations. Webpack builds on lessons learned from these systems and applies the concept of *modules* to any file in your project.
+    
+    > Node.js는 거의 처음부터 모듈식 프로그래밍을 지원해 왔습니다. 하지만 **웹에서는 모듈에 대한 지원이 더디게 이루어졌습니다. 웹에서 모듈형 JavaScript를 지원하는 여러 도구가 존재하며, 각 도구는 다양한 장점과 한계**를 지니고 있습니다. Webpack은 이러한 시스템에서 얻은 교훈을 바탕으로 **프로젝트의 모든 파일에 모듈 개념을 적용**합니다.
+    > 
+
+---
+
+## Webpack
+
+<img src="/images/webpack/webpack1.png" width="800" height="500" alt="img" />
+
+webpack 공식문서에는 webpack을 다음과 같이 소개하고 있습니다.
+
+*At its core, **webpack** is a *static module bundler* for modern JavaScript applications. When webpack processes your application, it internally builds a [dependency graph](https://webpack.js.org/concepts/dependency-graph/) from one or more *entry points*
+ and then combines every module your project needs into one or more *bundles*, which are static assets to serve your content from.*
+> 웹팩의 핵심은 최신 자바스크립트 애플리케이션을 위한 **정적 모듈 번들러**입니다. 웹팩은 애플리케이션을 처리할 때 내부적으로 하나 이상의 진입점에서 종속성 그래프를 구축한 다음 **프로젝트에 필요한 모든 모듈을 하나 이상의 번들로 결합하여 콘텐츠를 제공할 정적 자산을 생성**합니다.
+> 
+정리해보면 **하나의 시작점(Entry point)으로부터 의존적인 모듈을 전부 찾아내서 하나의 파일로 만든다.** 라는 개념으로 시작했다는 것을 알 수 있습니다. 하지만 여기서 보지 못하던 개념이 새롭게 나옵니다. module bundler의 bundler입니다. modul을 이해했으니 이제 bundler를 이해해야 할 때입니다.
+
+---
+
+### bundling
+
+**bundle의 의미는 “꾸러미, 묶음, 보따리”** 입니다.  즉 **moduler bundler는 말 그대로 모든 모듈을 묶어서 정리한다**는 것입니다. 각각 모듈화로 분리된 파일이 하나의 파일에서 정상적으로 작동되도록 만든다는 것을 의미합니다. 
+
+webpack은 JS 파일 뿐만 아니라 로더(Loder) 설정에 따라서 다른 형태의 파일 또한 번들링할 수 있습니다.
+
+#### bundling의 장점
+
+1. 같은 타입(html, css, js 등)의 파일을 묶어서 요청/응답을 받기 때문에 네트워크 비용이 감.
+2.  **Webpack 4**버전 이상부터는 [ development ], [ production ]  두 가지의 mode 지원을 한다. **특히 production 모드로 번들링을 진행할 경우, 코드 난독화, 압축, 최적화(Tree Shaking) 작업을 지원한다.**
+
+---
+
+## Webpack의 핵심 개념
+
+- webpack의 핵심 개념은 **Entry(엔트리), Output(출력), Loaders(로더), Plugins(플러그인) , Mode(모드), Browser Compatibility(브라우저 호환성)로** 구분할 수 있습니다.
+- 이중 Entry(엔트리), Output(출력), Loaders(로더), Plugins(플러그인)에 대해서 정리하였습니다.
+
+### Entry / Output
+
+#### webpack 설치하기
+
+```
+// 웹팩 설치하기
+npm install webpack webpack-cli --save-dev
+
+// 웹팩 설정 파일 생성
+touch webpack.config.js
+```
+
+#### Entry / Output 설정
+
+- **Entry**
+    
+  **Entry** 포인트는 웹팩이 내부 종속성 그래프 작성을 시작할 때 사용할 모듈을 나타냅니다. **웹팩은 해당 엔트리 포인트가 직간접적으로 의존하는 다른 모듈과 라이브러리를 파악**합니다.
+    
+- **Output**
+    
+  **Output** 속성은 **웹팩이 생성한 번들을 어디로 내보낼지, 그리고 이 파일들의 이름을 어떻게 지정할지 알려줍니다**. 기본 값은 기본 출력 파일의 경우 ./dist/main.js, 기타 생성된 파일의 경우 ./dist 폴더입니다.
+    
+
+```jsx
+//webpack.config.js
+const path = require("path");
+
+module.exports = {
+  name: "agorastate", //구성의 이름
+  mode: "development", // 실서비스 : production
+  devtool: "eval", //hidden-source-map
+  entry: "./src/js/script.js",
+  output: {
+    filename: "main.js",
+    path: path.resolve(__dirname, "dist"),
+  },
+};
+```
+
+- name, mode, devtool 과 같은 옵션은 webpack의 Other Options에서 확인할 수 있습니다. 개발 진행 단계에서는 mode와 devtool을 위와 같이 설정한다면, 실제 production 배포 단계에서는 mode를 production으로 devtool을 none으로 설정합니다.
+
+
+> ⚠️ **Node.js Path 라이브러리**
+>
+> **파일이나 디렉토리의 경로를 단순히 문자열을 이용하여 접근하면 프로그램이 특정 운영체제에서만 돌아갈 위험**이 생깁니다. Node.js에서는 `path` 모듈을 제공하여 자바스크립트 개발자들이 이러한 위험 없이 경로를 다룰 수 있도록 도와주는 것.
+>
+> `resolve()` 함수는 마치 터미널에서 `cd` 명령어를 연속해서 날리는 것처럼 작동을 하고 항상 절대 경로를 반환.
+
+```jsx
+const path = require("path");
+
+console.log(path.resolve(__dirname));
+console.log(path.resolve(__dirname, "zeroCho"));
+console.log(path.resolve(__dirname, "zeroCho", "index.js"));
+/*
+C:\Users\js953\Desktop\Github\codestate\deepJs
+C:\Users\js953\Desktop\Github\codestate\deepJs\zeroCho
+C:\Users\js953\Desktop\Github\codestate\deepJs\zeroCho\index.js
+*/
+```
+
+- package.json에 npm 스크립트를 추가 해서 간단하게 build를 진행할 수 있습니다. 매번 npx webpack을 입력할 필요가 없습니다!
+
+```json
+{
+  "name": "fe-sprint-my-agora-states",
+  "version": "1.0.0",
+  "description": "applying a webpack",
+  "main": "./src/js/script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kd02109/fe-sprint-my-agora-states.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kd02109/fe-sprint-my-agora-states/issues"
+  },
+  "homepage": "https://github.com/kd02109/fe-sprint-my-agora-states#readme",
+  "devDependencies": {
+    "webpack": "^5.78.0",
+    "webpack-cli": "^5.0.1"
+  }
+}
+```
+
+---
+
+### Loader
+
+- 지금까지 js 파일을 번들링 하는 과정을 알아보았습니다. 하지만 webpack의 장점은 js 파일 이외의 다른 파일도 번들링을 지원해준다는 점입니다. 이를 가능하게 해주는 option이 **Loader** 입니다. Css 파일을 예로 시작해보겠습니다.
+
+#### Loading CSS
+
+- 자바스크립트 모듈 내에서 CSS 파일을 가져오려면 스타일 로더와 css-loader를 설치하여 모듈 구성에 추가해야 한다.
+
+```
+npm install --save-dev style-loader css-loader
+```
+
+```jsx
+const path = require("path");
+
+module.exports = {
+  name: "agorastate",
+  mode: "production", // 실서비스 : production
+  entry: "./src/js/script.js",
+  output: {
+    filename: "main.js",
+    path: path.resolve(__dirname, "build"),
+  },
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: ["style-loader", "css-loader"],
+      },
+    ],
+  }
+};
+
+```
+
+- test는 어떤 파일 형식을 조사할지 webpack에 알려줍니다. 이는 정규표현식을 활용합니다. 여기서는 파일의 끝이 .css로 끝나는 파일을 검사하고 번들링 하겠다는 것을 표현합니다.
+- 모듈 로더를 체인으로 연결할 수 있습니다. 체인의 각 로더는 처리된 리소스에 변환을 적용합니다. **체인은 역순으로 실행**됩니다. **첫 번째 로더는 그 결과(변환이 적용된 리소스)를 다음 로더로 전달하는 식으로 실행(css-loder가 실행이되고 style-loder가 실행)**됩니다. 마지막으로 **웹팩은 체인의 마지막 로더가 자바스크립트를 반환**할 것으로 예상합니다.
+    
+    **위의 로더 순서를 유지**해야 합니다. 'style-loader'가 먼저 오고 'css-loader'가 그 뒤를 따릅니다. 이 규칙을 따르지 않으면 웹팩에서 오류가 발생할 수 있습니다.
+    
+- 마지막으로 해당하는 css 파일을 entry js 파일과 연결 시켜야 합니다.
+    
+    ```jsx
+    import { agoraStatesDiscussions } from "./data.js";
+    import PageNation from "./pagenation.js";
+    import { AVATAR_URL } from "./avatarData.js";
+    import "../css/style.css";
+    ```
+    
+- html에 build 된 js파일을 연결하고 기존의 css를 연결한 link tag를 해제해도 정상적으로 style이 적용되는 걸 확인할 수 있습니다!
+- 만약 css를 따로 분리해서 관리하기를 원한다면 ****[MiniCssExtractPlugin](https://webpack.js.org/plugins/mini-css-extract-plugin/#root) 사용을 추천 드립니다.**
+- 이외에도 image, fonts, data 등을 webpack 번들링 하는 방법이 공식 문서에 작성되어 있습니다. 😃
+
+#### babel-loder 적용하기
+
+```
+// 바벨 설치하기
+npm install --save-dev @babel/core @babel/cli @babel/preset-env babel-loader
+// webpack 모듈화 과정에서 사용할 core-js 설치하
+npm install --save core-js@3.30.0
+```
+
+```jsx
+// webpak.config.js
+// webpak.config.js
+const path = require("path");
+module.exports = {
+  name: "agorastate",
+  mode: "development", // 실서비스 : production
+  devtool: "eval",
+  entry: "./src/js/script.js",
+  output: {
+    filename: "main.js",
+    path: path.resolve(__dirname, "dist"),
+  },
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: ["style-loader", "css-loader"],
+      },
+      {
+        test: /\.js$/,
+        loader: "babel-loader",
+        exclude: /node_modules/, //예외처리
+        options: {
+          presets: [
+            [
+              "@babel/preset-env",
+              {
+                useBuiltIns: "usage", // 폴리필 사용 방식 지정
+                corejs: "3.6.5", // 폴리필 버전 지정
+              },
+            ],
+          ],
+        },
+      },
+    ],
+  },
+};
+/*
+사용하는 써드파티 라이브라리가 많을수록 바벨 로더가 느리게 동작할 수 있는데 
+node_modules 폴더를 로더가 처리하지 않도록 예외 처리
+*/
+```
+
+---
+
+### Plugin
+
+- 플러그인은 번들된 결과물을 처리한다. 번들된 자바스크립트를 난독화 한다거나 특정 텍스트를 추출하는 용도로 사용한다.
+
+```
+// webpak.config.js
+const path = require("path");
+module.exports = {
+  name: "agorastate",
+  mode: "development", // 실서비스 : production
+  devtool: "eval",
+  entry: "./src/js/script.js",
+  output: {
+    filename: "main.js",
+    path: path.resolve(__dirname, "dist"),
+  },
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: ["style-loader", "css-loader"],
+      },
+      {
+        test: /\.js$/,
+        loader: "babel-loader",
+        exclude: /node_modules/, //예외처리
+        options: {
+          presets: [
+            [
+              "@babel/preset-env",
+              {
+                useBuiltIns: "usage", // 폴리필 사용 방식 지정
+                corejs: "3.6.5", // 폴리필 버전 지정
+              },
+            ],
+          ],
+        },
+      },
+    ],
+  },
+};
+```
+
+- **플러그인을 사용하려면 `require()` 함수를 사용해 설치된 플러그인이 불러온 후, `plugins`배열에 추가**해야 합니다 . 대부분의 플러그인은 **옵션을 통해 사용자 정의** 할 수 있습니다. 목적에 따라 플러그인을 여러 번 사용할 수 있으므로 `**new` 연산자를 사용해 플러그인 인스턴스를 만들어야 합니다** .
+
+#### MiniCssExtractPlugin 활용하기
+
+```
+// 설치하기
+npm install --save-dev mini-css-extract-plugin 
+```
+
+```jsx
+const path = require("path");
+// 플러그인 불러오기
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+
+module.exports = {
+  name: "agorastate",
+  mode: "development", // 실서비스 : production
+  devtool: "eval",
+  entry: "./src/js/script.js",
+  output: {
+    filename: "main.js",
+    path: path.resolve(__dirname, "build"),
+  },
+ // 플러그린 배열로 정의하기, 옵션 설정 output 파일 이름 설정
+  plugins: [
+    new MiniCssExtractPlugin({
+      filename: "styles.css",
+    }),
+  ],
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
+/*
+	loader에서 기존에는 'style-loder'로 js 파일 내부로 통합했다면, 
+	이제는 MiniCssExtractPlugin.loader를 활용해서 css를 따로 분리하여 번들링한다.
+*/
+      },
+    ],
+  },
+};
+```
+
+## react와 webpack 연결하기
+
+- creat-react-app은 별도의 webpack과 다른 라이브러리 설정 없이 매우 쉽게 react를 사용할 수 있도록 해줍니다. 따라서 어떻게 react에서 creat-react-app에서 webpack을 어떻게 설정했는지 간단하게 알아보고자 합니다.
+
+---
+
+### 설정에 필요한 라이브러리 설치
+
+- 목록은 다음과 같습니다.
+
+```json
+{
+  "name": "webpack_react_practice",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "core-js": "^3.30.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.21.3",
+    "@babel/preset-env": "^7.20.2",
+    "@babel/preset-react": "^7.18.6",
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.10",
+    "babel-loader": "^9.1.2",
+    "css-loader": "^6.7.3",
+    "mini-css-extract-plugin": "^2.7.5",
+    "react-refresh": "^0.14.0",
+    "webpack": "^5.76.3",
+    "webpack-cli": "^5.0.1",
+    "webpack-dev-server": "^4.13.1"
+  }
+}
+```
+
+- 바벨을 설치한 이유는 JS ES5 이상의 문법 변환과 react 코드를 변환하기 위해서 입니다. 대표적인 예시가 JSX입니다. JSX는 리엑트의 문법은 아닙니다. 단지 코드 작성과 가독성의 편의를 위해 사용하는 것입니다. 따라서 jsx 코드는 리엑트가 이해할 수 있는 코드로 변화시켜 주어야 합니다. 이와 같은 역할을 하는 것이 @babel/preset-env 입니다. ([예시 링크](https://babeljs.io/repl#?browsers=defaults%2C%20not%20ie%2011%2C%20not%20ie_mob%2011&build=&builtIns=usage&corejs=3.21&spec=true&loose=true&code_lz=KYDwDg9gTgLgBAE2AMwIYFcA29noHYDGMAlhHnAIJhgAUAlHAN4BQccUwM6U5NrbcADwJiANwB8_AUIAKUCMmKZg06QGdiAL2ABeRgEYADIYC-U1WGBQ1ZPS1Wq8qALbAAXHABEAaVQw16ADWEHAAyqhQ6AAWqGpRxJ4ANOYOxM6oAObAAJIIHp4AmsjAAPIAjmAATJ4pAiZmDgD0kg6CcgpKwLVsGtp6ABym3XCW1raM9g4CTq75FIGYSuhwADLAzulJw2xpmTl5XiXeoQBsAOyYUTVTcPW1zbVt8orKw726jACsQzejNnh2bZwGbuLwrYjkFaoPAATwhGS2Nx26SyuXy-gARgANT4ARQAEidrlM7k0WgJBI0RBJ-HQANzMMxAA&debug=false&forceAllTransforms=false&modules=amd&shippedProposals=false&circleciRepo=&evaluate=false&fileSize=false&timeTravel=false&sourceType=module&lineWrap=false&presets=env%2Creact%2Cstage-0&prettier=false&targets=Electron-1.8%252CNode-10.13&version=7.21.3&externalPlugins=&assumptions=%7B%7D))
+
+---
+
+### webpack 설정하기
+
+```jsx
+// webpak.config.js
+const path = require("path");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+
+module.exports = {
+  name: "agora-state-react",
+  mode: "development",
+  devtool: "eval",
+
+  // 입력
+  entry: "./src/index.js",
+
+  //출력
+  output: {
+    filename: "app.js",
+    path: path.resolve(__dirname, "dist"),
+  },
+
+  //plugin 설정
+  plugins: [
+    new MiniCssExtractPlugin({
+      filename: "styles.css",
+    }),
+  ],
+
+  module: {
+    rules: [
+      {
+        //CSS 변환하기
+        test: /\.css$/i,
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
+      },
+      {
+        //바벨 loader 설정하기
+        test: /\.js$/,
+        loader: "babel-loader",
+        exclude: /node_modules/, //예외처리
+        options: {
+          presets: [
+            [
+              "@babel/preset-env", //ES5
+              {
+                useBuiltIns: "usage", // 폴리필 사용 방식 지정
+                corejs: "3.6.5", // 폴리필 버전 지정
+              },
+            ],
+            "@babel/preset-react", // react
+          ],
+        },
+      },
+    ],
+  },
+};
+```
+
+- 다음과 같이 webpack을 설정하고 webpack을 실행하면 dist 폴더에 app.js, style.css가 생성되는 것을 확인할 수 있습니다. 이를 index.html과 연결하겠습니다.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Web site created using create-react-app"
+    />
+    <script
+      src="https://kit.fontawesome.com/981361981b.js"
+      crossorigin="anonymous"
+    ></script>
+    <title>My Agora State</title>
+    <link rel="stylesheet" href="./dist/styles.css" />
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+  <script src="./dist/app.js"></script>
+</html>
+```
+
+- index.html 파일을 실행하면 문제 없이 리엑트 코드가 실행되는 것을 확인 할 수 있습니다!
+
+---
+
+## Webpack DevServer
+
+- 웹팩-개발서버를 사용하여 애플리케이션을 빠르게 개발할 수 있습니다. ([링크](https://webpack.js.org/configuration/dev-server/#root))
+- 리엑트에서 저희가 파일을 수정할 때 마다 자동으로 페이지를 새로고침하여 변경 사항을 바로 적용할 수 있습니다. 이를 위해서 2개의 라이브러리를 추가적으로 설치하겠습니다.
+
+```
+npm install -D @pmmmwh/react-refresh-webpack-plugin react-refresh
+```
+
+```json
+// 웹팩 서버를 실행하기 위해서 다음과 같이 npm 스크립트를 작성합니다.
+"scripts": {
+    "dev": "webpack serve --env developemont",
+  },
+```
+
+```jsx
+// webpack.config.js
+const WebpackServer = require("@pmmmwh/react-refresh-webpack-plugin");
+
+//loaders에서 plugins에 다음과 같이 추가합니다.
+plugins: ["react-refresh/babel"],
+
+//devServer 설정하기
+devServer: {
+    //output 경로를 똑같이 적용합니다.
+		//웹팩 에셋을 처리하는 웹팩 개발 미들웨어에 옵션을 제공합니다.
+    devMiddleware: { publicPath: "/dist/" },
+		//정적 파일을 제공하기 위한 옵션을 구성 -> 경로상의 index.html을 실행합니다.
+    static: { directory: path.resolve(__dirname) },
+		// 
+    hot: true,
+  },
+```
+
+- 웹팩 빌드 결과물을 돌리고 이를 publicPath 경로의 메모리에 저장합니다. index.html을 실행하면 저장된 결과물을 실행시켜 줍니다.
+- hot 소스코드의 변경점을 발견해서 저 장한 결과물을 수정해줍니다.
+
+## 참조
+
+- [Modules | webpack](https://webpack.js.org/concepts/modules/#root)
+
+- [Concepts | webpack](https://webpack.js.org/concepts/)
+
+- [Devtool | webpack](https://webpack.js.org/configuration/devtool/#devtool)
+
+- [[webpack] 2) 번들링(Bundling) 개념 및 사용 이유](https://humanwater.tistory.com/2)
+
+- [프론트엔드 개발환경의 이해: 웹팩(기본)](https://jeonghwan-kim.github.io/series/2019/12/10/frontend-dev-env-webpack-basic.html#2-엔트리아웃풋)
+
+- [번들러](https://ui.toast.com/fe-guide/ko_BUNDLER)
+
+- [Node.js의 path 모듈로 경로 다루기](https://www.daleseo.com/js-node-path/)
+
+- [React App 매뉴얼 구성](https://yamoo9.gitbook.io/webpack/react/create-your-own-react-app)
+
+- [[10분 테코톡] ☀️ 썬의 모듈 번들러와 빌드도구](https://www.youtube.com/watch?v=9b89f21Sizs)
+
+- [리액트 무료 강좌 2-9. 웹팩 데브 서버와 핫 리로딩(2021년 버전 )](https://www.youtube.com/watch?v=RCb0UF7Lu90&list=PLcqDmjxt30RtqbStQqk-eYMK8N-1SYIFn&index=20)
+
+- [npm: react-refresh](https://www.npmjs.com/package/react-refresh)
+
+- [https://github.com/pmmmwh/react-refresh-webpack-plugin](https://github.com/pmmmwh/react-refresh-webpack-plugin)
+
+- [https://github.com/zloirock/core-js](https://github.com/zloirock/core-js)
+
+- [Parcel vs Rollup vs Webpack 비교](https://velog.io/@subin1224/Parcel-vs-Rollup-vs-Webpack-비교)
+
+- [모듈화](https://www.notion.so/7f120bc0b01d43ce8d6e6cbba787afeb?pvs=21)
