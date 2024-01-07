@@ -1,0 +1,335 @@
+---
+title: Cookie
+date : 2023-05-02
+id : cookie
+tag: 
+   - cookie
+   - javascript
+   - login
+brand: blog
+description: 내가 만든 브라우저 쿠키 로그인을 위해 구웠지
+---
+
+
+## Cookie
+<img src="/images/cookie/cookie.png" alt="img" width="500" height="500" />
+
+쿠키는 **서버에서 클라이언트에 영속성 있는 데이터를 저장하는 방법**입니다. 
+서버는 클라이언트의 쿠키를 이용하여 데이터를 가져올 수 있습니다.
+
+그러므로 쿠키를 이용하는 것은 **단순히 서버에서 클라이언트에 쿠키를 전송하는 것만 의미하지 않고 클라이언트에서 서버로 쿠키를 다시 전송하는 것도 포함됩니다.**
+
+<img src="/images/cookie/cookie1.png" alt="img" width="700" height="700" />
+
+서버는 쿠키를 이용하여 데이터를 저장하고 이 데이터를 다시 불러와 사용할 수 있습니다.
+하지만 **데이터를 저장한 이후 아무 때나 데이터를 가져올 수는 없습니다. 데이터를 저장한 이후 특정 조건들이 만족되어야 다시 가져올 수 있기 때문입니다.**
+
+이런 조건들은 아래 코드처럼 http 헤더를 사용해 **쿠키 옵션**으로 표현할 수 있습니다.
+
+```jsx
+'Set-Cookie':[
+            'cookie=yummy', 
+            'Secure=Secure; Secure',
+            'HttpOnly=HttpOnly; HttpOnly',
+            'Path=Path; Path=/cookie',
+            'Doamin=Domain; Domain=cookietest.com'
+        ]
+```
+
+### Cookie Options
+
+- **Domain**
+
+    **쿠키 옵션에서 도메인은 포트 및 서브 도메인 정보, 세부 경로를 포함하지 않습니다.**
+    따라서 요청해야 할 URL이 `http://www.localhost.com:3000/users/login`이라 하면 여기에서 Domain은 `localhost.com`이 됩니다.
+    만약 쿠키 옵션에서 도메인 정보가 존재한다면 **클라이언트에서는 쿠키의 도메인 옵션과 서버의 도메인이 일치해야만 쿠키를 전송할 수 있습니다**. 
+    이를 통해 `naver.com`에서 받은 쿠키를 `google.com`에 전송하는 일을 막을 수 있습니다.
+    
+
+- **Path**
+
+  `Path`는 세부 경로로써 서버가 라우팅할 때 사용하는 경로를 의미합니다. 
+  만약 **요청해야 하는 URL이 `http://www.localhost.com:3000/users/login`**인 경우라면 여기에서 
+  `Path`, 즉 세부 경로는 `/users/login`이 됩니다. 이를 명시하지 않으면 **기본적으로 `/`으로 설정**되어 있습니다.
+  `Path` 옵션의 특징은 **설정된 경로를 포함하는 하위 경로로 요청을 하더라도 쿠키를 서버에 전송할 수 있습니다. 즉 `Path`가 `/users`로 설정되어 있고, 요청하는 세부 경로가 `/users/:id`인 경우라면 쿠키 전송이 가능**합니다.
+  하지만 `/posts/:id`로 전송되는 요청은 `Path` 옵션`/users`을 만족하지 못하기 때문에 서버로 쿠키를 전송할 수 없습니다.
+
+- **MaxAge or Expires**
+
+    쿠키의 유효한 기간을 정하는 옵션입니다.
+      - **`MaxAge`는 쿠키의 유효한 시간을 초 단위로 설정**하는 옵션
+      - `Expires`는 `MaxAge`와 비슷하지만 언제까지 쿠키가 유효한지 지정할 수 있습니다. 
+      이때 **옵션의 값은 클라이언트의 시간을 기준**으로 합니다. 이후 지정된 시간, 날짜를 초과하게 되면 쿠키는 자동으로 파괴됩니다. 
+      **쿠키의 유효 일자는 반드시 GMT(Greenwich Mean Time) 포맷으로 설정해야 합니다.**
+          
+          ```jsx
+          let date = new Date(Date.now() + 86400e3);
+          date = date.toUTCString();
+          document.cookie = "user=John; expires=" + date;
+          ```
+        
+    쿠키는 위 옵션의 여부에 따라 세션 쿠키(Session Cookie)와 영속성 쿠키(Persistent Cookie)로 나눠집니다.
+        1. **세션 쿠키** : `MaxAge` 또는 `Expires` 옵션이 없는 쿠키로, 브라우저가 실행 중일 때 사용할 수 있는 임시 쿠키입니다. 브라우저를 종료하면 해당 쿠키는 삭제됩니다.
+        2. **영속성 쿠키** : 브라우저의 종료 여부와 상관없이 `MaxAge` 또는 `Expires`에 지정된 유효시간만큼 사용가능한 쿠키입니다.
+
+- **Secure**
+   **사용하는 프로토콜에 따른 쿠키의 전송 여부를 결정하는 옵션입니다.**
+   만약 `Secure` 옵션이 `true`로 설정된 경우 HTTPS를 이용하는 경우에만 쿠키를 전송할 수 있습니다.
+   `**Secure` 옵션이 없다면 프로토콜에 상관없이 `http://www.naver.com` 또는 `https://www.naver.com`에 모두 쿠키를 전송할 수 있습니다**. 
+   (도메인이 `localhost`인 경우에는 HTTPS가 아니어도 쿠키 전송이 가능합니다. 개발 단계에서는 `localhost`를 사용하는 경우가 많기 때문에 생긴 예외입니다.)
+
+- **HttpOnly**
+  자바스크립트로 브라우저의 쿠키에 접근이 가능한지 여부를 결정합니다. 
+  만약 **해당 옵션이 `true`로 설정된 경우, 자바스크립트로 쿠키에 접근이 불가**합니다.
+  **옵션을 명시하지 않는 경우에는 기본적으로 `false`로 지정**됩니다. 
+  만약 이 옵션이 `false`인 경우 `document.cookie`를 이용해 자바스크립트로 쿠키에 접근할 수 있으므로 쿠키가 탈취될 위험이 있습니다.
+  <img src="/images/cookie/cookie2.png" alt="img" width="700" height="700" />
+
+- **SameSite**
+
+  Cross-Site 요청을 받은 경우, **요청에서 사용한 메서드(e.g. GET, POST, PUT, PATCH …)와 해당 옵션의 조합을 기준으로 서버의 쿠키 전송 여부를 결정**하게 됩니다. 
+  이때, **Cross-Origin(Same-Origin)과 Cross-Site(Same-Site)를 혼동하지 않도록 주의**해야 합니다.
+
+    - **Cross-Origin** : **서버의 도메인, 프로토콜, 포트** 중 하나라도 다른 경우 Cross-Origin으로 구분됩니다.
+        - **`http://naver.com` vs `https://naver.com`** : 프로토콜이 다르므로 Cross-Origin입니다.
+        - **`https://naver.com:443` vs `https://naver.com`** : https의 기본 포트는 443입니다. 따라서 도메인, 프로토콜, 포트가 모두 같은 Same-Origin입니다.
+
+    - **Cross-Site** : eTLD+1이 다른 경우 Cross-Site로 구분됩니다. 
+    여기서 **eTLD+1 이란, `.com`, `.org`과 같이 도메인의 가장 마지막 부분을 TLD(Top Level Domain, 최상위 도메인)라고 하는데, 이 최상위 도메인의 바로 왼쪽의 하위 레벨 도메인을 합한 것을 eTLD+1** 이라고 합니다. 참고로, 요즘 자주 볼 수 있는 `**.io`의 경우 바로 왼쪽의 주소를 하나 더 합한 것을 TLD라고 판단**합니다.
+        - **`http://naver.com` vs `https://naver.com`** : **두 주소 모두 TLD는 `.com`, eTLD+1은 `naver.com`으로 같으므로 Same-Site입니다.**
+        - **`https://code.github.io` vs `https://states.github.io`** : 두 주소 모두 TLD가 **`github.io`로 같지만, eTLD+1은 각각 `code.github.io`, `states.github.io`로 다르므로 Cross-Site**입니다.
+
+
+  SameSite 옵션에서 사용할 수 있는 속성은 다음과 같습니다.
+
+    - **Lax**: **Cross-Site 요청이라면 GET 메서드에 대해서만 쿠키를 전송**할 수 있습니다.
+    - **Strict**: 단어 그대로 가장 엄격한 옵션으로, Cross-Site가 아닌 **Same-Site인 경우에만 쿠키를 전송**할 수 있습니다.
+    - **None**: Cross-Site에 대해 가장 관대한 옵션으로 **항상 쿠키를 보내줄 수 있습니다. 다만 쿠키 옵션 중 Secure 옵션이 필요**합니다.
+
+## 쿠키를 이용한 상태 유지
+
+이러한 쿠키의 특성을 이용하여 서버는 클라이언트에 인증정보를 담은 쿠키를 전송하고, 
+클라이언트는 전달받은 쿠키를 서버에 요청과 함께 전송하여 Stateless한 인터넷 연결을 Stateful하게 유지할 수 있습니다.
+
+**하지만 기본적으로 쿠키는 오랜 시간 동안 유지될 수 있고, HttpOnly 옵션을 사용하지 않았다면 자바스크립트를 이용해서 쿠키에 접근할 수 있기 때문에 쿠키에 민감한 정보를 담는 것은 위험합니다.**
+
+이런 인증정보를 이용해 공격자가 유저인척 서버에 요청을 보낸다면 서버는 누가 요청을 보낸 건지 의심하지 않고 이를 인증된 유저의 요청으로 취급하게 됩니다. 
+이때 개인정보와 같은 민감한 정보를 공격자가 탈취한다면 2차 피해가 일어날 수 있습니다.
+
+```
+📦fe-sprint-auth-cookie
+ ┃ 
+ ┣ 📂client
+ ┃ ┣ 📂public
+ ┃ ┃ ┗ 📜index.html
+ ┃ ┣ 📂src
+ ┃ ┃ ┣ 📂pages
+ ┃ ┃ ┃ ┣ 📜Login.js
+ ┃ ┃ ┃ ┗ 📜Mypage.js
+ ┃ ┃ ┣ 📂__test__
+ ┃ ┃ ┃ ┗ 📜client.test.js
+ ┃ ┃ ┣ 📜App.css
+ ┃ ┃ ┣ 📜App.js
+ ┃ ┃ ┣ 📜index.js
+ ┃ ┃ ┗ 📜setupTests.js
+ ┃ ┣ 📜.gitignore
+ ┃ ┣ 📜package-lock.json
+ ┃ ┣ 📜package.json
+ ┃ ┗ 📜README.md
+ ┗ 📂server
+ ┃ ┣ 📂controllers
+ ┃ ┃ ┣ 📂users
+ ┃ ┃ ┃ ┣ 📜login.js
+ ┃ ┃ ┃ ┣ 📜logout.js
+ ┃ ┃ ┃ ┗ 📜userInfo.js
+ ┃ ┃ ┗ 📜index.js
+ ┃ ┣ 📂db
+ ┃ ┃ ┗ 📜data.js
+ ┃ ┣ 📂__test__
+ ┃ ┃ ┗ 📜server.test.js
+ ┃ ┣ 📜.gitignore
+ ┃ ┣ 📜index.js
+ ┃ ┣ 📜multi-reporters.json
+ ┃ ┣ 📜package-lock.json
+ ┃ ┗ 📜package.json
+```
+
+<img src="/images/cookie/cookie3.png" alt="img" width="800" height="800" />
+
+- 1. 로그인 버튼 클릭
+
+  로그인 버튼이 클릭 될 시 유저의 아이디와 비밀번호 `**loginInfo**`를 백엔드에 넘깁니다.  
+  추가적으로 cookies의 maxAge 와 expires options 설정을 위해 로그인 유지하기`checkedKeepLogin`의 상태 값도 넘겨줍니다.
+      
+      ```jsx
+      //client/pages/Login.js
+      
+      // 유효성 검사
+      if (!loginInfo.password || !loginInfo.userId) {
+            setErrorMessage("아이디와 비밀번호를 입력하세요");
+            return;
+          }
+      
+      //
+      return axios.post("http://localhost:4000/login", { loginInfo, checkedKeepLogin })
+      ```
+    
+
+- 2. 서버에서 요청을 처리해서 응답(유저 정보, 쿠키 전달)
+  /login에서 client에서 보낸 post 요청을 처리합니다. 로그인에 성공했을 시 그에 관련한 cookie를 만듭니다.
+  이때 바로 client로 요청을 보내지 않고 /userinfo endpoint로 redirect 해준다. 즉 /login에서 쿠키만 발급하고, /userinfo에서 회원 정보를 보내준다.
+
+  ```jsx
+  // server/controllers/users/login.js
+  const cookiesOption = {
+    domain: "localhost",
+    path: "/",
+    secure: true,
+    httpOnly: true,
+    sameSite: "strict",
+  };
+
+  module.exports = (req, res) => {
+    const { userId, password } = req.body.loginInfo;
+    const { checkedKeepLogin } = req.body;
+    const userInfo = {
+      ...USER_DATA.filter(
+        (user) => user.userId === userId && user.password === password
+      )[0],
+    };
+    // 로그인 실패시
+    if (userInfo.id === undefined) {
+      res.status(401).send("Not Authorized");
+    } 
+    //로그인 성공 및, 로그인 상태 유지시
+    else if (checkedKeepLogin === true) {
+      //cookie로 coo성
+      res.cookie("cookieID", userInfo.id, {
+        ...cookiesOption,
+        maxAge: 1000 * 60 * 30,
+        expires: new Date(Date.now() + 1000 * 60 * 30),
+      });
+    } 
+    //로그인 성공 로그인 상태 유지 하지 않기
+    else {
+      res.cookie("cookieId", userInfo.id, cookiesOption);
+    }
+    return res.redirect("/userinfo");
+  }
+  ```
+
+  ```jsx
+  // server/controllers/users/userInfo.js
+  module.exports = (req, res) => {
+  /* 요청에서 login.js에서 발급한 쿠키 정보 받아오기 
+    request에서 cookie를 조회할때는 복수형으로 접근 cookies! */
+    const {
+      cookies: { cookieId },
+    } = req;
+    console.log(req.cookies, cookieId);
+  // cookie 정보를 토대로 유저 찾기
+    const userInfo = {
+      ...USER_DATA.filter((user) => user.id === cookieId)[0],
+    };
+  // cookie나 user 정보가 없을시 error 처리
+    if (!cookieId || !userInfo.id) {
+      return res.status(401).send("Not Authorized");
+    }
+  // 성공적으로 유저 검색 성공했을 시 유저 정보 client에게 전달 
+    else {
+      // 비밀번호는 민감한 정보라서 삭제 후에 보내야 합니다.
+      delete userInfo.password;
+      return res.send(userInfo);
+    }
+  };
+  ```
+
+- 3. 응답을 받아 상태 업데이트
+  ```
+  //client/pages/Login.js
+  return axios
+        .post("http://localhost:4000/login", { loginInfo, checkedKeepLogin })
+        .then((data) => {
+          console.log(data);
+          setIsLogin(true); //로그인 성공 정보 담기
+          setUserInfo(data.data); //유저 정보 담기
+          setErrorMessage("");
+        })
+        .catch((err) => {
+          setErrorMessage("로그인에 실패했습니다");
+          console.log(err);
+        });
+  ```
+
+- 4. 로그아웃 버튼 클릭 하기
+
+  로그 아웃 버튼 클릭시 쿠키 삭제를 요청하기 위해 client에서 post 요청을 전송합니다.
+
+  ```jsx
+  //client/pages/Mypage.js
+
+  .post("http://localhost:4000/logout")
+  ```
+
+- 5.로그아웃 처리 (쿠키 삭제하기)
+
+  서버 `/logout` router로 들어온 post 요청을 처리합니다. 여기에서 cookie를 삭제합니다.
+
+  ```jsx
+  //server/controllers/logout.js
+  const cookiesOption = {
+    domain: "localhost",
+    path: "/",
+    secure: true,
+    httpOnly: true,
+    sameSite: "strict",
+  };
+
+  module.exports = (req, res) => {
+    // cookie 삭제하기. **이때 만들었을 때와 동일한 이름 동일한 옵션으**로 처리를 해야 한다.
+    res.status(205).clearCookie("cookieId", cookiesOption).send("logout");
+  };
+  ```
+
+- 6. FE에서 상태 업데이트 하기
+
+  ```jsx
+  //client/pages/Mypage.js
+  return axios
+        .post("http://localhost:4000/logout")
+        .then((res) => {
+          setIsLogin(false); //로그인 X
+          setUserInfo(null); //유저 정보 비우기
+        })
+        .catch((err) => {
+          console.log(err.response.data);
+        });
+  ```
+
+- 7. 조건부 렌더링으로 로그인 페이지 유지
+  앱을 종료 했다가 다시 접속하였을 때, cookie가 존재한다면, 이를 토대로 Login 페이지를 보여주지 않고 Mypage를 보여주어야 합니다. 이를 위해서 App이 mount 될 때 마다 get 요청을 통해 cookie가 있는지 확인하여 user 정보를 받아온다.
+
+  ```jsx
+  // client/App.js
+  const authHandler = () => {
+      axios
+        .get("http://localhost:4000/userinfo")
+        .then((res) => {
+          setIsLogin(true);
+          setUserInfo(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    };
+
+    useEffect(() => {
+      authHandler();
+    }, []);
+  ```
+
+  - 전달 받은 cookie 형태
+  <img src="/images/cookie/cookie4.png" alt="img" width="900" height="300" />
+
+
+  <img src="/images/cookie/cookie5.png" alt="img" width="700" height="300" />
