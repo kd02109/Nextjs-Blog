@@ -1,0 +1,548 @@
+---
+title: promise fetch axios
+date : 2023-04-17
+id : promise fetch axios
+tag: 
+   - javascript
+   - ajax
+brand: blog
+description: ajax 방식 promise, fetch, axios에 대해 정리합니다. 
+---
+## 프로미스(Promise)
+
+ES6에서 비동기 처리를 위한 또 다른 패턴으로 프로미스(Promise)를 도입했습니다. 
+**프로미스는 전통적인 콜백 패턴이 가진 단점을 보완하며 비동기 처리 시점을 명확하게 표현할 수 있다는 장점이 있습니다**.
+
+프로미스는 내용이 실행이 되었지만 **결과를 아직 반환하지 않은 객체**입니다.
+이러한 프로미스의 장점은 **실행 결과에 따라서 코드를 분리해서 작성**할 수 있다는 점이다.
+(코드를 분기에 따라 구분하여 작성할 수 있다는 것은 에러 처리와 성공 처리에서 매우 뛰어난 성능을 발휘하고 상황에 따라 다양한 처리를 할 수 있게 만듭니다.)
+
+### 비동기 처리를 위한 콜백 패턴의 단점
+
+비동기 함수는 비동기 처리 결과를 외부에 반환할 수 없고, 상위 스코프의 변수에 할당할 수도 없습니다. 
+따라서 비동기 함수의 처리 결과(서버 응답 등)에 대한 후속 처리는 비동기 함수 내부에서 수행해야 합니다. 
+이때 비동기 함수를 범용적으로 사용하기 위해 비동기 함수에 비동기 처리 결과에 대한 후속 처리를 수행하는 콜백함수를 전달하는 것이 일반적이었습니다.
+필요에 따라 비동기 처리가 성공하면 호출될 콜백 함수와 비동기 처리가 실패하면 호출될 콜백 함수를 전달할 수 있습니다.
+    
+    ```jsx
+    // GET 요청을 위한 비동기 함수
+    const get = (url, successCallback, failureCallback) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', url);
+      xhr.send();
+    
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          // 서버의 응답을 콜백 함수에 인수로 전달하면서 호출하여 응답에 대한 후속 처리를 한다.
+          successCallback(JSON.parse(xhr.response));
+        } else {
+          // 에러 정보를 콜백 함수에 인수로 전달하면서 호출하여 에러 처리를 한다.
+          failureCallback(xhr.status);
+        }
+      };
+    };
+    
+    // id가 1인 post를 취득
+    // 서버의 응답에 대한 후속 처리를 위한 콜백 함수를 비동기 함수인 get에 전달해야 한다.
+    get('https://jsonplaceholder.typicode.com/posts/1', console.log, console.error);
+    /*
+    {
+      "userId": 1,
+      "id": 1,
+      "title": "sunt aut facere ...",
+      "body": "quia et suscipit ..."
+    }
+    */
+    ```
+    
+
+#### 콜백 지옥의 등장
+
+위의 예시처럼 콜백 함수를 통해 비동기 처리 결과에 대한 후속 처리를 수행하는 비동기 함수가 
+비동기 처리 결과를 가지고 또다시 비동기 함수를 호출해야 한다면 
+**콜백 함수 호출이 중첩되어 복잡도가 높아지는 현상**이 발생하는데, 이를 **콜백 지옥**이라합니다.
+이러한 콜백 지옥이 나타나는 이유는 각 함수를 순차적으로 실행하고 싶기 때문에 나타나는 현상입니다.
+
+```jsx
+// GET 요청을 위한 비동기 함수
+const get = (url, callback) => {
+  const xhr = new XMLHttpRequest();
+  xhr.open('GET', url);
+  xhr.send();
+
+  xhr.onload = () => {
+    if (xhr.status === 200) {
+      // 서버의 응답을 콜백 함수에 전달하면서 호출하여 응답에 대한 후속 처리를 한다.
+      callback(JSON.parse(xhr.response));
+    } else {
+      console.error(`${xhr.status} ${xhr.statusText}`);
+    }
+  };
+};
+
+const url = 'https://jsonplaceholder.typicode.com';
+
+// id가 1인 post의 userId를 취득
+get(`${url}/posts/1`, ({ userId }) => {
+  console.log(userId); // 1
+  // post의 userId를 사용하여 user 정보를 취득
+  get(`${url}/users/${userId}`, userInfo => {
+    console.log(userInfo); // {id: 1, name: "Leanne Graham", username: "Bret",...}
+  });
+});
+```
+
+```jsx
+// 터미널에 `node index.js`를 입력하여 비동기 코드가 작동하는 순서를 확인해보세요.
+const printString = (string, callback) => {
+  setTimeout(function () {
+    console.log(string);
+    callback();
+  }, Math.floor(Math.random() * 100) + 1);
+};
+
+const printAll = () => {
+  printString("유저 정보 받아오기", () => {
+    printString("ID Pawword 확인", () => {
+      printString("로그인 여부 확인", () => {
+        printString("로그인!", () => {
+          printString("사진 받아오기!", () => {
+            console.log("done");
+          });
+        });
+      });
+    });
+  });
+};
+
+printAll();
+```
+
+- **에러 처리의 한계**
+
+비동기 처리를 위한 **콜백 패턴의 문제점 중에서 가장 심각한 것은 에러 처리가 어렵습니다.**
+
+```jsx
+try {
+  setTimeout(() => { throw new Error('Error!'); }, 1000);
+} catch (e) {
+  // 에러를 캐치하지 못한다
+  console.error('캐치한 에러', e);
+}ㅅ
+```
+
+- `setTimeout` 은 비동기 함수이기에 **콜백 함수는 테스크 큐로 푸쉬 됩니다. 따라서 콜 스택 내에서 try, catch 문이 실행되고 있는 중에는 에러를 잡을 수 없습니다**. 
+콜백 함수의 실행은 모든 실행을 마치고 콜스택이 비었을 때, 테스크 큐에서 이벤트 루프를 통해 푸쉬 되기 때문입니다.
+
+### 프로미스의 생성
+
+- ES6에서 도입된 Promise는 호스트 객체가 아닌 ECMAScript 사양에 정의된 **표준 빌트인 객체**입니다.
+- Promise 생성자 함수는 비동기 처리를 수행할 콜백함수를 인수로 전달받는데 이 콜백 함수는 resolve와 reject 함수를 인수로 전달받습니다.
+
+```jsx
+// GET 요청을 위한 비동기 함수
+const promiseGet = url => {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', url);
+    xhr.send();
+
+    xhr.onload = () => {
+      if (xhr.status === 200) {
+        // 성공적으로 응답을 전달받으면 resolve 함수를 호출한다.
+        resolve(JSON.parse(xhr.response));
+      } else {
+        // 에러 처리를 위해 reject 함수를 호출한다.
+        reject(new Error(xhr.status));
+      }
+    };
+  });
+};
+
+// promiseGet 함수는 프로미스를 반환한다.
+promiseGet('https://jsonplaceholder.typicode.com/posts/1');
+```
+
+- 비동기 처리는 Promise 생성자 함수가 인수로 전달받은 콜백 함수 내부에서 실행됩니다. 
+비동기 처리가 성공하면 비동기 처리 결과를 resolve 함수에 인수로 전달하면서 호출하고, 
+비동기 처리가 실패하면 에러를 reject 함수에 인수로 전달하면서 호출 합니다.
+- 프로미스는 다음과 같이 현재 비동기 **처리가 어떻게 진행되고 있는지를 나타내는 상태 정보를 갖는다**.
+
+<img src="/images/promise-fetch-axios/promise-fetch-axios.png" alt="img" width="1000" height="400"/>
+
+
+<img src="/images/promise-fetch-axios/promise-fetch-axios1.png" alt="img" width="1000" height="600"/>
+
+```jsx
+// fulfilled된 프로미스
+const fulfilled = new Promise((resolve) => resolve(1));
+// rejected된 프로미스
+const rejected = new Promise((_, reject) =>
+  reject(new Error("error occurred"))
+);
+```
+
+<img src="/images/promise-fetch-axios/promise-fetch-axios2.png" alt="img" width="1000" height="400"/>
+
+- **프로미스는 비동기 처리 상태와 처리 결과를 관리하는 객체입니다**.
+
+#### 프로미스의 후속 처리 메서드
+
+프로미스의 비동기 처리 상태가 변화하면 이에 따른 후속 처리를 해야 합니다. 
+fulfilled 상태일 때 처리 결과를 처리하는 방식과, rejected 상태일 때 처리 결과를 처리하는 방법을 결정해야 합니다. 
+**이를 위해 프로미스는 후속 메서드 then, catch, finally를 제공**합니다.
+
+- `Promise.prototype.then`
+
+  then 메서드는 두 개의 콜백 함수를 인수로 전달받습니다.
+  - **첫 번째 콜백 함수**는 프로미스가 **fulfilled 상태**가 되면 호출된다. 이때 **콜백 함수는 프로미스의 비동기 처리 결과를 인수로 전달** 받는다.
+  - **두 번째 콜백 함수**는 프로미스가 **rejected 상태**가 되면 호출된다. 이때 **콜백 함수는 에러를 인수로 전달** 받는다.
+  - 언제나 **프로미스를 반환**한다.
+
+```jsx
+// fulfilled
+new Promise(resolve => resolve('fulfilled'))
+  .then(v => console.log(v), e => console.error(e)); // fulfilled
+
+// rejected
+new Promise((_, reject) => reject(new Error('rejected')))
+  .then(v => console.log(v), e => console.error(e)); // Error: rejected
+```
+
+- `Promise.prototype.catch`
+  - 한 개의 콜백 함수를 인수로 전달받는다. catch 메서드의 콜백 함수는 프로미스가 rejected 상태인 경우만 호출된다.
+  - 언제나 **프로미스를 반환**한다.
+
+```jsx
+new Promise((_, reject) => reject(new Error('rejected')))
+  .catch(e => console.log(e)); // Error: rejected
+```
+
+- **Promise.prototype.finally**
+
+  - 한 개의 콜백 함수를 인수로 전달받는다. **finally 메서드의 콜백함수는 프로미스의 성공 또는 실패와 상관없이 무조건 한 번 호출**된다.
+  - 실행 결과와 상관 없이 공통적으로 수행해야 할 처리 내용이 있을 때 유용하다.
+  - finally 메서드는 언제나 **프로미스를 반환**한다.
+
+#### 프로미스의 에러 처리
+
+- 프로미스는 에러를 문제 없이 처리할 수 있습니다. (catch, then)
+- 이때 가독성을 위하여 애러 처리는 then 메서드에서 하지 말고 catch 메서드에서 하는 것을 권장합니다.
+
+```jsx
+promiseGet('https://jsonplaceholder.typicode.com/todos/1')
+  .then(res => console.xxx(res))
+  .catch(err => console.error(err)); // TypeError: console.xxx is not a function
+```
+
+#### 프로미스 체이닝
+
+- 프로미스는 then, catch, finally 후속 처리 메서드를 통해 콜백 헬을 해결할 수 있습니다.
+
+```jsx
+const url = 'https://jsonplaceholder.typicode.com';
+
+// id가 1인 post의 userId를 취득
+promiseGet(`${url}/posts/1`)
+  // 취득한 post의 userId로 user 정보를 취득
+  .then(({ userId }) => promiseGet(`${url}/users/${userId}`))
+  .then(userInfo => console.log(userInfo))
+  .catch(err => console.error(err));
+```
+
+<img src="/images/promise-fetch-axios/promise-fetch-axios3.png" alt="img" width="1000" height="400"/>
+
+### 프로미스의 정적 메서드
+
+#### Promise.resolve / Promise.reject
+
+- 프로미스 객체에 **이미 존재하는 값을 래핑하여 프로미스를 생성하기 위해 사용**한다.
+
+```jsx
+var original = Promise.resolve(33);
+var cast = Promise.resolve(original);
+cast.then(function(value) {
+  console.log('value: ' + value);
+});
+console.log('original === cast ? ' + (original === cast));
+
+// 로그 순서:
+// original === cast ? true
+// value: 33
+// then 호출은 비동기기 때문에 반대로 실행 된다.
+```
+
+#### Promise.all
+
+- **여러 개의 비동기 처리를 모두 병렬 처리할 때 사용**된다.
+    
+    ```jsx
+    const requestData1 = () => new Promise(resolve => setTimeout(() => resolve(1), 3000));
+    const requestData2 = () => new Promise(resolve => setTimeout(() => resolve(2), 2000));
+    const requestData3 = () => new Promise(resolve => setTimeout(() => resolve(3), 1000));
+    
+    Promise.all([requestData1(), requestData2(), requestData3()])
+      .then(console.log) // [ 1, 2, 3 ] ⇒ 약 3초 소요
+      .catch(console.error);
+    ```
+    
+    - 두 번째 프로미스는 2초 후에 2을 반환한다.
+    - 세 번째 프로미스는 1초  후에 3을 반환한다.
+    - 첫 번째 프로미스는 3초 후에 1을 반환한다.
+- **Promise.all 메서드는 인수로 전달받은 배열의 모든 프로미스가 모두 fulfilled 상태가 되면 종료**한다. 따라서 Promise.all 메서드가 종료하는 데 걸리는 시간은 가장 늦게fulfilled 상태가 되는 프로미스의 처리 시간보다 조금 더 길다. 이때 **첫 번째 프로미스가 fulfilled 가 되기 위해 가장 많은 시간이 소요되어도 순서 대로 처리**를 한다.
+- **Promise.all 은 프로미스 중 하나라도 rejected 상태가 되면 다른 것의 처리 여부와 관계없이 즉시 종료**된다.
+
+#### Promise.race
+
+- Promise.all 메서드와 동일하게 프로미스를 요소로 갖는 배열 등의 이터러블을 인수로 전달 받는다. 이 중 **가장 먼저 fulfilled 상태가 된 프로미스 처리 결과를 resolve하는 새로운 프로미스를 반환**한다.
+
+```jsx
+Promise.race([
+  new Promise(resolve => setTimeout(() => resolve(1), 3000)), // 1
+  new Promise(resolve => setTimeout(() => resolve(2), 2000)), // 2
+  new Promise(resolve => setTimeout(() => resolve(3), 1000)) // 3
+])
+  .then(console.log) // 3
+  .catch(console.log);
+```
+
+- Promise.race도 전달된 프로미스 중 하나라도 rejected 상태가 되면 에러를 reject하는 새로운 프로미스를 즉시 반환한다.
+
+#### Promise.allSettled
+
+- ES11에 도입된 메서드인 Promise.allSettled는 **프로미스를 요소로 갖는 배열 등의 이터러블을 인수로 전달** 받는다. 그리고 전달 받은 프로미스가 모두 **settled 상태(비동기 처리가 수행된 상태, 즉 fulfilled 또는 rejected 상태)가 되면 처리 결과를 배열로 반환**한다.
+
+```jsx
+const fetchResult = fetch(
+  `https://api.themoviedb.org/3/movie/top_rated?api_key=${APIKEY}&language=en-US&page=1`
+);
+const fetchResult2 = fetch(
+  `https://api.themoviedb.org/3/movie/upcoming?api_key=${APIKEY}&language=en-US&page=1`
+);
+const fetchResult3 = fetch(
+  `https://api.themoviedb.org/3/movie/popular?api_key=${APIKEY}&language=en-US&page=1`
+);
+Promise.allSettled([fetchResult, fetchResult2, fetchResult3]).then(console.log);
+```
+
+<img src="/images/promise-fetch-axios/promise-fetch-axios4.png" alt="img" width="1000" height="400"/>
+
+## 마이크로태스크 큐
+
+```jsx
+setTimeout(() => console.log(1), 0);
+
+Promise.resolve()
+  .then(() => console.log(2))
+  .then(() => console.log(3));
+// 2, 3 ,1
+```
+
+- 모두 비동기적으로 작동하는데, 왜 1,2,3으 순으로 출력이 되는 것이 아닐까? 이는 **프로미스의 후속 처리 메서드의 콜백함수는 태스크 큐가 아니라 마이크로태스크 큐(microtask queue/ job queue)에 저장**되기 때문이다.
+- **마이크로태스크 큐는 태스크 큐와는 별도의 큐다. 마이크로태스크 큐에는 프로미스의 후속 처리 메서드의 콜백 함수가 일시 저장된다. 그 외의 비동기 함수의 콜백 함수나 이벤트 핸들러는 태스크 큐에 일시 저장**된다.
+- 태스크 큐와 동일하지만 **마이크로태스크 큐는 태스크 큐보다 우선순위가 높다**.
+
+## fetch
+
+- fetch 함수는 XMLHttpRequest 객체와 마찬가지로 **HTTP 요청 전송 기능을 제공**하는 클라이언트 사이드 **Web API**이다.
+- 프로미스 기능을 지원하기 때문에 **XMLHttpRequest + 프로미스를 결합**한 멋진 녀석이다.
+- fetch 함수는 **HTTP 응답을 나타내는 Response 객체를 래핑한 프로미스 객체를 반환**한다.
+
+```jsx
+const fetchResult = fetch(
+  `https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}&language=en-US&page=1`
+);
+console.log(fetchResult);
+
+fetchResult.then((res) => console.log(res));
+```
+
+<img src="/images/promise-fetch-axios/promise-fetch-axios5.png" alt="img" width="1000" height="400"/>
+
+- Response.prototype에는 Response 객체에 포함되어 있는 HTTP 응답 몸체를 위한 다양한 메서드를 제공한다. **Response.prototype.json()메서드는 HTTP 응답 몸체를 취득하여 역직렬화** 한다.
+
+```jsx
+const fetchResult = fetch(
+  `https://api.themoviedb.org/3/movie/top_rated?api_key=${API_KEY}&language=en-US&page=1`
+)
+  .then((res) => res.json())
+  .then((json) => console.log(json))
+```
+
+<img src="/images/promise-fetch-axios/promise-fetch-axios6.png" alt="img" width="1000" height="400"/>
+
+### 에러 처리
+
+- fetch 함수를 사용할 때는 에러 처리에 주의 해야한다.
+
+```jsx
+//API 키를 제외하고 api를 요
+const fetchResult = fetch(
+  `https://api.themoviedb.org/3/movie/top_rated?api_key=&language=en-US&page=1`
+);
+console.log(fetchResult);
+```
+
+<img src="/images/promise-fetch-axios/promise-fetch-axios7.png" alt="img" width="1000" height="400"/>
+
+- 이때도 response 객체는 받아온다. 다만 `Response.ok : false` 값으로 api가 정상적으로 호출 되지 않았음을 알려준다.
+- **fetch 함수가 반환하는 프로미스는 기본적으로 404 Not Found나 500 Internal Server Error 와 같은 HTTP 에러가 발생해도 에러를 reject하지 않고 불리언 타입의 ok 상태를 false로 설정한 Response 객체를 resolve 한다. 오프라인 등의 네트워크 장애나 CORS 에러에 의해 요청이 완료되지 못한 경우에만 프로미스를 reject한다.**
+
+```jsx
+const fetchResult = fetch(
+  `https://api.themoviedb.org/3/movie/top_rated?api_key=&language=en-US&page=1`
+)
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error(response.status); // error 출력
+    }
+    return response.json();
+  })
+  .then((json) => console.log(json))
+  .catch((e) => console.log(e));
+```
+
+<img src="/images/promise-fetch-axios/promise-fetch-axios8.png" alt="img" width="1000" height="400"/>
+
+- `fetch()` 메서드에는 선택적으로 두 번째 매개변수도 제공할 수 있습니다. 이 매개변수, `init`
+ 객체를 사용하면 여러가지 설정을 제어할 수 있습니다.
+
+```jsx
+const request = {
+  get(url) {
+    return fetch(url);
+  },
+  post(url, payload) {
+    return fetch(url, {
+      method: 'POST',
+      headers: { 'content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  },
+  patch(url, payload) {
+    return fetch(url, {
+      method: 'PATCH',
+      headers: { 'content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  },
+  delete(url) {
+    return fetch(url, { method: 'DELETE' });
+  }
+};
+```
+
+## Axios
+
+- Axios는 node.js와 브라우저를 위한 **Promise 기반** HTTP 클라이언트 입니다. Axios는 **동형이다.(동일한 코드베이스로 브라우저와 node.js에서 실행할 수 있습니다).** 서버 사이드에서는 네이티브 node.js의 `http` 모듈을 사용하고, 클라이언트(브라우저)에서는 XMLHttpRequests를 사용한다.
+- 프레임워크에서 ajax를 구현할 떄는 axios 사용이 증가하는 추세이다.
+    - **운영 환경에 따라 브라우저의 XMLHttpRequest 객체 또는 Node.js의 http api 사용**
+    - **Promise(ES6) API 사용**
+    - **요청과 응답 데이터의 변형**
+    - **HTTP 요청 취소**
+    - **HTTP 요청과 응답을 JSON 형태로 자동 변경**
+
+### 사용
+
+- 기본적으로 fetch와 사용 방법이 같다.
+- Default는 axios.get()과 같이 작동한다. 첫 번째 인수는 요청할 URL를 보내고 두 번째 매개변수는 다양한 옵션을 적용할 수 있다.
+- Axios를 사용하면 응답 데이터를 기본적으로 JSON 타입으로 사용할 수 있다. 응답 데이터는 언제나 응답 객체의 `data` 프로퍼티에서 사용할 수 있다.
+
+```jsx
+import axios from "axios";
+
+axios(
+  `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}&language=en-US&page=1`
+).then((respone) => console.log(respone));
+```
+
+<img src="/images/promise-fetch-axios/promise-fetch-axios10.png" alt="img" width="1000" height="400"/>
+
+- 따라서 다음과 같이 코드를 작성할 수 있다.
+
+```jsx
+axios.post('/user', {
+    firstName: 'Fred',
+    lastName: 'Flintstone'
+  })
+  .then(function (response) {
+    console.log(response);
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+// 2번째 방법
+axios({
+  method: 'post',
+  url: '/user/12345',
+  data: {
+    firstName: 'Fred',
+    lastName: 'Flintstone'
+  }
+})
+```
+
+### Axios 에러 처리
+
+- Axisos status 프로퍼티가 2XX를 넘어가면 거부한다.
+- fetch는 status에 따라 분기별 처리를 해야하지만 Axios 그럴 필요가 없다.
+
+```jsx
+const url = "https://jsonplaceholder.typicode.co/todos";
+
+axios
+
+.get(url)
+
+.then((response) => console.log(response.data))
+
+.catch((err) => {
+
+console.log(err.message);
+
+});
+```
+
+<img src="/images/promise-fetch-axios/promise-fetch-axios10.png" alt="img" width="1000" height="400"/>
+
+
+### 응답 시간 초과, 요청 취소
+
+- Axios에서는 `timeout` 속성을 설정 객체에 추가하여 요청이 종료될 때까지의 시간을 밀리초로 지정할 수 있다.
+
+```jsx
+axios
+  .get(url, {
+    timeout: 4000, // 기본 설정은 '0'입니다 (타임아웃 없음)
+  })
+  .then((response) => console.log(response.data))
+  .catch((err) => {
+    console.log(err.message);
+  });
+```
+
+## axios vs fetch
+
+| axios | fetch |
+| --- | --- |
+| 써드파티 라이브러리로 설치가 필요 | 현대 브라우저에 빌트인이라 설치 필요 없음 |
+| XSRF 보호를 해준다. | 별도 보호 없음 |
+| data 속성을 사용 | body 속성을 사용 |
+| data는 object를 포함한다. | body는 문자열화 되어 있다. |
+| status가 200이고 statusText가 ‘OK’이면 성공 | 웅답 객체가 ok 속성을 포함하면 성공 |
+| 자동으로 JSON 데이터 형식으로 변환된다. | .json() 메서드를 사용해야 한다. |
+| 요청을 취소할 수 있고 타임아웃을 걸수 있다. | 제공 X |
+| HTTP 요청을 가로 챌 수 있다. | 제공 X |
+| download 진행에 대해 기본적인 지원을 한다. | 기본적으로 제공하지 않는다. |
+| 좀더 많은 브라우저에 지원된다. | Chrome 42+, Firefox 39+, Edge 14+, and Safari 10.1+이상에 지원 |
+
+## 참조
+
+- [[AXIOS] 📚 axios 설치 & 특징 & 문법 💯 정리](https://inpa.tistory.com/entry/AXIOS-📚-설치-사용)
+
+- [요청 Config | Axios Docs](https://axios-http.com/kr/docs/req_config)
+
+- [[번역] 입문자를 위한 Axios vs Fetch](https://velog.io/@eunbinn/Axios-vs-Fetch)
+
+- [Fetch 사용하기 - Web API | MDN](https://developer.mozilla.org/ko/docs/Web/API/Fetch_API/Using_Fetch)
+
