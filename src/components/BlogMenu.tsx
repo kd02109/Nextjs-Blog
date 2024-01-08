@@ -36,7 +36,7 @@ export default function BlogMenu({ toc }: Prop) {
           className="text-base py-1 font-extrabold leading-6 mb-4 border-b-2 border-solid">
           Content Table
         </div>
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3 max-h-80 overflow-hidden w-full hover:overflow-y-scroll">
           {toc.map(({ title, slug, id }) => (
             <Link
               href={`#${slug}`}
