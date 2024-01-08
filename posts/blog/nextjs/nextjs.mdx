@@ -1,0 +1,110 @@
+---
+title: Next.jS?
+date : 2023-07-28
+id : Nextjs
+tag: 
+   - nextJS
+brand: blog
+description: Next.js의 등장 원인과 역사를 정리합니다.
+---
+
+## NextJs의 탄생
+
+공식문서에서는 Next.js를 다음과 같이 정의하고 있습니다.
+
+*Next.js is a framework for building web applications. With Next.js, you can build user interfaces using React components. Then, Next.js provides additional structure, features, and optimizations for your application.*
+
+> Next.js는 웹 애플리케이션을 구축하기 위한 프레임워크입니다. Next.js를 사용하면 React 컴포넌트를 사용하여 사용자 인터페이스를 구축할 수 있습니다. 그런 다음 Next.js는 애플리케이션을 위한 추가 구조, 기능 및 최적화를 제공합니다.
+> 
+
+Next.js는 React를 기반으로 한 프레임워크임을 알 수 있습니다. React는 근본적으로 라이브러리입니다. 기본 라이브러리 보다는 많은 기능을 제공하고 있지만, 태생은 라이브러리 입니다. 그렇다면 우선 라이브러리와 프레임워크의 차이점을 다시 한 번 짚어보아야 할 것 같습니다. 
+
+React는 JavaScript 라이브러리로 UI를 만들기 위한 라이브러리 입니다. 컴포넌트를 단위로 해서 손쉽게 UI 작업을 하는 것을 도와줍니다. UI는 사용자가 사용하는 웹, 앱 어플리케이션 화면 안의 모든 것을 의미합니다. 디자인, 레이아웃을 아우르는 개념입니다. React는 이러한 UI를 Component 기반으로 제작할 수 있도록 돕습니다.  React는 SPA(Single Page Application)을 지향하는 재사용성이 높은 컴포넌트 기반 라이브러리이며, 기본적으로 CSR을 지향합니다.
+
+<img src="/images/nextjs/nextjs.png" alt="nextjs" width="800" height="800" />
+
+
+## Library vs Framework
+
+- **라이브러리**
+
+라이브러리는 도구를 의미합니다. 다른 개발자가 이미 개발을 한 기능을 불러와서 필요한 상황에 맞게 사용할 수 있습니다. React는 Meta의 facebook 개발자들이 만든 라이브러리로서 UI 작업을 손쉽게 하는 것을 돕기 위해 만들어진 라이브러리 입니다.
+
+- **프레임워크**
+
+프레임워크는 라이브러리 보다는 큰 틀을 의미합니다. 작은 단위의 기능에 도움을 주는 것이 아닌 큰 단위의 해결 방법을 제안합니다. 이미 형성된 골격이 있으며, 개발자는 프레임워크가 제안하는 틀에 맞추어서 개발을 진행해야 합니다. 따라서 프레임워크에는 UI, Roution, HTTP Clients, state management에 관한 방안을 포함하고 있습니다. 
+
+따라서 **Next.js는 React를 기반으로 하여 웹 개발에 필요한 전체적인 해결책을 모두 제공하는 도안**이라고 할 수 있습니다.  (Full-stack, File-based routing, SEO&Image&Font Optimization,  SSR, Hybrid Rendering 등을 제공하고 있습니다.)
+
+이러한 **프레임워크와 라이브러리의 차이점은 제어 흐름의 권한이 어디에 있는가**에 있습니다.
+
+
+> - 💡 **토비의 스프링 中**
+>
+>***프레임워크는 단지 미리 만들어준 반제품이나, 확장해서 사용할 수 있도록 준비된 추상 라이브러리의 집합이 아니다. 프레임워크가 어떤 것인지 이해하려면 라이브러리와 프레임워크가 어떻게 다른지 알아야 한다.***
+>
+>***라이브러리를 사용하는 애플리케이션 코드는 애플리케이션 흐름을 직접 제어한다.***
+>
+>***단지 동작하는 중에 필요한 기능이 있을 때 능동적으로 라이브러리를 사용할 뿐이다.***
+>
+>***반면에 프레임워크는 거꾸로 애플리케이션 코드가 프레임워크에 의해 사용된다.***
+>
+>***프레임워크에는 분명한 [제어의 역전] 개념이 적용되어 있어야 한다.***
+>
+>***애플리케이션 코드는 프레임워크가 짜 놓은 틀에서 수동적으로 동작해야 한다.***
+
+
+- **제어의 역전(IoC, Inversion of Control)**
+
+기본적으로 라이브러리만을 사용하는 경우에는 객체의 생성, 설정, 초기화, 메소드 호출, 소멸을 프로그래머가 직접 관리합니다. 즉 라이브러리를 사용하여 흐름을 통제하는 권한은 개발자에게 주어집니다. 개발자는 필요한 위치에 자유롭게 라이브러리를 호출해서 사용할 수 있습니다. 
+
+하지만 프레임워크를 사용하게 될 경우 객체, 메서드의 제어를 개발자가 아닌 프레임워크에 위임하게 됩니다. 따라서 이를 제어의 역전이라고 합니다. 개발자가 작성한 코드는 프레임워크의 일부분이 되어서 프레임워크가 코드를 통제하게 됩니다.  어플리케이션의 제어의 책임이 개발자에서 프레임워크로 위임되므로, 개발자는 핵심 비즈니스 로직에 더 집중할 수 있다는 장점이 있습니다.
+
+<img src="/images/nextjs/nextjs1.png" alt="nextjs" width="800" height="800" />
+
+이러한 제어의 역전은 원칙입니다. Ioc를 실현하기 위한 여러 방법 중 하나로 DI(Dependency Injection) 의존성 주입 패턴을 많이 사용합니다.  의존성은 하나의 객체를 실행하기 위해 다른 객체를 필요로 한다고 한다면, 이러한 다른 객체를 의존성이라고 할 수 있습니다.  의존성 주입은 하나의 객체가 강한 결합을 하지 않고 자유롭게 사용할 수 있는 구조를 만드는 패턴이라고 할 수 있습니다. 이를 통해 확장성과 재사용성에 유리해지며, 의존성은 쉽게 교체할 수 있습니다. 
+
+## NextJs의 역사
+
+Next.js를 소개하기에 앞서, React, 라이브러리와 프레임워크의 차이점, 제어의 역전, 의존성 주입등을 정리하며 먼길을 돌아왔습니다! 간단하게 정리하자면, Next.js는 **“React를 기반으로 한 프레임워크이다.”** 가 다입니다. 나머지는 이 한 줄의 문장을 이해하기 위한 정리였습니다. 새삼 하나의 문장을 완벽하게 이해하기 위해서는 많은 기반 지식이 필요하다는 것을 느꼈습니다.  그렇다면 왜 Next.js 프레임워크를 만들었는지 한번 살펴보겠습니다. 
+
+Next.js는 2016년 10월 25일에 깃허브에 오픈소스 프로젝트로 처음 공개되었습니다. Next.js를 만든 회사는 Vercel입니다. 저희가 웹 배포를 할때 많이 사용을 하고 있는 Vercel(**PaaS** Cloud Platform as a Service)입니다.
+
+Next.js는 6가지 원칙을 제안합니다. 
+
+- **out-of-the-box functionality requiring no setup, (설정이 필요 없는 즉시 사용 가능한 기능)**
+- **JavaScript everywhere, all functions are written in JavaScript, (모든 기능을 JavaScript로 작성)**
+- **automatic code-splitting and server-rendering, (자동 코드 분할과 서버 렌더링)**
+- **configurable data-fetching, (서버, 클라이언트 데이터 fetch를 세부 설정 할 수 있습니다.)**
+- **anticipating requests, (요청 사항을 예상 가능하게 만든다.)**
+- **simplifying deployment (단순한 배포)**
+
+앞으로 버전을 업그레이드 하면서 위의 6가지 원칙을 위배하지 않는 방향으로 업그레이드가 진행이 됩니다.  주요 변경 사항은 다음과 같습니다. 
+
+2018년에는 7.0버전이 출시되었습니다. 애러 핸들링 기능을 개선하였으며, React Context API를 지원합니다. Wevpack 4로 업그레이드한 첫 번째 버전이기도 합니다. 
+
+2020년 3월에 출시한 9.3 버전은 다양한 최적화와 글로벌 Sass 및 CSS 모듈 지원이 포함되었습니다.
+
+2020년 7월에 출시한 9.5 버전은 incremental statci Generation(특정 주기별로 사이트를 다시 만드는 매커니즘), Rewrite, Redirect가 등장합니다. 
+
+2023년에 Next.js 13이 출시가 되었습니다. react 18과 함께 많은 변화가 있었습니다. new routing(/app), nested layouts(중첩 레이아웃), 리엑트 18버전과 함께 사용가능한 server Components, HTML streaming, webpack을 능가하는 Turbopack이 등장합니다.
+
+
+> - 💡 **HTML streaming?**
+>
+> Next.js의 배경에 대해 공부하면서 처음으로 접한 개념이었습니다.  이는 ServerSideRendering에서 발생하는 깜빡임 문제를 해결하기 위한 방안이라는 것을 알게 되었습니다.  ChatGPT에서 다음과 같이 답변을 주었습니다.
+>
+> 전통적으로 사용자가 웹 사이트에 액세스하면 브라우저는 콘텐츠 렌더링을 시작하기 전에 전체 HTML 문서가 서버에서 수신 될 때까지 기다립니다. 이 프로세스는 특히 대용량 HTML 파일이 있거나 서버 응답이 느린 웹 사이트의 경우 시간이 오래 걸릴 수 있습니다. 결과적으로 사용자는 페이지에서 보이는 콘텐츠를 보기 전에 상당한 지연을 경험할 수 있습니다.
+> 
+> 
+> HTML 스트리밍은 HTML 콘텐츠를 더 작은 덩어리로 나누고 순차적으로 브라우저에 전송함으로써 사용자 경험을 향상시키는 것을 목표로 합니다. 각 청크가 수신되면 브라우저는 콘텐츠 렌더링을 즉시 시작하여 사용자가 페이지의 표시 요소를 훨씬 빠르게 볼 수 있습니다. 이로 인해 페이지 로드 속도가 증가하고 전반적인 사용자 만족도가 향상될 수 있습니다.
+> 
+
+
+## 참고
+
+- [리엑트 의존성 주입](https://velog.io/@jay/react-dependency-injection)
+
+- [Docs - nextjs](https://nextjs.org/docs)
+
+- [Next.js - wikipedia](https://en.wikipedia.org/wiki/Next.js)
