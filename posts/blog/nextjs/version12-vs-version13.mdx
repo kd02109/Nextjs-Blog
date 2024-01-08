@@ -1,0 +1,349 @@
+---
+title: Version 12 vs Version 13의 차이점
+date : 2023-08-03
+id : version12-vs-version13
+tag: 
+   - nextJs
+brand: blog
+description: Next.js의 v12와 v13의 차이점에 대해서 정리합니다.
+---
+
+## 렌더링 방식
+
+Version 12는 `getStaticProps()`, `getServerSideProps()` 등을 활용해서 **페이지 별**로 렌더링 방식을 결정합니다.
+
+Version 13에서는 기본적으로 **모든 페이지는 Sever Side Rendering**을 진행합니다. 이제는 페이지 라우팅 처리가 아닌 **컴포넌트 단위로 렌더링 방식을 결정**합니다. 즉 페이지 내에서 렌더링 방식을 혼합하여 사용할 수 있습니다.
+
+<img src="/images/version12-vs-version13/version12-vs-version13.png" alt="version12-vs-version13" width="1000" height="600" />
+
+### Server Component
+
+server Component는 브라우저의 API는 사용할 수 없고, **node API를 사용**할 수 있습니다. 따라서 리엑트 또한 CSR을 지원하기 때문에 Server Component에서는 사용할 수 없습니다.  server component 는 빌드 단계에서 컴파일되어 웹으로 html 파일을 전달하기 때문입니다. 따라서 브라우저의 상태, useEffect 등은 사용할 수 없습니다.
+
+server Component를 사용하면 **초기 페이지 로딩이 빨라지고 클라이언트 측 JavaScript 번들 크기가 줄어듭니다**. **기본 클라이언트 측 런타임은 캐싱이 가능하고 크기를 예측할 수 있으며 애플리케이션이 성장해도 증가하지 않습니다**. 추가 자바스크립트는 클라이언트 컴포넌트를 통해 애플리케이션에서 클라이언트 측 인터랙티브가 사용될 때만 추가됩니다.
+
+### Client Component
+
+Client Component를 사용하면 애플리케이션에 클라이언트 측 인터랙션을 추가할 수 있습니다. Next.js에서는 서버에서 미리 렌더링되고 클라이언트에서 hydration됩니다. 클라이언트 컴포넌트는 페이지 라우터의 컴포넌트가 항상 작동하는 방식이라고 생각하면 됩니다.
+
+**"use client" 지시문은 서버와 클라이언트 컴포넌트 모듈 그래프 사이의 경계를 선언하는 규칙입니다. "use client" 지시문은 임포트하기 전에 파일 맨 위에 정의**해야 합니다. 모든 파일에 "use client"를 정의할 필요는 없습니다. 클라이언트 모듈 경계는 "진입점"에서 한 번만 정의하면 되며, 이 경계로 가져온 모든 모듈은 클라이언트 컴포넌트로 간주됩니다.
+
+```tsx
+'use client'
+ 
+import { useState } from 'react'
+ 
+export default function Counter() {
+  const [count, setCount] = useState(0)
+ 
+  return (
+    <div>
+      <p>You clicked {count} times</p>
+      <button onClick={() => setCount(count + 1)}>Click me</button>
+    </div>
+  )
+}
+```
+
+**따라서 재사용 가능한 작은 단위로 컴포넌트를 구성하는 것이 매우 매우 중요해졌습니다.**
+
+## 빌드 과정
+
+```
+//production build 최적화
+- info Creating an optimized production build
+- info Compiled successfully
+
+//linting 및 type 확인
+- info Linting and checking validity of types
+
+// 페이지 데이터 모으기
+- info Collecting page data
+
+// 정적 페이지 형성
+// 정적 페이지를 형성하는 과정 중에 서버 컴포넌트, 클라이언트 컴포넌트의 코드가 동작합니다.
+- info Generating static pages (10/10)
+
+// 마지막으로 결과물을 알려줍니다.
+- info Finalizing page optimization
+```
+
+초기에도 **Client Component 또한 처음으로 받아온 HTML 페이지에 포함**이 됩니다. 다만 **HTML 상에서 event는 처리가 되지 않습니다. 이는 hydration을 통해 react 코드를 적용**시켜야 합니다.  따라서 컴포넌트 단계 별로 분리를 하기 때문에 웹에서 보내는 JS의 번들링 크기를 줄여줍니다. 따라서 **Client Component여도 CSR이 아닙니다. Client Component 또한 SSR로 동작**을 합니다.
+
+## When to use Server and Client Components?
+
+서버 컴포넌트와 클라이언트 컴포넌트 간의 결정을 단순화하기 위해 클라이언트 컴포넌트에 대한 사용 사례가 있을 때까지는 **서버 컴포넌트(앱 디렉토리의 기본값)를 사용하는 것이 좋습니다**.
+
+<img src="/images/version12-vs-version13/version12-vs-version131.png" alt="version12-vs-version13" width="1000" height="1000" />
+
+## 간단한 Server Component 작성하기 (SSG)
+
+일반적으로 Server Component에서 서버의 데이터를 받아오는 작업은 비동기로 이루어집니다. promise 데이터를 풀기 위해서는 Component를 async/await function으로 만들어야 합니다. 
+
+```json
+// 간단한 데이터 만들기 
+[
+    {
+        "id" : "1234",
+        "name" : "청바지",
+        "price" : 5000
+    },
+    {
+        "id" : "1235",
+        "name" : "티셔츠",
+        "price" : 6000
+    },
+    {
+        "id" : "1236",
+        "name" : "스커트",
+        "price" : 7000
+    }
+]
+```
+
+### 데이터 가지고 오기
+
+```tsx
+import path from 'path';
+import { promises } from 'fs';
+
+export type Product = {
+  name: string;
+  price: number;
+  id: string;
+};
+
+export async function getProducts(): Promise<Product[]> {
+  const dir = path.join(process.cwd(), 'data', 'products.json');
+  const data = await promises.readFile(dir, 'utf-8');
+  return JSON.parse(data);
+}
+
+export async function getProduct(id: string): Promise<Product | undefined> {
+  const products = await getProducts();
+
+  return products.find(item => item.id === id);
+}
+```
+
+### 서버 컴포넌트에 적용하기
+
+```tsx
+//products/page.tsx
+
+import { getProducts } from '@/service/products';
+import Link from 'next/link';
+
+export default async function Page() {
+  const products = await getProducts();
+  // 서버 파일에 있는 제품의 리스트를 읽어와서 이를 보여주기
+
+  return (
+    <div className="flex flex-col min-h-screen justify-center">
+      <ul className="flex gap-4 flex-col justify-center">
+        {products.map(item => (
+          <li key={item.id}>
+            <Link href={`/products/${item.id}`}>{item.name}</Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+```
+
+```tsx
+// products/[slug]/page.tsx
+
+import NotFound from '@/app/not-found';
+import { getProduct, getProducts } from '@/service/products';
+import React from 'react';
+
+type Props = {
+  params: {
+    slug: string;
+  };
+};
+export default async function ProductPage({ params }: Props) {
+  // 서버 파일의 데이터 중 해당 제품의 정보를 찾아서 이를 보여준다.
+  const product = await getProduct(params.slug);
+
+  if (!product) {
+    NotFound();
+  }
+  return <div className="flex min-h-screen flex-col items-center justify-between p-24">{product && product.name}</div>;
+}
+
+export async function generateStaticParams() {
+  // 모든 제품의 페이지들을 미리 만들어 올 수 있게 한다
+  const productions = await getProducts();
+  return productions.map(product => ({ slug: product.id }));
+}
+```
+
+## ISR
+
+페이지의 상위에 `revalidate`를 설정합니다. Default `revalidate` 값은 false입니다. 
+
+이를 통해 몇초 간격으로 다시 데이터를 refetch할지 결정할 수 있습니다.
+
+```tsx
+export const revalidate = 3600 // revalidate at most every hour
+```
+
+외부 데이터를 가지고 오겠습니다. 해당 api는 다음과 같은 데이터를 렌덤으로 제공합니다.
+
+```json
+{
+  "data": [
+    "Cats can jump up to six times their length."
+  ]
+}
+```
+
+```tsx
+export default async function CatsPage() {
+  const res = await fetch('https://meowfacts.herokuapp.com');
+  const data = await res.json();
+  return <div>{data.data}</div>;
+}
+```
+
+이때 fetch를 통해 외부에서 가지고 온 데이터는 build 과정에서 한번만 호출이 됩니다. 따라서 **웹을 아무리 새로고침하여도 항상 같은 데이터를 제공**하게 됩니다.
+
+여기에 ISR을 적용하기 위해서는 다음과 같이 fetch에 옵션을 제공해야 합니다.
+
+```tsx
+type Prop = {
+  data: [string];
+};
+
+export default async function CatsPage() {
+  const res = await fetch('https://meowfacts.herokuapp.com', {
+    next: { revalidate: 3 },
+  });
+  const data: Prop = await res.json();
+  return <div>{data.data[0]}</div>;
+}
+```
+
+revalidate 옵션을 통해서 약 3초 간격으로 새로고침 시 데이터가 최신화 되는 것을 확인할 수 있습니다.
+
+이때 revalidate 옵션을 0으로 설정하면 SSR이 됩니다.  또는 cache 옵션을 사용할 수도 있습니다.
+
+```tsx
+type Prop = {
+  data: [string];
+};
+
+export default async function CatsPage() {
+  const res = await fetch('https://meowfacts.herokuapp.com', {
+    //next: { revalidate: 3 },
+    cache: 'no-store',
+  });
+  const data: Prop = await res.json();
+  return <div>{data.data[0]}</div>;
+}
+```
+
+`no-store` : cache를 저장하지 않고 SSR 처럼 동작을 하게 됩니다.
+
+`force-cache` : 영원히 cache 되는 것을 의미합니다. 이는 Default 값으로 SSG로 동작을 하게 됩니다.
+
+**따라서 페이지를 언제 다시 렌더링을 할 것인가에 따라 요청을 새롭게 설정을 해야 합니다.**
+
+## fetch를 사용한 CSR
+
+**동적으로 자주 변경되면서 웹 페이지에서 중요성이 떨어지는 부분을 CSR로 만듭니다.**  고양이 정보를 제공하는 부분을 CSR로 작성합니다.
+
+```tsx
+'use client';
+
+import { useEffect, useState } from 'react';
+
+export default function Meow() {
+  const [text, setText] = useState('');
+  useEffect(() => {
+    fetch('https://meowfacts.herokuapp.com')
+      .then(res => res.json())
+      .then(data => {
+        setText(data.data[0]);
+      });
+  }, []);
+  return;
+}
+```
+
+## 12 Version 구현
+
+**서버에서 어떤 함수로 Prop을 전달하는가에 따라서 렌더링 형식이 결정**이 됩니다. 따라서 각 페이지의 렌더링 방식은 모두 같습니다.
+
+**컴포넌트 영역은 무조건 클라이언트에서 동작**합니다. 다만 **Next.js에서 구현한 내부 함수는 서버 쪽에서 동작**을 합니다. 이후 서버에서 동작한 반환 값을 prop으로 전달해야 합니다. 따라서 클라이언트 영역은 웹 콘솔에서 코드를 확인할 수 있지만, 서버 영역은 서버에서 코드를 확인할 수 있습니다.
+
+```tsx
+// SSG
+export default function SSGPage({ products }: Props) {
+  return (
+    <>
+      <h1>제품 소개 페이지!</h1>
+      <ul>
+        {products.map(({ id, name }, index) => (
+          <li key={index}>
+            <Link href={`/products/${id}`}>{name}</Link>
+          </li>
+        ))}
+      </ul>
+      <MeowArticle />
+    </>
+  );
+}
+
+export async function getStaticProps() {
+  const products = await getProducts();
+  return {
+    props: { products },
+    revalidate: 10, // ISR 옵
+  };
+}
+```
+
+```tsx
+//SSR
+import MeowArticle from '@/components/MeowArticle';
+import { getProducts, Product } from '@/service/products';
+import Link from 'next/link';
+
+type Props = {
+  products: Product[];
+};
+
+export default function SSGPage({ products }: Props) {
+  return (
+    <>
+      <h1>제품 소개 페이지!</h1>
+      <ul>
+        {products.map(({ id, name }, index) => (
+          <li key={index}>
+            <Link href={`/products/${id}`}>{name}</Link>
+          </li>
+        ))}
+      </ul>
+      <MeowArticle />
+    </>
+  );
+}
+
+export async function getServerSideProps() {
+  const products = await getProducts();
+  return {
+    props: { products },
+  };
+}
+```
+
+## Reference
+
+- [Getting Started: React Essentials](https://nextjs.org/docs/getting-started/react-essentials#why-server-components)
+
+- [Data Fetching: Fetching, Caching, and Revalidating](https://nextjs.org/docs/app/building-your-application/data-fetching/fetching-caching-and-revalidating)
+
+- [Functions: fetch](https://nextjs.org/docs/app/api-reference/functions/fetch)
