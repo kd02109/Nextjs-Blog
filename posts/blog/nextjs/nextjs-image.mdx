@@ -1,0 +1,113 @@
+---
+title: Next.js Image
+date : 2023-08-04
+id : nextjs-image
+tag: 
+   - nextJs
+brand: blog
+description: Next.js에서 제공하는 Image 컴포넌트에 대해서 정리합니다. 
+---
+## Local Image
+
+Next.js 는 HTML의 img 태그를 사용하기 보다는 next.js에서 제공하는 자체 컴포넌트 Image 사용을 추천하고 있습니다.
+이는 **Image 태그를 통해 사이즈와 크기를 자동으로 최적화 해주기 때문입니다.** 따라서 서버에 저장된 이미지를 사용하는 경우 이미지를 불러와서 작성하면 됩니다. 
+
+이때 Image 컴포넌트를 사용하기 위해서는 src, width, heigth, alt는 필수 속성으로 반드시 지정을 해주어야 합니다.
+
+```tsx
+import Image from 'next/image'
+import profilePic from './me.png'
+ 
+export default function Page() {
+  return (
+    <Image
+      src={profilePic}
+      alt="Picture of the author"
+      width={500} 
+      height={500} 
+      // blurDataURL="data:..." 
+      // placeholder="blur" // Optional blur-up while loading
+    />
+  )
+}
+```
+width와 height 속성은 fill과 중복으로 사용할 수 없습니다. 
+fill 속성의 값은 boolean입니다. 이때 부모 tag의 css중 display 속성은 
+반드시 `position: "relative"`, `position: "fixed"`, 혹은 `position: "absolute"` 중 하나여야 합니다.
+
+
+## Remote Images
+
+브라우저에서 이미지를 가져와서 사용하면, scr 속성이 URL 문자열이어야 합니다.
+Next.js는 빌드 과정 중에 원격으로 파일에 접근을 할 수 없습니다. 
+따라서 `width`, `height` 그리고 `blurDataUrl` prop을 수동으로 설정해주어야 합니다.
+`width` 및 `height` 속성은 이미지의 올바른 종횡비를 유추하고 이미지 로드 시 레이아웃 이동을 방지하는 데 사용됩니다. 
+**`width`와 `height`는 이미지 파일의 렌더링 크기를 결정하지 않습니다.**
+
+이미지 최적화를 안전하게 허용하려면 **next.config.js에서 지원되는 URL 패턴 목록을 정의**해야합니다. 
+아래의 예시를 참고해서 어떤 브라우저에서 이미지를 가지고 올지 결정해야 합니다. `next.config.js`에서 허용한 url에서만 이미지를 가지고 올 수 있습니다.
+해당 설정을 하지 않는다면, 다음과 같은 에러가 발생합니다.
+
+<img src="/images/next-image/next-image.png" alt="next-image" width="800" height="300"/>
+
+```tsx
+module.exports = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 's3.amazonaws.com',
+        port: '',
+        pathname: '/my-bucket/**',
+      },
+    ],
+  },
+}
+```
+
+### priority
+
+각 페이지에서 가장 큰 콘텐츠가 많은 페인트(LCP - Largest Contentful Paint) 요소가 될 이미지에 우선순위 속성을 추가해야 합니다. 
+이렇게 하면 Next.js가 사전 로드 태그 또는 우선순위 힌트 등을 통해 로드할 
+이미지의 우선순위를 특별히 지정할 수 있으므로 LCP를 의미 있게 향상시킬 수 있습니다.
+
+```tsx
+import Image from 'next/image'
+import profilePic from '../public/me.png'
+ 
+export default function Page() {
+  return <Image src={profilePic} alt="Picture of the author" priority />
+}
+```
+
+### blur && blurDataUrl
+
+Next.js에서 이미지를 불러오는 동안 해당 이미지 위치에 빈화면을 보여주게 됩니다. 이는 사용자 경험에서 그렇게 좋지 않습니다.
+처음 방문한 사용자라면, 해당 페이지의 위치에 어떤 컨텐츠가 있을지 알 수 없기 때문입니다. 
+
+따라서 본래 이미지가 로드 될때까지 해당 위치에 blur처리 이미지를 먼저 보여줌으로서 사용자 경험을 향상시킬 수 있습니다.
+이를 위해서 Next.js Image 컴포넌트의 placeholder prop과 blurDataURL prop을 활용해야 합니다. 
+이때 blurDataURL에 할당되는 값은 반드시 ` base64-encoded image`여야 합니다. 
+따라서 공식문서에는 10px 이하의 이미지를 사용하는 것을 추천하고 있습니다.
+이를 위해 공식 문서에서 [blur image 생성](https://png-pixel.com/)사이트를 알려주고 있습니다.
+
+만약 동적으로 각각의 이미지 별로 blur 이미지를 적용하고 싶다면 참조 사이트 혹은 구글링을 통해 해당 방식을 찾아봐야 하겠습니다!!
+이때 Next.js는 [plaiceholder](https://github.com/joe-bell/plaiceholder) 라이브러리를 추천하고 있습니다.
+
+> *For dynamic images, you must provide the blurDataURL property. Solutions such as Plaiceholder can help with base64 generation.*
+
+
+```tsx
+placeholder = 'empty' // "empty" | "blur" | "data:image/..."
+```
+
+
+
+## Reference
+- [Optimizing: Images](https://nextjs.org/docs/app/building-your-application/optimizing/images)
+
+- [Components: Images](https://nextjs.org/docs/app/api-reference/components/image)
+
+- [동적으로 blur 이미지 적용하기](https://medium.com/@kavindumadushanka972/learn-how-to-create-dynamic-blur-data-urls-for-images-in-next-js-bc4eb5d04ec6)
+
+- [plaiceholder 라이브러리 적용하기](https://haruisshort.tistory.com/302)
