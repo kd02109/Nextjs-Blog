@@ -1,0 +1,121 @@
+---
+title: Next.js Redirect, Rewrite
+date : 2023-08-04
+id : redirect-rewrite
+tag: 
+   - nextJs
+brand: blog
+description: Next.js의 Redirect, Rewrite를 활용한 router 기능을 정리합니다.
+---
+
+## Redirect Option
+
+**Redirects을 사용하면 들어오는 요청 경로를 다른 대상 경로로 리디렉션할 수 있습니다.**
+
+**리디렉션을 사용하려면 `next.config.js`에서 `redirects` 키를 사용하면 됩니다:**
+
+```tsx
+module.exports = {
+  async redirects() {
+    return [
+      {
+        source: '/about',
+        destination: '/',
+        permanent: true,
+      },
+    ]
+  },
+}
+```
+
+- `source` :  들어오는 요청 경로 패턴입니다.
+- `destination`: 라우팅하려는 경로입니다.
+- `permanent` `true` or `false` : 참이면 클라이언트/검색 엔진에 **리디렉션을 영구적으로 캐시하도록 지시하는 308 상태 코드를 사용**하고, 거짓이면 일시적이며 캐시되지 않는 307 상태 코드를 사용합니다. (이는 SEO 에게 보내는 상태 코드를 결정합니다.)
+
+## Rewrite Option
+
+서버로 오는 요청 사항 path를 새롭게 정의할 수 있습니다. 내부적으로 복잡한 URL 혹은 보안상 민감한 key가 노출된 url을 다른 것으로 대체할 수 있습니다. 아래의 코드는 ‘/about’ 을 입력하면,  ‘/’으로 이동이 됩니다. 공대되는 URL은 rewrite한 url로 대체가 됩니다.
+
+```tsx
+module.exports = {
+  async rewrites() {
+    return [
+      {
+        source: '/about',
+        destination: '/',
+      },
+    ]
+  },
+}
+```
+
+- `source` : 문자열 - 들어오는 요청 경로 패턴입니다.
+- `destination` : 문자열 - 라우팅할 경로입니다.
+
+지금까지의 방식은 정적으로 redirect를 설정하는 방법이었습니다. 이는 next.confing.js에서 수행이 되었습니다. 이외에도 동적으로 경로를 redirect 하는 방법이 있습니다.
+
+## Redirect
+
+redirect 함수를 사용하여 사용자를 다른 URL로 이동시킬 수 있습니다. redirect는 Server Component, Client Component, Route-Handlers, Server Actions 등에서 사용할 수 있습니다.
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| path | string | The URL to redirect to. Can be a relative or absolute path. |
+| type | 'replace' (default) or 'push' (default in Server Actions) | The type of redirect to perform. |
+
+기본적으로 redirect는 `push` 메서드를 Server Component에서 사용합니다. 그리고 이외의 곳에서는 `replace` 를 사용합니다. type 매개변수를 통해 이를 덮어씌울 수 있습니다. Server Component에서 type 매개변수는 어떠한 효과도 없습니다.
+
+```tsx
+import { redirect } from 'next/navigation'
+ 
+async function fetchTeam(id) {
+  const res = await fetch('https://...')
+  if (!res.ok) return undefined
+  return res.json()
+}
+ 
+export default async function Profile({ params }) {
+  const team = await fetchTeam(params.id)
+  if (!team) {
+    redirect('/login')
+  }
+ 
+  // ...
+}
+```
+
+## useRouter
+
+useRouter hook을 사용하면, Client Component 내에서 프로그래밍 방식으로 경로를 변경 할 수 있습니다.
+
+```tsx
+'use client'
+ 
+import { useRouter } from 'next/navigation'
+ 
+export default function Page() {
+  const router = useRouter()
+ 
+  return (
+    <button type="button" onClick={() => router.push('/dashboard')}>
+      Dashboard
+    </button>
+  )
+}
+```
+
+- `router.push(href: string)`: 제공된 경로로 클라이언트 측 탐색을 수행합니다. 브라우저의 히스토리 스택에 새 항목을 추가합니다.
+- `router.replace(href: string)`: 브라우저의 기록 스택에 새 항목을 추가하지 않고 제공된 경로로 클라이언트 측 탐색을 수행합니다.
+- `router.refresh()`:  현재 경로를 새로 고칩니다**. 서버에 새 요청을 하고, 데이터 요청을 다시 가져오고, 서버 컴포넌트를 다시 렌더링**합니다. **클라이언트는 영향을 받지 않은 클라이언트 측 React(예: 사용 상태) 또는 브라우저 상태(예: 스크롤 위치)를 잃지 않고 업데이트된 React 서버 컴포넌트 페이로드를 병합**합니다.
+- `router.prefetch(href: string)`: client-side의 빠른 전환을 위해 Prefetch를 제공합니다.
+- `router.back()`: 브라우저의 기록 스택에서 이전 경로로 돌아갑니다.
+- `router.forward()`: 브라우저의 기록 스택에서 다음 페이지로 이동합니다.
+
+## reference
+- [next.config.js Options: redirects](https://nextjs.org/docs/app/api-reference/next-config-js/redirects)
+
+- [next.config.js Options: rewrites](https://nextjs.org/docs/app/api-reference/next-config-js/rewrites)
+
+- [Functions: redirect](https://nextjs.org/docs/app/api-reference/functions/redirect)
+
+- [Functions: useRouter](https://nextjs.org/docs/app/api-reference/functions/use-router)
