@@ -7,7 +7,7 @@ export default function Footer() {
   const since =
     year === siteConfig.since ? `${year}` : `${siteConfig.since - year}`;
   return (
-    <footer className="border-t-2 flex flex-col h-20 justify-center items-end">
+    <footer className="flex flex-col h-20 justify-center items-end">
       <div className="flex gap-4 py-1 justify-end">
         <Link href="https://github.com/kd02109" target="_blank">
           <Github />

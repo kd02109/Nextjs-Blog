@@ -1,15 +1,16 @@
 import BlogComment from '@/components/BlogComment';
 import BlogMenu from '@/components/BlogMenu';
 import CodeBlock from '@/components/CodeBlock';
+import DetailProjectPageList from '@/components/DetailProjectPageList';
 import PostFooter from '@/components/PostFooter';
 import Tag from '@/components/Tag';
+import WritingList from '@/components/layout/WritingList';
+import { ProjectName } from '@/types/projectType';
 import { findH } from '@/util/findH';
-import { toc } from '@/util/toc';
 import { Post } from 'contentlayer/generated';
 import { format, parseISO } from 'date-fns';
 import { useMDXComponent } from 'next-contentlayer/hooks';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
 
 type Prop = {
   post: Post | undefined;
@@ -18,6 +19,7 @@ type Prop = {
     prevPost: Post | undefined;
     nextPost: Post | undefined;
   };
+  projectFooter?: ProjectName;
 };
 
 const mdxComponents = {
@@ -29,10 +31,14 @@ const mdxComponents = {
   pre: CodeBlock,
 };
 
-export default function DetailPage({ post, tags, postFooter }: Prop) {
+export default function DetailPage({
+  post,
+  tags,
+  postFooter,
+  projectFooter,
+}: Prop) {
   const Content = useMDXComponent((post as Post).body.code);
   const slugMap = findH(post?.body.raw as string);
-
   return (
     <>
       <article className="py-8">
@@ -63,6 +69,13 @@ export default function DetailPage({ post, tags, postFooter }: Prop) {
           </div>
         </div>
         {postFooter && <PostFooter {...postFooter} />}
+        {projectFooter && (
+          <DetailProjectPageList
+            title={projectFooter}
+            param={post?.url}
+            date={post?.date}
+          />
+        )}
       </article>
       <BlogComment />
     </>
