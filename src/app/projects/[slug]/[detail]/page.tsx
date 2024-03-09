@@ -1,5 +1,6 @@
 import { allPosts } from 'contentlayer/generated';
 import DetailPage from '@/components/DetailPage';
+import { ProjectName } from '@/types/projectType';
 
 type Props = {
   params: {
@@ -27,6 +28,7 @@ export const generateMetadata = ({ params }: Props) => {
 
 export default function ProjectDetailPage({ params }: Props) {
   const str = params.slug.trim() + '/' + params.detail.trim();
+  const projectTag = params.slug.trim() as ProjectName;
   const post = allPosts.find(post => {
     return `${post.url}` === str;
   });
@@ -34,7 +36,7 @@ export default function ProjectDetailPage({ params }: Props) {
 
   return (
     <>
-      <DetailPage post={post} tags={tags} />
+      <DetailPage post={post} tags={tags} projectFooter={projectTag} />
     </>
   );
 }
