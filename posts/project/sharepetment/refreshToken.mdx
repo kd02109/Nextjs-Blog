@@ -1,0 +1,166 @@
+---
+title: Refresh Token 설정하기
+date : 2023-08-11
+id : RefreshToken-SharePetment
+tag: 
+   - sharepetment
+   - project
+brand: project
+description: refresh token을 활용한 access token을 갱신하는 방법에 대해서 정리합니다. 
+---
+
+
+## 배경
+
+- server와 로그인 정보를 주고받는 방법으로 jwt를 사용했습니다. 초기에는 access token의 만료시간을 매우 길게 잡아서 계속해서 로그인을 유지하도록 하였습니다.
+- 이는 보안을 생하였을 때, 효율적이지 못한 방법이었습니다. access token을 탈취 당한다면, 사용자의 정보가 노출되게 됩니다. 이러한 문제를 해결하기 위해 **access token의 만료 시간을 짧게 설정하고 access token이 만료된다면, refresh token을 통해 access token을 새롭게 발급 받도록 수정**을 해야 했습니다.
+
+## 로직 구성하기
+
+- 서버에서는 프런트에서 access token과 refresh token을 함께 보내면, 자동으로 access token을 재 설정 하도록 구현을 하였습니다.
+- 이때 access token을 재발급 하기 위해서는 access token이 만료되기 전에 재발급이 이루어져야 했습니다. 서버에서 access token을 decode하여 유저 정보를 확인하고 새롭게 token을 발급하는 로직을 사용하고 있기 때문입니다.
+- 따라서 token이 만료되기 전에 미리 token을 일정 시간마다 재발급을 받도록 해야 했습니다.
+- 추가적으로 서버와의 API 요청에서 token이 필요한 요청이 발생하기 전에 항상 token의 만료 여부를 확인하는 요청이 선행되어야 했습니다.
+
+<img src="/images/refreshToken/refreshToken1.png" alt="refreshToken" width="1000" height="1000"/>
+
+<aside>
+💡 **이외의 방식**
+
+- 위의 방식 외에도 생각해볼 수 있는 방법이 있습니다.
+    1. **client**에서 api 요청을 보낸 후에 **server**가 만료 여부를 파악한 뒤에 401 response를 보내고, 응답을 받은 **client**가 refresh api 요청을 보내 갱신된 access token으로 재 요청을 보내는 방식.
+        
+        <img src="/images/refreshToken/refreshToken2.png" alt="refreshToken" width="1000" height="1000"/>
+        
+    2. **client에서 access token 만료 가능성을 확인 후, 만료됐거나 만료가 임박하면 api request header에 추가적인 refresh token을 실어서 보낸다**. 요청을 받은 **server는 header에 유효한 refresh token이 존재한다면 해당 api까지는 정상적인 요청으로 간주하고 갱신된 access token을 추가하여 응답으로 보내는 방식**.
+        
+        <img src="/images/refreshToken/refreshToken3.png" alt="refreshToken" width="1000" height="1000"/>
+        
+</aside>
+
+## Axios interceptors
+
+- Axios를 http 프로토콜 요청에서 활용하고 있는 상황에서 interceptors라는 메서드를 제공하고 있었습니다.
+- 공식 문서에는 다음과 같이 설명하고 있습니다.
+    
+    > `**then` 또는 `catch`로 처리되기 전에 요청과 응답을 가로챌수 있습니다.**
+    > 
+    
+    즉 callback fn을 통해 요청이 이루어지기 전에 요청을 선 수행할 수 있도록 하는 작업이었습니다. node express의 middleware와 유사한 개념이었습니다. 
+    
+- interseptor를 활용하여 token이 필요한 요청 이전에 토큰의 만료시간을 확인하고 이를 재발급하는 요청을 추가 하여 먼저 발생하도록 하였습니다.
+
+## 구현하기
+
+1. 우선 로그인이 진행될 때, 서버와 약속한 만료 시간을 계산하여 로컬스토리지에 저장합니다. 이때 만료 시간은 서버의 만료 시간 보다 짧게 설정했습니다. 
+
+```tsx
+import { useEffect, useContext } from 'react';
+import { EXPIRED_TIME } from '@/api/axios';
+import LoadingComponent from '@/components/loading/LoadingComponent';
+
+export function Component() {
+  useEffect(() => {
+      // 만료시간 로컬에 저장하기
+      const date = Date.now() + EXPIRED_TIME;
+
+      setExpiresTime(`${date}`);
+  }, [
+    setExpiresTime,
+  ]);
+
+  return <LoadingComponent />;
+}
+
+Component.displayName = 'Loading';
+```
+
+1. Axios 인터셉터에 활용할 함수를 생성합니다.
+
+```tsx
+// axios.ts
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import axios, { AxiosRequestConfig } from 'axios';
+import { postTokenRefesh } from '@/api/queryfn';
+import { RefreshToken } from '@/types/tokenApiType';
+
+export const EXPIRED_TIME = 1000 * 60 * 60 * 23;
+
+export const refresgInterceptor = async (
+  config: AxiosRequestConfig,
+): Promise<any> => {
+  const expiresIn = window.localStorage.getItem('expiresTime');
+
+  // 만료시간이 없을 경우
+  if (expiresIn === null) return config;
+
+  const now = Date.now();
+  const expiresDate = Number(expiresIn.replace(/\D/g, '')) + EXPIRED_TIME;
+
+  // 만료시간이 현재 시간보다 큰 경우
+
+  if (expiresDate >= now) return config;
+
+  // 만료시간보다 현재 시간이 큰 경우
+  if (expiresDate < now) {
+    window.localStorage.setItem('expiresTime', `${Date.now() + EXPIRED_TIME}`);
+    const { accessToken, refreshToken } =
+      (await postTokenRefesh()) as RefreshToken;
+    window.localStorage.setItem('accessToken', JSON.stringify(accessToken));
+    window.localStorage.setItem('refreshToken', JSON.stringify(refreshToken));
+
+    return config;
+  } else {
+    return config;
+  }
+};
+
+const axiosInstance = axios.create();
+
+axiosInstance.interceptors.request.use(refresgInterceptor);
+
+export default axiosInstance;
+```
+
+1. 토큰이 만료되었을 경우 토큰을 재 요청하는 api를 작성합니다. 
+
+```tsx
+/* ------------------- accessToken 갱신 ------------------------------- */
+
+export const postTokenRefesh = async () => {
+  let refresh = window.localStorage.getItem('refreshToken')?.toString();
+  let access = window.localStorage.getItem('accessToken')?.toString();
+  refresh = refresh?.replace(/[''""]/g, '').slice(7) as string;
+  access = access?.replace(/[''""]/g, '').slice(7) as string;
+
+  try {
+    const result = await axiosInstance.post<RefreshToken>(
+      `${SERVER_URL}/refresh`,
+      {
+        refreshToken: refresh,
+        accessToken: access,
+      },
+    );
+
+    const { accessToken, refreshToken } = result.data;
+
+    return { accessToken, refreshToken };
+  } catch (err) {
+    alert('로그인이 만료되었습니다. 다시 로그인을 부탁드립니다. 😥');
+    window.localStorage.removeItem('expiresTime');
+    window.localStorage.removeItem('accessToken');
+    window.localStorage.removeItem('refreshToken');
+  }
+};
+```
+
+## 문제
+
+- 해당 로직을 통해 refresh Token은 local storage에 저장하지만, access token은 front의 global state로 저장해서 관리해도 문제가 없습니다. 하지만, **현재 서버 로직이 access token이 만료되면, refresh token만으로 access token을 갱신할 수 없기 때문에, 유효하지 않습니다**.
+- access token이 만료되었을 때, 갱신이 되어야 하지만, 현재는 만료 전에 미리 갱신을 해야 합니다. 이는 서버 분들과의 논의 중에 현재 DB에 refresh token이 저장되지 않는 문제로 인하여 어떤 유저의 refresh token인지 구분할 수 없기 때문에 생기는 문제 인 것 같습니다. 따라서 **access token이 만료된 상황에서 유저가 web에 접속을 한다면, 불가피 하게 유저 측에서 로그인 과정을 진행해야 합니다**.
+
+## reference
+
+[인터셉터 | Axios Docs](https://axios-http.com/kr/docs/interceptors)
+
+[axios interceptors와 refresh token을 활용한 jwt 토큰 관리](https://gusrb3164.github.io/web/2022/08/07/refresh-with-axios-for-client/)
