@@ -1,0 +1,195 @@
+---
+title: SEO 등록 과정
+date : 2023-09-22
+id : seo
+tag: 
+   - project
+   - nextJs
+brand: project
+description: Next.js SEO 등록 방법과 Google Seach에 sitemap 등록 방법을 정리합니다.
+---
+## 페이지 별 meta 등록
+
+- 페이지별로 각기 다른 meta title과 description을 제공하도록 하였습니다. 이를 통해서 보다 구체적인 정보를 크롤링 봇에게 제공하고자 하였습니다.
+- NextJS의 [Metadata](https://nextjs.org/docs/app/building-your-application/optimizing/metadata)를 참고하면서 각 페이지 별로 다른 메타 정보를 등록하였습니다.
+
+```jsx
+// 정적 페이지의 경우
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  openGraph: {
+    title: 'SON의 개발 블로그',
+    description: '지금까지 작성한 글들을 확인할 수 있습니다.',
+    images: 'https://source.unsplash.com/random/300×300',
+  },
+};
+```
+
+```jsx
+//다이나믹 페이지의 경우
+import { Metadata } from 'next';
+
+export const generateMetadata = ({ params }: { params: any }): Metadata => {
+  const post = allPosts.find(post => {
+    const str = params.slug.join('/').trim();
+    return `${post._raw.flattenedPath.trim()}` === str;
+  });
+
+  return {
+    title: post?.title,
+    description: post?.description,
+    openGraph: {
+      title: post?.title,
+      images: 'https://source.unsplash.com/random/300×300',
+      description: post?.description,
+    },
+  };
+};
+```
+
+### Open Graph 등록하기
+
+**인터넷 프로토콜**의 한 종류로서 2010년에 페이스북이 발표했습니다. 오픈 그래프의 목적은 웹페이지에 대한 정보를 담고 있는 메타데이터의 사용방식을 표준화하여 페이스북 내에서의 링크 공유 시 해당 웹페이지에 대한 정보를 특정 형식의 미리보기 형태로 제공해주는 기능을 **모든 웹페이지에서 가능하게끔 하는 것**이었고, 이후 트위터와 링크드인에서 이를 차용하여 더 나은 UX를 제공하는 데에 활용하고 있습니다.
+
+open graph를 활용하면 썸네일을 포함한 웹페이지 미리보기가 제공이 됩니다. 이를 통해 페이지에 접근하기 전에 어떤 내용을 다루고 있는지 확인할 수 있습니다.  og 태그의 종류는 다음과 같습니다. 
+
+- og:title
+
+---
+
+- og:type
+
+---
+
+- og:image
+
+---
+
+- og:url
+
+---
+
+```html
+<head>
+<title>The Rock (1996)</title>
+<meta property="og:title" content="The Rock" />
+<meta property="og:type" content="video.movie" />
+<meta property="og:url" content="https://www.imdb.com/title/tt0117500/" />
+<meta property="og:image" content="https://ia.media-imdb.com/images/rock.jpg" />
+...
+</head>
+```
+
+## SEO 등록하기
+
+- [네이버](https://searchadvisor.naver.com/console/board)
+-[구글](https://search.google.com/search-console?resource_id=https://nextjs-blog-kd02109.vercel.app/)
+
+## Sitemap 등록하기
+
+Sitemap은 웹마스터가 크롤링에 사용할 수 있는 사이트의 페이지에 대한 정보를 검색 엔진에 알리는 손쉬운 방법입니다. Sitemap의 가장 간단한 형식은 검색 엔진에서 사이트를 보다 지능적으로 크롤링할 수 있도록 **각 URL에 대한 추가 메타데이터(마지막 업데이트된 날짜, 변경 빈도, 사이트의 다른 URL에 상대적인 중요도)와 함께 사이트에 대한 URL을 나열하는 XML 파일입니다**.
+
+웹크롤러는 보통 해당 사이트 및 기타 사이트의 링크에서 페이지를 검색합니다.Sitemap은 해당 데이터를 보완하여 Sitemap을 지원하는 크롤러가 해당 Sitemap에 있는 모든 URL을 선택하고 관련 메타데이터를 사용하여 이들 URL에 대해 파악할 수 있도록 합니다.Sitemap [프로토콜](https://www.sitemaps.org/ko/protocol.html)을 사용하더라도 웹페이지가 반드시 검색 엔진에 포함되는 것은 아니지만 이를 통해 웹크롤러가 귀하의 사이트를 보다 효과적으로 크롤링하기 위한 힌트를 얻을 수 있습니다.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+   <url>
+      <loc>https://7942yongdae.tistory.com/78</loc>
+      <lastmod>2021-05-14T10:00:54+09:00</lastmod>
+      <changefreq>monthly</changefreq>
+      <priority>0.8</priority>
+   </url>
+</urlset>
+```
+
+- **next-sitemap**을 활용해도 되지만 간단하게 직접 사이트맵을 구현하였습니다.
+
+1. 파일 생성
+    
+    ```jsx
+    //sitemap.config.ts
+    import { promises as fs, writeFileSync } from 'fs';
+    import postJson from './.contentlayer/generated/Post/_index.json';
+    import { siteConfig } from './src/config';
+    
+    const SITE_URL = 'https://nextjs-blog-kd02109.vercel.app';
+    export default async function stiempaConfig() {
+      const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+    <url><loc>${SITE_URL}</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+    ${siteConfig.menus
+      .map(
+        url =>
+          `<url><loc>${SITE_URL}${url.path}</loc><changefreq>daily</changefreq><priority>0.7</priority></url>`,
+      )
+      .join('\n')}
+    ${postJson
+      .map(post => {
+        if (post.url.includes('blog'))
+          return `<url><loc>${SITE_URL}blogs/${post.url}</loc><changefreq>daily</changefreq><priority>0.7</priority></url>`;
+        return `<url><loc>${SITE_URL}projects/${post.url}</loc><changefreq>daily</changefreq><priority>0.7</priority></url>`;
+      })
+      .join('\n')}
+    </urlset>`;
+    
+      await fs.writeFile('public/sitemap.xml', sitemap, {
+        encoding: 'utf-8',
+      });
+    }
+    const createRobotsTxt = () => {
+      const siteUrl = siteConfig.url;
+    
+      const text = `
+    User-agent: *
+    Allow: /
+    Sitemap: ${siteUrl}/sitemap.xml
+    Host: ${siteUrl}
+    `;
+    
+      writeFileSync('public/robots.txt', text.trim(), 'utf-8');
+    };
+    
+    void createRobotsTxt();
+    void stiempaConfig();
+    ```
+    
+2. package.json 설정 (node 환경에서 해당 파일을 실행해야 하므로 ts-node를 설치하였습니다.)
+    
+    ```
+    npm i -D ts-node
+    ```
+    
+    ```json
+    //package.json
+    {
+    	"scripts": {
+    	    "dev": "next dev",
+    	    "build" : "next build && npm run sitemap",
+    	    "sitemap" : "ts-node --project tsconfig.node.json ./sitemap.config.ts",
+    	    "start": "next start",
+    	    "lint": "next lint",
+    	    "prepare": "husky install",
+    	    "lint-staged": "lint-staged"
+    	  },
+    }
+    ```
+    
+3. .gitignore설정
+    
+    ```
+    /public/sitemap*.xml
+    /public/robots.txt
+    ```
+    
+
+## Reference
+
+[sitemaps.org – 홈](https://www.sitemaps.org/ko/index.html)
+
+[Next.js 블로그 sitemap 생성, 검색엔진 등록](https://bepyan.github.io/blog/nextjs-blog/5-create-sitemap#검색엔진-등록)
+
+[Optimizing: Metadata](https://nextjs.org/docs/app/building-your-application/optimizing/metadata)
+
+[Open Graph protocol](https://ogp.me/)
