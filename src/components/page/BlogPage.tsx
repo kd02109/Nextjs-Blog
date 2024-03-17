@@ -60,16 +60,14 @@ export default function BlogPage() {
             className="w-full flex justify-center items-center my-10"
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -300, opacity: 0 }}
-            transition={{ type: 'just' }}
-            layoutId="change">
+            transition={{ type: 'just' }}>
             <Spiner />
           </motion.div>
         )}
         {!loading && (
           <motion.div
             className="grid grid-rows-2 grid-cols-2 gap-3 max-sm:grid-rows-1 max-sm:grid-cols-1"
-            layoutId="change"
-            initial={{ y: 300, opacity: 0 }}
+            initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.5 }}>
             {posts.map(post => (
