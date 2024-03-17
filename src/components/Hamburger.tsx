@@ -5,7 +5,7 @@ import { siteConfig } from '@/config';
 import HambugerIcon from '@/components/svg/HamburgerIcon';
 import LinkItem from '@/components/LinkItem';
 import XIcon from '@/components/svg/XIcon';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import DarkSwitch from '@/components/DarkSwitch';
 import { allowScroll, preventScroll } from '@/util/scrollControl';
 
@@ -51,58 +51,60 @@ export default function Hamburger({ pathName, isOpened, setIsOpened }: Prop) {
           <span className="hidden">HamburgerIcon</span>
         </motion.button>
       )}
-      {isOpened && (
-        <div
-          className="hidden overflow-hidden fixed w-100 h-[100%] top-0 left-0 right-0 bottom-0 z-60 max-md:block before:content-[ ] before:fixed before:top-0 before:left-0 before:right-0 before:bottom-0 before:backdrop-blur"
-          onClick={e => {
-            e.stopPropagation();
-            setIsOpened(false);
-          }}>
-          <motion.div
-            initial={{ x: -200, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -200, opacity: 0 }}
-            transition={{ ease: 'linear', duration: 0.3 }}
-            className="fixed w-60 h-100 p-4 top-0 right-0 left-0 bottom-0 overflow-hidden hidden max-md:block z-80 bg-white dark:bg-[#121212] rounded-xl">
-            <div className="flex justify-between my-4">
-              <nav>
-                <ol>
-                  <LinkItem href={'/'} isActive={pathName === '/'}>
-                    <li
-                      className={`py-4 border-b-2 border-solid w-40 ${
-                        pathName === '/' && 'border-yellow-400'
-                      }`}>
-                      Home
-                    </li>
-                  </LinkItem>
-                  {menus.map(({ path, label }) => (
-                    <LinkItem
-                      href={path}
-                      key={label}
-                      isActive={pathName.includes(path)}>
+      <AnimatePresence>
+        {isOpened && (
+          <div
+            className="hidden overflow-hidden fixed w-100 h-[100%] top-0 left-0 right-0 bottom-0 z-60 max-md:block before:content-[ ] before:fixed before:top-0 before:left-0 before:right-0 before:bottom-0 before:backdrop-blur"
+            onClick={e => {
+              e.stopPropagation();
+              setIsOpened(false);
+            }}>
+            <motion.div
+              initial={{ x: -200, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -200, opacity: 0 }}
+              transition={{ ease: 'linear', duration: 0.3 }}
+              className="fixed w-60 h-100 p-4 top-0 right-0 left-0 bottom-0 overflow-hidden hidden max-md:block z-80 bg-white dark:bg-[#121212] rounded-xl">
+              <div className="flex justify-between my-4">
+                <nav>
+                  <ol>
+                    <LinkItem href={'/'} isActive={pathName === '/'}>
                       <li
                         className={`py-4 border-b-2 border-solid w-40 ${
-                          pathName.includes(path) && 'border-yellow-400'
+                          pathName === '/' && 'border-yellow-400'
                         }`}>
-                        {label}
+                        Home
                       </li>
                     </LinkItem>
-                  ))}
-                </ol>
-              </nav>
-              <button
-                className="self-start py-4"
-                onClick={() => {
-                  setIsOpened(false);
-                }}>
-                <span className="hidden">Cancle Button</span>
-                <XIcon />
-              </button>
-            </div>
-            <DarkSwitch />
-          </motion.div>
-        </div>
-      )}
+                    {menus.map(({ path, label }) => (
+                      <LinkItem
+                        href={path}
+                        key={label}
+                        isActive={pathName.includes(path)}>
+                        <li
+                          className={`py-4 border-b-2 border-solid w-40 ${
+                            pathName.includes(path) && 'border-yellow-400'
+                          }`}>
+                          {label}
+                        </li>
+                      </LinkItem>
+                    ))}
+                  </ol>
+                </nav>
+                <button
+                  className="self-start py-4"
+                  onClick={() => {
+                    setIsOpened(false);
+                  }}>
+                  <span className="hidden">Cancle Button</span>
+                  <XIcon />
+                </button>
+              </div>
+              <DarkSwitch />
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
