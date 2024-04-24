@@ -44,7 +44,7 @@ export const projectObj: ProjectType[] = [
     name: 'NextJS Blog',
     image: 'https://i.imgur.com/y7xcTyo.png',
     description: 'Next.js를 기반으로 한 개발 블로그를 구현합니다.',
-    href: 'https://nextjs-blog-kd02109.vercel.app',
+    href: 'https://sonblog.vercel.app',
     github: 'https://github.com/kd02109/Nextjs-Blog',
     link: 'nextjs-blog',
     date: '2023-08-30 ~ 2023-09-20',
