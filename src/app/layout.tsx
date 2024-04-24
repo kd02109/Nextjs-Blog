@@ -114,11 +114,11 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`mx-auto max-w-3xl px-6 lg:max-w-6xl lg:px-8 ${nanum.className}`}>
+        className={`mx-auto max-w-3xl lg:max-w-6xl lg:px-8 ${nanum.className}`}>
         <GoogleAnalytics />
         <NextThemeProvider>
           <HeaderDynamic />
-          <main>{children}</main>
+          <main className="px-6">{children}</main>
           <Footer />
         </NextThemeProvider>
       </body>
