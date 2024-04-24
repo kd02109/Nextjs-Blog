@@ -27,6 +27,7 @@ export const generateMetadata = ({ params }: Props) => {
 };
 
 export default function ProjectDetailPage({ params }: Props) {
+  console.log(params);
   const str = params.slug.trim() + '/' + params.detail.trim();
   const projectTag = params.slug.trim() as ProjectName;
   const post = allPosts.find(post => {
