@@ -25,7 +25,14 @@ type Prop = {
 const mdxComponents = {
   img: ({ src, alt, ...props }: { src: string; alt: string }) => {
     return (
-      <Image layout="responsive" alt={alt} src={src} width={100} height={100} />
+      <Image
+        layout="responsive"
+        alt={alt}
+        src={src}
+        width={100}
+        height={100}
+        {...props}
+      />
     );
   },
   pre: CodeBlock,
@@ -41,7 +48,7 @@ export default function DetailPage({
   const slugMap = findH(post?.body.raw as string);
   return (
     <>
-      <article className="py-8">
+      <article className="py-8 mt-16">
         <div className="mb-8 text-center">
           <h1 className="text-5xl max-sm:text-3xl mb-2">{post?.title}</h1>
           <nav className="my-3">
