@@ -1,0 +1,72 @@
+---
+title: Optimistic Updates
+date : 2024-04-08
+id : Optimistic Updates
+tag: 
+   - react
+   - react-query
+brand: blog
+
+description: 낙관적 업데이트(optimistic update)의 필요성과 원리 예시에 대해서 정리했습니다.
+---
+
+## 낙관적 업데이트(Optimistic Updates)?
+
+낙관적 업데이트는 서버의 성공 여부와 관계없이, 해당 서버의 통신이 성공했다고 가정하고 UI를 미리 업데이트하는 방법입니다. 이는 서버의 응답을 기다리지 않고 바로 UI를 변경하기 때문에 사용자에게 빠른 피드백을 제공할 수 있습니다. 낙관적 업데이트를 사용하는 경우는 게시물 좋아요, 팔로우 요청등 실시간으로 유저의 피드백이 필요한 경우에 작업이 이루어집니다. 
+
+이러한 낙관적 업데이트는 서버의 응답을 기다리지 않고 UI를 업데이트 하기 때문에, 서버 응답이 실패한 경우 UI를 롤백하는 기능이 필요합니다. 
+
+React Query에서는 `post, patch, put, delete` 요청을 `mutation` 기능을 통해 처리합니다. 해당 `mutation` 기능을 통해 쉽게 낙관적 업데이트를 구현할 수 있습니다. 
+
+## React Query 활용하기
+
+React Query를 활용하는 경우 mutation의 설정 중 `onMutate`, `onError`, `onSettled`를 활용합니다. 
+
+- `onMutate` : `fetch`, `axios`를 활용해서 업데이트가 이루어지기 전에 해당 api 요청이 성공한 것을 가정하고 미리 예상되는 UI 업데이트를 진행합니다.
+- `onError` : 해당 api 요청이 실패했을 경우 다시 이전의 query 상태로 롤백하는 기능을 추가합니다.
+- `onSettled` : mutaion이 실패, 성공 했을 경우를 고려 하지 않고, 하나의 api 요청이 끝났을 경우 이루어지는 로직을 작성합니다.
+
+해당 방식을 참고해서 follow 버튼을 클릭해서 follow를 했을 경우, 낙관적 업데이트를 적용하는 방식에 대해서 정리를 합니다. 
+
+```tsx
+  const queryClient = useQueryClient();
+  const follow = useMutation({
+    // mutaion에서 사용되는 api 함수 정의
+    mutationFn: postFollow,
+    // api 요청 전에 ui 업데이트 적용
+    onMutate() {
+      // queryClient에서 업데이트에 필요한 데이터를 가지고 옵니다.
+      const previousFollowers: UserType[] | undefined = queryClient.getQueryData(['users', 'followRecommends']);
+      // 예상되는 동작에 맞추어 데이터를 업데이트 합니다.
+      if (Array.isArray(previousFollowers)) {
+        const userIdx = previousFollowers.findIndex(follower => follower.id === id);
+        if (userIdx > -1) {
+          const shallow = previousFollowers.map(follower => ({
+            ...follower,
+            Followers: [...follower.Followers],
+            _count: { ...follower._count },
+          }));
+          shallow[userIdx].Followers.push({ id: name as string });
+          shallow[userIdx]._count.Followers += 1;
+          queryClient.setQueryData(['users', 'followRecommends'], shallow);
+        }
+      }
+      // 롤백에 필요한 데이터를 반환합니다.
+      return { previousFollowers };
+    },
+    onError(err, variable, context) {
+      // error가 발생했을 경우, onMutate에서 반환한 rollback 데이터로 데이터를 업데이트 합니다.
+      queryClient.setQueryData(['users', 'followRecommends'], context?.previousFollowers);
+    },
+    onSettled() {
+      // sucess, error 처리가 모두 끝난 경우 해당 데이터 변환이 있는 쿼리를 무효화 처리 합니다.
+      queryClient.invalidateQueries({ queryKey: ['users', 'followRecommends'] });
+    },
+  });
+```
+
+객체를 업데이트 하는 경우 깊은 복사를 통해서 새로운 객체 데이터를 생성해야 합니다. 배열의 구조, 객체의 구조가 복잡한 경우 Immer 등의 라이브러리를 활용하는 것이 좋을 듯 합니다. 
+
+## Reference
+
+[TanStack Query Docs](https://tanstack.com/query/latest/docs/framework/react/guides/optimistic-updates?from=reactQueryV3)
