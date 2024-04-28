@@ -1,16 +1,19 @@
+'use client';
+
 import BlogComment from '@/components/BlogComment';
 import BlogMenu from '@/components/BlogMenu';
 import CodeBlock from '@/components/CodeBlock';
 import DetailProjectPageList from '@/components/DetailProjectPageList';
 import PostFooter from '@/components/PostFooter';
 import Tag from '@/components/Tag';
-import WritingList from '@/components/layout/WritingList';
 import { ProjectName } from '@/types/projectType';
+import { makeCookieClient } from '@/util/cookie/cookieClient';
 import { findH } from '@/util/findH';
 import { Post } from 'contentlayer/generated';
 import { format, parseISO } from 'date-fns';
 import { useMDXComponent } from 'next-contentlayer/hooks';
 import Image from 'next/image';
+import { useEffect } from 'react';
 
 type Prop = {
   post: Post | undefined;
@@ -46,6 +49,13 @@ export default function DetailPage({
 }: Prop) {
   const Content = useMDXComponent((post as Post).body.code);
   const slugMap = findH(post?.body.raw as string);
+  useEffect(() => {
+    const slugs = post?.url.split('/');
+    if (slugs) {
+      const slug = slugs[slugs.length - 1];
+      makeCookieClient(slug);
+    }
+  }, [post?.url]);
   return (
     <>
       <article className="py-8 mt-16">

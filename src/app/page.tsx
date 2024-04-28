@@ -3,6 +3,7 @@ import getPosts from '@/util/getPosts';
 import CardCarousel from '@/components/carousel/CardCarosuel';
 import getCaruselPosts from '@/util/getCaruselPosts';
 import Link from 'next/link';
+import { supabase } from '@/util/supabase';
 
 export const metadata: Metadata = {
   openGraph: {
@@ -12,8 +13,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Home() {
+export default async function Home() {
   const posts = getPosts();
+  const { data } = await supabase.from('views').select('*');
+  console.log(data);
   const carosuelPosts = getCaruselPosts(posts);
   return (
     <section className="max-w-4xl py-8 mx-auto">

@@ -3,7 +3,7 @@
 import LoadingIcon from '@/components/svg/Loading';
 import { $ } from '@/lib/core';
 import { Form } from '@/types/email';
-import contactEmail from '@/util/contact';
+import contactEmail from '@/util/api/contact';
 import { ChangeEvent, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 
