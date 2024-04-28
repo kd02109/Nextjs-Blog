@@ -2,7 +2,6 @@ import { allPosts } from 'contentlayer/generated';
 import getPosts from '@/util/getPosts';
 import DetailPage from '@/components/DetailPage';
 import { Metadata } from 'next';
-import postView from '@/util/postView';
 
 export const generateMetadata = ({ params }: { params: any }): Metadata => {
   const post = allPosts.find(post => {
@@ -22,8 +21,6 @@ export const generateMetadata = ({ params }: { params: any }): Metadata => {
 };
 
 const PostLayout = async ({ params }: { params: { slug: string[] } }) => {
-  const res = await postView(params.slug.at(-1));
-  console.log(res);
   const str = params.slug.join('/');
 
   const allPostsSort = getPosts('blog');

@@ -20,14 +20,30 @@ export async function POST(req: NextRequest, res: NextResponse) {
   const { data, error } = await supabase
     .from('views')
     .upsert(
-      { slug: slug as string, view_count: count ? 1 + Number(count) : 1 },
+      { slug: slug as string, view_count: count ? 1 + Number(count) : 0 },
       { onConflict: 'slug' },
     )
     .select('view_count')
     .single();
 
   if (error) {
-    return new Response(JSON.stringify({ message: 'fail' }), { status: 500 });
+    return new Response(JSON.stringify({ message: 'get data fail' }), {
+      status: 500,
+    });
+  }
+
+  if (data) {
+    const { data, error } = await supabase.rpc('increment', {
+      slug: slug as string,
+    });
+
+    if (error) {
+      console.log(error);
+      return new Response(
+        JSON.stringify({ message: 'update view_count fail' }),
+        { status: 500 },
+      );
+    }
   }
   return new Response(JSON.stringify({ message: 'ok' }), { status: 200 });
 }
