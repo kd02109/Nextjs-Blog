@@ -1,6 +1,7 @@
 'use client';
 
 import Tag from '@/components/Tag';
+import useSupabaseCount from '@/components/hook/useSupabaseCount';
 import { getCookieClient, makeCookieClient } from '@/util/cookie/cookieClient';
 
 import { supabaseIncrement, supabaseViewCount } from '@/util/supabase';
@@ -12,12 +13,9 @@ import { useEffect, useMemo, useState } from 'react';
 
 export default function PostCard(post: Post) {
   const ids = useMemo(() => post.url.split('/'), [post.url]);
-  const [view, setView] = useState<number | null>(null);
-  const router = useRouter();
+  const view = useSupabaseCount(ids[ids.length - 1]);
 
-  useEffect(() => {
-    supabaseViewCount(ids[ids.length - 1]).then(data => setView(data));
-  }, [ids]);
+  const router = useRouter();
 
   const onClick = async () => {
     const slug = ids[ids.length - 1].trim();
