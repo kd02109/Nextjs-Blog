@@ -1,11 +1,12 @@
 import '@/styles/globals.css';
 import type { Metadata } from 'next';
 import { nanum } from '@/font/font';
-import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import NextThemeProvider from '@/components/ThemeProvider';
 import GoogleAnalytics from '@/components/layout/GoogleAnalytics';
 import dynamic from 'next/dynamic';
+
+export const revalidate = 360;
 
 export const metadata: Metadata = {
   title: "Son's blog",

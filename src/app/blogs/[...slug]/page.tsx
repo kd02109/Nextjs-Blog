@@ -23,7 +23,7 @@ export const generateMetadata = ({ params }: { params: any }): Metadata => {
 
 const PostLayout = async ({ params }: { params: { slug: string[] } }) => {
   const res = await postView(params.slug.at(-1));
-
+  console.log(res);
   const str = params.slug.join('/');
 
   const allPostsSort = getPosts('blog');
