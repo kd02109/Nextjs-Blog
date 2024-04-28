@@ -2,6 +2,8 @@ import { allPosts } from 'contentlayer/generated';
 import getPosts from '@/util/getPosts';
 import DetailPage from '@/components/DetailPage';
 import { Metadata } from 'next';
+import { getCookieServer } from '@/util/cookie/cookieServer';
+import { supabaseIncrement } from '@/util/supabase';
 
 export const generateMetadata = ({ params }: { params: any }): Metadata => {
   const post = allPosts.find(post => {
@@ -22,6 +24,12 @@ export const generateMetadata = ({ params }: { params: any }): Metadata => {
 
 const PostLayout = async ({ params }: { params: { slug: string[] } }) => {
   const str = params.slug.join('/');
+  const slug = params.slug.at(-1);
+  const isCookie = await getCookieServer(slug as string);
+
+  if (!isCookie) {
+    await supabaseIncrement(slug as string);
+  }
 
   const allPostsSort = getPosts('blog');
   let postIndex = Infinity;

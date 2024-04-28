@@ -8,7 +8,6 @@ export const supabase: SupabaseClient<Database> = createClient(
 
 export const supabaseIncrement = async (slug: string) => {
   const obj = await supabase.rpc('increment_view', { slug_text: slug });
-  console.log(obj);
 };
 
 export const supabaseViewCount = async (slug: string) => {
