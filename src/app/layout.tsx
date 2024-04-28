@@ -1,11 +1,12 @@
 import '@/styles/globals.css';
 import type { Metadata } from 'next';
 import { nanum } from '@/font/font';
-import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import NextThemeProvider from '@/components/ThemeProvider';
 import GoogleAnalytics from '@/components/layout/GoogleAnalytics';
 import dynamic from 'next/dynamic';
+
+export const revalidate = 360;
 
 export const metadata: Metadata = {
   title: "Son's blog",
@@ -116,6 +117,7 @@ export default function RootLayout({
       <body
         className={`mx-auto max-w-3xl lg:max-w-6xl lg:px-8 ${nanum.className}`}>
         <GoogleAnalytics />
+
         <NextThemeProvider>
           <HeaderDynamic />
           <main className="px-6">{children}</main>
