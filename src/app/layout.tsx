@@ -117,6 +117,7 @@ export default function RootLayout({
       <body
         className={`mx-auto max-w-3xl lg:max-w-6xl lg:px-8 ${nanum.className}`}>
         <GoogleAnalytics />
+
         <NextThemeProvider>
           <HeaderDynamic />
           <main className="px-6">{children}</main>

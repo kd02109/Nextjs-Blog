@@ -1,6 +1,8 @@
 import { allPosts } from 'contentlayer/generated';
 import DetailPage from '@/components/DetailPage';
 import { ProjectName } from '@/types/projectType';
+import { getCookieServer } from '@/util/cookie/cookieServer';
+import { supabaseIncrement } from '@/util/supabase';
 
 type Props = {
   params: {
@@ -26,9 +28,14 @@ export const generateMetadata = ({ params }: Props) => {
   };
 };
 
-export default function ProjectDetailPage({ params }: Props) {
-  console.log(params);
-  const str = params.slug.trim() + '/' + params.detail.trim();
+export default async function ProjectDetailPage({ params }: Props) {
+  const slug = params.detail.trim();
+  const isCookie = await getCookieServer(slug);
+  if (!isCookie) {
+    await supabaseIncrement(slug);
+  }
+
+  const str = params.slug.trim() + '/' + slug;
   const projectTag = params.slug.trim() as ProjectName;
   const post = allPosts.find(post => {
     return `${post.url}` === str;

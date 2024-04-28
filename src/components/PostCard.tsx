@@ -1,28 +1,32 @@
 'use client';
 
 import Tag from '@/components/Tag';
-import postView from '@/util/postView';
+import { getCookieClient, makeCookieClient } from '@/util/cookie/cookieClient';
+
 import { supabaseIncrement, supabaseViewCount } from '@/util/supabase';
 import { Post } from 'contentlayer/generated';
 import { format, parseISO } from 'date-fns';
-import Link from 'next/link';
+
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 export default function PostCard(post: Post) {
+  const ids = useMemo(() => post.url.split('/'), [post.url]);
   const [view, setView] = useState<number | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    const ids = post.url.split('/');
     supabaseViewCount(ids[ids.length - 1]).then(data => setView(data));
-  }, [post.url]);
+  }, [ids]);
 
   const onClick = async () => {
-    const slug = post.url.split('/');
-    await supabaseIncrement(slug[slug.length - 1]);
+    const slug = ids[ids.length - 1].trim();
+    if (!getCookieClient(slug)) {
+      await supabaseIncrement(slug);
+      makeCookieClient(slug);
+    }
+
     const brand = post.brand.trim();
-    console.log(brand);
     if (brand === 'project') router.push(`projects/${post.url}`);
     else router.push(`blogs/${post.url}`);
   };
