@@ -10,6 +10,9 @@ import Calender from '@/components/svg/Calender';
 import { format, parseISO } from 'date-fns';
 import List from '@/components/svg/List';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { getCookieClient, makeCookieClient } from '@/util/cookie/cookieClient';
+import { supabaseIncrement } from '@/util/supabase';
+import { useRouter } from 'next/navigation';
 
 type Porps = {
   title: ProjectName;
@@ -18,6 +21,7 @@ type Porps = {
 };
 export default function DetailProjectPageList({ title, param, date }: Porps) {
   const [isClick, setIsClick] = useState(false);
+  const router = useRouter();
   const { theme } = useTheme();
   const posts = getPosts()
     .filter(post => post.url.includes(title) && post.url !== param)
@@ -25,6 +29,16 @@ export default function DetailProjectPageList({ title, param, date }: Porps) {
 
   const onClick = () => {
     setIsClick(prev => !prev);
+  };
+
+  const onLinkClick = async (url: string) => {
+    const slugs = url.split('/');
+    const slug = slugs[slugs.length - 1];
+    if (!getCookieClient(slug)) {
+      await supabaseIncrement(slug);
+      makeCookieClient(slug);
+    }
+    router.push(`/projects/${url}`);
   };
 
   const variants: Variants = {
@@ -66,17 +80,20 @@ export default function DetailProjectPageList({ title, param, date }: Porps) {
       <AnimatePresence>
         {isClick && (
           <motion.ul
-            className="mt-2"
+            className="mt-2 flex flex-col gap-2"
             variants={variants}
             initial="initial"
             exit="exit"
             animate="animate">
             {posts.map((post, idx) => (
-              <Link href={`/projects/${post.url}`} key={post.id}>
+              <button
+                key={post.id}
+                onClick={() => onLinkClick(post.url)}
+                className="text-left">
                 <li className="font-bold text-md mb-2">
                   {idx + 1}. {post.title}
                 </li>
-              </Link>
+              </button>
             ))}
             <button onClick={onClick}>간략히</button>
           </motion.ul>
