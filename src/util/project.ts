@@ -68,4 +68,15 @@ export const projectObj: ProjectType[] = [
     date: '2023-10-30 ~ 2023-12-21',
     stack: ['react', 'typescript', 'nextJs'],
   },
+    {
+    name: 'Swifty',
+    image: 'https://imgur.com/a/uW108KC',
+    description:
+      '학습용 뱅킹앱에서 돌고 돌아 대학교 축제 티케팅을 지원하는 프로젝트로 발전하기까지의 과정을 정리합니다.',
+    href: '#',
+    github: 'https://github.com/ToyVallet',
+    link: 'swifty',
+    date: '2024-03-06 ~ ',
+    stack: ['react', 'typescript', 'nextJs', 'reactHookForm' , "eslint", "tailwindcss"],
+  },
 ];
