@@ -1,0 +1,208 @@
+---
+title: Nextjs를 사용하면서 마주친 쿠키 문제
+date: 2024-06-08
+id: nextjs-with-cookie
+tag:
+  - project
+  - cookie
+  - nextJs
+brand: project
+description: Nextjs를 사용하면서 마주친 쿠키 문제에 대해서 정리합니다.
+carousel: true
+---
+
+### 쿠키
+
+쿠키는 사용자가 방문한 웹사이트에서 사용자의 브라우저에 전송하는 작은 텍스트 조각입니다. 저희는 로그인한 유저의 관리를 위해 쿠키에 발급한 access token, refresh token 정보를 저장해 FE와 BE 사이에 소통하도록 하였습니다. 이때 마주친 문제에 대해서 정리합니다.
+
+### SECURE && SAMESITE
+
+**크롬을 기준으로 해서 기본적으로 생성된 쿠키의 Same-Site의 Default 옵션은 Lax입니다**. Same-Site 옵션은 총 3가지가 있습니다.
+
+- **None :** Same-Site 옵션이 있기 전 쿠키가 동작하는 방식과 같습니다. None으로 설정된 쿠키의 경우 크로스 사이트 요청의 경우에도 항상 전송됩니다. 해당 방식은 서드 파티 쿠키도 전송이 되기 때문에 보안적으로 좋지 않습니다. 따라서 **Same-Site를 None으로 설정하는 경우 Secure을 True로 설정하는 것을 크롬은 권장하고 있으며, secure 설정을 하지 않은 쿠키에 대해서는 애플리케이션에 저장되지 않도록 하고 있습니다.**
+- **Strict :** 가장 보수적인 정책으로 크로스 사이트 요청에서 항상 전송되지 않습니다. 서드 파티 쿠키는 전송되지 않고, 퍼스트 쿠키만 전송됩니다.
+- **Lax :** Strict에 비해 상대적으로 유연한 정책입니다. Lax는 서드 파티 쿠키를 전송하지 않지만 몇가지 예외적인 요청에는 전송됩니다.
+  Lax 요청은 Same-Site일 경우는 당연히 요청이 되고, 이 외에는 웹 페이지 이동(Top Level Navigation), “안전한” HTTP 메서드 요청의 경우 전송이 됩니다.
+  - **Top Level Navigation** : 유저가 링크(`<a>`)를 클릭하거나, `window.location.replace` 등으로 인해 자동으로 이뤄지는 이동, `302` 리다이렉트를 이용한 이동이 포함됩니다.
+    하지만 `<iframe>`이나 `<img>`를 문서에 삽입함으로서 발생하는 HTTP 요청은 **"Navigation"**이라고 할 수 없으니 `Lax` 쿠키가 전송되지 않고, `<iframe>` 안에서 페이지를 이동하는 경우는 "Top Level"이라고 할 수 없으므로 `Lax` 쿠키는 전송되지 않습니다.
+  - **안전한 HTTP 메서드 요청:** `POST`나 `DELETE` 같은 요청의 경우, `Lax` 쿠키는 전송되지 않습니다. 하지만 `GET`처럼 서버의 서버의 상태를 바꾸지 않을 거라고 기대되는 요청에는 `Lax` 쿠키가 전송됩니다.
+
+> **Same Site의 판별 기준**
+>
+> `api.swifty.kr` 과 `www.swifty.kr` 은 모두 Same-Site입니다. 즉 서브 도메인 이외에 도메인이 같은 경우는 Same-Site에 해당합니다. **Same-Site는 최상위 도메인과 해당 suffix 앞까지를 하나의 site로 보는 것입니다.** 만약 최상위 도메인이 `.com` 이라면 `google.com` 이 하나의 site가 됩니다.
+>
+> 이러한 기준에서 `example.github.io` 와 `dev.github.io`는 SameSite가 아닌 Cross-Site 입니다.
+>
+> 이는 `github.io`가 하나의 최상위 suffix로 동작하기 때문입니다.
+
+따라서 해당 SECURE 옵션과 SAME-SITE 문제를 해결하기 위해서는 sub domain을 활용해서 같은 site를 통해 BE, FE 배포 site를 구분하고 모두 SSL 적용을 마쳐 HTTPS로 배포가 되도록 하였습니다.
+
+해당 과정을 통해 FE에서 배포한 사이트와 서버에서 배포한 사이트 간의 소통은 쿠키 생성과 보관에 어떠한 문제도 없이 동작을 한다는 것을 확인할 수 있었습니다. 하지만 **사이트를 새로고침하면 저장된 쿠키가 사라지는 마법이? 해당 문제는 쿠키의 Domain과 연관**이 있었습니다.
+
+### Cookie Domain && Path
+
+앞서 살펴 본 것과 같이 cookie는 same-site인 경우 어떠한 제약도 없이 자유롭게 소통을 할 수 있습니다. 이때 `api.swifty.kr` 에서 쿠키를 작성해서 `www.swifty.kr`로 전송한다고 해보겠습니다. 저희는 이때 하위 도메인을 모두 포함하여 Domain 옵션을 지정했습니다. **Domain은 현재 쿠키가 어떤 서버로 전송 되어져야 하는지를 지정하는 속성입니다.**
+
+```
+Set-Cookie: qwerty=219ffwef9w0f; Domain=api.swifty.kr;
+```
+
+위와 같이 쿠키 도메인을 지정하게 되면, 다른 서브 도메인을 가지는 same-site와는 소통이 불가능하게 됩니다. 따라서 다음과 같이 쿠키를 지정해야 합니다.
+
+```
+Set-Cookie: qwerty=219ffwef9w0f; Domain=.swifty.kr;
+
+혹은
+
+Set-Cookie: qwerty=219ffwef9w0f; Domain=swifty.kr;
+```
+
+상위 도메인을 설정하는 경우 `.` 을 앞에 붙여주는 이유는 예전 버전의 브라우저에서도 상위 도메인으로 인식하여 전송하도록 하게 하기 위함입니다. (최신 버전의 경우 `.` 없이 지정해도 상위 도메인으로 인식합니다.)
+
+더불어 url path 제한이 없다면, path는 `/` 로 지정하는 것이 좋습니다. 만약 아래와 같이 path를 docs로 지정한 쿠키라면, URL 안에 반드시 docs 경로가 존재해야 합니다.
+
+```
+Set-Cookie: qwerty=219ffwef9w0f; Domain=swifty.kr; path=/docs
+```
+
+- 요청 경로 `/docs`, `/docs/`, `/docs/Web/`, `/docs/Web/HTTP`는 모두 일치합니다.
+- 요청 경로 `/`, `/docsets`, `/fr/docs`는 일치하지 않습니다.
+
+해당 문제를 모두 해결하고 배포 사이트에서 쿠키를 테스트 할 때 어떤 문제도 없이 정상적으로 동작하는 것을 확인할 수 있었습니다. 하지만 다른 문제가 남아 있었는데, 바로 **local 개발과 배포 서버와의 연결**이었습니다.
+
+### **local 개발과 배포 서버와의 연결:** DOMAIN
+
+이미 배포한 서버에서 domain을 위와 같이 배포한 url로 쿠키를 발급한 경우 localhost 개발 환경에서 정상적으로 쿠키가 저장되지 않고 있었습니다. **예외적으로 localhost에서 secure 옵션이 있어도 개발의 편의성을 위해서 정상적으로 쿠키가 발급된다는 것은 확인할 수 있었습니다**. 하지만 Domain이 다른 경우는 정상적으로 쿠키 발급이 되지 않고 있었습니다.
+
+따라서 강제적으로 서버에서 쿠키를 생성할 때 domain을 localhost로 변경하도록 하였습니다.
+
+```
+Set-Cookie: qwerty=219ffwef9w0f; Domain=localhost;
+```
+
+하지만 해당 방식으로 쿠키를 생성할 때 두 가지 문제가 발생하였습니다.
+
+1. **서버 Host와 쿠키 domain이 일치하지 않아서 브라우저 자체에서 쿠키 생성을 막게 됩니다.**
+2. **localhost는 접두사, 접미사 구분이 존재하지 않습니다. 따라서 도메인 규칙에 어긋나기 때문에 cookie가 생성되지 않은 것이다.**
+
+해당 문제를 해결하기 위해 각자의 로컬 환경에서 DNS 이름을 변경하여 적용하고 별도로 localhost에 ssl을 등록하여 문제를 해결했습니다.
+
+1. **localhost domain 이름 변경하기**
+
+   경로 : `C:\Windows\System32\drivers\etc`
+
+   ```
+   # Copyright (c) 1993-2009 Microsoft Corp.
+   #
+   # This is a sample HOSTS file used by Microsoft TCP/IP for Windows.
+   #
+   # This file contains the mappings of IP addresses to host names. Each
+   # entry should be kept on an individual line. The IP address should
+   # be placed in the first column followed by the corresponding host name.
+   # The IP address and the host name should be separated by at least one
+   # space.
+   #
+   # Additionally, comments (such as these) may be inserted on individual
+   # lines or following the machine name denoted by a '#' symbol.
+   #
+   # For example:
+   #
+   #      102.54.94.97     rhino.acme.com          # source server
+   #       38.25.63.10     x.acme.com              # x client host
+
+   # localhost name resolution is handled within DNS itself.
+   	127.0.0.1       localhost.swifty.kr
+   	::1             localhost.swifty.kr
+
+   ```
+
+2. **ssl 등록하기**
+
+   ```
+   mkcert "<허용 도메인 이름 작성하기>" localhost 127.0.0.1 ::1
+   ```
+
+3. **https 서버 접속 생성**
+
+   ```jsx
+   const http = require('http');
+   const { parse } = require('url');
+   const next = require('next');
+   const https = require('https');
+   const fs = require('fs');
+
+   const dev = process.env.NODE_ENV !== 'production';
+   const app = next({ dev });
+   const handle = app.getRequestHandler();
+
+   const PORT = 3000;
+
+   const httpsOptions = {
+     key: fs.readFileSync('./localhost-key.pem'),
+     cert: fs.readFileSync('./localhost.pem'),
+   };
+
+   app.prepare().then(() => {
+     if (httpsOptions.key && httpsOptions.cert) {
+       https
+         .createServer(httpsOptions, (req, res) => {
+           const parsedUrl = parse(req.url, true);
+           handle(req, res, parsedUrl);
+         })
+         .listen(PORT, err => {
+           if (err) {
+             console.error('HTTPS Server Error:', err);
+             throw err;
+           }
+           console.log(`> HTTPS: Ready on https://localhost.swifty.kr:${PORT}`);
+         });
+     } else {
+       http
+         .createServer((req, res) => {
+           const parsedUrl = parse(req.url, true);
+           console.log('HTTP Request:', req.url);
+           handle(req, res, parsedUrl);
+         })
+         .listen(PORT, err => {
+           if (err) {
+             console.error('HTTP Server Error:', err);
+             throw err;
+           }
+           console.log(
+             `> Ready on http://localhost:${PORT} or https://localhost.swifty.kr:${PORT}`,
+           );
+         });
+     }
+   });
+   ```
+
+## Next.js Server action에서 쿠키를 받아오지 못하는 현상
+
+현재 로그인 post 요청을 client에서 보내면 서버에서 set-cookie로 쿠키를 생성해서 header에 담아서 보내고 있습니다. 이때 해당 요청을 `Next.js` `server action`으로 처리하게 되면 브라우저에서 쿠키를 생성하지 않는 문제가 있었습니다.
+
+**해당 문제는 브라우저에서 서버의 api 요청을 받고 header에서 set-cookie를 확인하지 않기 때문입니다**. 이를 해결하려면 Next.js 서버에서 별도로 cookie method를 활용해서 쿠키를 만들어주어야 하는 이중 관리 문제가 발생하게 됩니다. 따라서 해당 문제를 해결하기 위해서는 클라이언트 측에서 서버 응답을 받아서 브라우저에서 자동으로 쿠키를 관리하도록 해주어야 합니다.
+
+## Fetch Credentials
+
+FE와 BE에서 API 소통간에 정상적으로 쿠키를 소통하게 하려면, **`Access-Control-Allow-Credentials`** 옵션을 설정해주어야 합니다. 해당 설정이 갖춰줘야만 브라우저에서 소통시 cookie를 전송합니다. Fetch는 기본적으로 Cookie를 사용하지 않기 때문입니다.
+
+1. **include**
+   - Cross-origin 호출도 자격증명을 포함.
+2. **same-origin(default)**
+   - Same-origin 호출만 자격증명을 포함.
+3. **omit**
+   - 절대 자격증명을 포함하지 않음.
+
+## Reference
+
+[SameSite 쿠키 설명  |  Articles  |  web.dev](https://web.dev/articles/samesite-cookies-explained?hl=ko#explicitly-state-cookie-usage-with-the-samesite-attribute)
+
+[브라우저 쿠키와 SameSite 속성 / seob.dev](https://seob.dev/posts/브라우저-쿠키와-SameSite-속성/)
+
+[Set-Cookie - HTTP | MDN](https://developer.mozilla.org/ko/docs/Web/HTTP/Headers/Set-Cookie)
+
+[[윈도우] hosts 파일 위치와 hosts 파일로 로컬 도메인 설정하기](https://apost.dev/windou-hostsrokeol-domein-seoljeong/)
+
+[A guide to cookies in Next.js - LogRocket Blog](https://blog.logrocket.com/guide-cookies-next-js/)
+
+[Access-Control-Allow-Credentials - HTTP | MDN](https://developer.mozilla.org/ko/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials)
