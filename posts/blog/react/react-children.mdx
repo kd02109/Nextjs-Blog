@@ -121,9 +121,9 @@ export default function App() {
             color: 'white',
             backgroundColor: 'black',
           }}>
-          It's a jsx
+          {"It's a jsx"}
         </div>
-        it's a string
+        {"it's a string"}
       </Grid>
     </div>
   );
@@ -225,7 +225,7 @@ function IgnoreFirstChild({children}: PropChildren): any{
   const childrenList = Children.toArray(children)
   return childrenList.map((item, index) => {
     if(index === 0) return null
-    else return <div>{item}</div>
+    else return (<div>{item}</div>)
   } )
 }
 

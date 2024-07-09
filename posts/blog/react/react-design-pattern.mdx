@@ -76,17 +76,19 @@ HOC를 사용하기 위해 본래의 컴포넌트인 MyComponent를 WithLogger�
 
 이 패턴에서 컴포넌트는 함수를 prop으로 받아 해당 함수를 사용하여 콘텐츠를 렌더링합니다.
 
-```ts
+```tsx
 import React from 'react';
 
-const MouseTracker = (props) => {
+const MouseTracker = props => {
   const [position, setPosition] = React.useState({ x: 0, y: 0 });
 
-  const handleMouseMove = (event) => {
+  const handleMouseMove = event => {
     setPosition({ x: event.clientX, y: event.clientY });
   };
 
-  return <div onMouseMove={handleMouseMove}>{props.renderPosition(position)}</div>;
+  return (
+    <div onMouseMove={handleMouseMove}>{props.renderPosition(position)}</div>
+  );
 };
 
 // Usage
@@ -99,7 +101,6 @@ const DisplayMousePosition = () => (
     )}
   />
 );
-
 ```
 
 renderPosition 함수를 prop으로 받아서 활용합니다. 내부 로직은 MouseTracker 컴포넌트에서 이미 작성이 되어 있으며, UI는 디자인에 맞추어서 자유롭게 작성할 수 있습니다.
@@ -108,32 +109,32 @@ renderPosition 함수를 prop으로 받아서 활용합니다. 내부 로직은 
 
 Container Component는 로직과 상태 관리를 처리하고 Presentational components는 제공된 prop을 기반으로 UI를 렌더링하는 데 중점을 둡니다.
 
-```ts
+```tsx
 import React from 'react';
 import { useState } from 'react';
 
-function ContainerComponent({url}: {url:string}){
-  const [data, setData] = useState('')
-  console.log(data)
- React.useEffect(()=>{
-    (async()=>{
-      const json = await fetch(url)
-      const data = await json.json()
-      setData(data[0])
-    })()
- }, [url])
-  return <PrasentationalComponent data = {data}/>
+function ContainerComponent({ url }: { url: string }) {
+  const [data, setData] = useState('');
+  console.log(data);
+  React.useEffect(() => {
+    (async () => {
+      const json = await fetch(url);
+      const data = await json.json();
+      setData(data[0]);
+    })();
+  }, [url]);
+  return <PrasentationalComponent data={data} />;
 }
 
-const PrasentationalComponent = ({data}) =>{
-  return <img src={data.url} />
+const PrasentationalComponent = ({ data }) => {
+  return <img src={data.url} />;
+};
+
+export default function App() {
+  return (
+    <ContainerComponent url={'https://api.thecatapi.com/v1/images/search'} />
+  );
 }
-
-
-export default function App(){
-  return <ContainerComponent url={'https://api.thecatapi.com/v1/images/search'}/>
-}
-
 ```
 
 Container Component는 상태와 필요한 콜백을 Presentational component에 prop으로 전달합니다. Presentational components는 데이터 가져오기나 비즈니스 로직에 대한 걱정 없이 제공된 prop을 기반으로 UI를 렌더링할 책임이 있습니다.

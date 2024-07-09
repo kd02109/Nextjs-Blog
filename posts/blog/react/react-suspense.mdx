@@ -168,22 +168,21 @@ function fetchData() {
 
 - Suspense는 Promise의 상태를 반환하는 코드가 있어야 fullback component를 진행합니다.
 
-```ts
+```tsx
 // App.tsx
-import React from "react";
-import UseSuspense from "./components/UseSuspense";
+import React from 'react';
+import UseSuspense from './components/UseSuspense';
 
-export default function App(){
-  return    (
-  <React.Suspense fallback={<div>Loading.....</div>}>
-    <UseSuspense />
-  </React.Suspense>
-  )
+export default function App() {
+  return (
+    <React.Suspense fallback={<div>Loading.....</div>}>
+      <UseSuspense />
+    </React.Suspense>
+  );
 }
-
 ```
 
-```ts
+```tsx
 // UseSuspense.tsx
 // react의 공식 문서를 참고하여 작성하였습니다.
 /*
@@ -191,49 +190,55 @@ export default function App(){
 실제로 React가 이렇게 Suspense와 Data Fetching을 처리하지는 않는다는 것을 주의해야 합니다.
 */
 type Data = {
-    id: string
-    url: string
-    width: number
-    height: number
-}
+  id: string;
+  url: string;
+  width: number;
+  height: number;
+};
 
-
-export default function UseSuspense(){
-    const catImages = use(fetchData("https://api.thecatapi.com/v1/images/search?limit=10`"));
-    console.log(catImages)
+export default function UseSuspense() {
+  const catImages = use(
+    fetchData('https://api.thecatapi.com/v1/images/search?limit=10`'),
+  );
+  console.log(catImages);
   return (
-        <div>
-            {catImages.map((image:Data) => (
-                    <img key={image.id} src={image.url} width={500} height={500} alt={`Cat image: ID is a ${image.id}`} />
-            ))}
-        </div>
+    <div>
+      {catImages.map((image: Data) => (
+        <img
+          key={image.id}
+          src={image.url}
+          width={500}
+          height={500}
+          alt={`Cat image: ID is a ${image.id}`}
+        />
+      ))}
+    </div>
   );
 }
 
-
 // callback 함수가 반환하는 promise에 따라 Suspense가 동작합니다.
-function use(promise: any ) {
-    if (promise.status === 'fulfilled') {
-      return promise.value;
-    } else if (promise.status === 'rejected') {
-      throw promise.reason;
-    } else if (promise.status === 'pending') {
-      throw promise;
-    } else {
-      promise.status = 'pending';
-      promise.then(
-        (result: any) => {
-          promise.status = 'fulfilled';
-          promise.value = result;
-        },
-        (reason: any) => {
-          promise.status = 'rejected';
-          promise.reason = reason;
-        },
-      );
-      throw promise;
-    }
+function use(promise: any) {
+  if (promise.status === 'fulfilled') {
+    return promise.value;
+  } else if (promise.status === 'rejected') {
+    throw promise.reason;
+  } else if (promise.status === 'pending') {
+    throw promise;
+  } else {
+    promise.status = 'pending';
+    promise.then(
+      (result: any) => {
+        promise.status = 'fulfilled';
+        promise.value = result;
+      },
+      (reason: any) => {
+        promise.status = 'rejected';
+        promise.reason = reason;
+      },
+    );
+    throw promise;
   }
+}
 
 // 데이터 가져오는  함수
 const cache = new Map();
@@ -245,17 +250,16 @@ function fetchData(url: string) {
 }
 
 async function getData(url: string) {
-    try{
-        await new Promise(resolve => {
-            setTimeout(resolve, 3000);
-        });
-        const json = await fetch(url)
-        const data = await json.json()
-        return data
-    }
-    catch(err){
-        return err
-    }
+  try {
+    await new Promise(resolve => {
+      setTimeout(resolve, 3000);
+    });
+    const json = await fetch(url);
+    const data = await json.json();
+    return data;
+  } catch (err) {
+    return err;
+  }
 }
 ```
 
