@@ -1,15 +1,15 @@
 ---
 title: Nextjs에서 localStorage 활용하기
-date : 2023-11-30
-id : nextjs-localstorage
-tag: 
-   - project
-   - nextJs
-   - localStorage
-   - mbtmi
+date: 2023-11-30
+id: nextjs-localstorage
+tag:
+  - project
+  - nextJs
+  - localStorage
+  - mbtmi
 brand: project
 
-description: localStorage를 어떻게 nextJs에서 활용할지 정리했습니다. 
+description: localStorage를 어떻게 nextJs에서 활용할지 정리했습니다.
 ---
 
 ## localStorage 사용하기
@@ -71,17 +71,17 @@ Error: useLocalStorage is a client-only hook
 해당 오류는 Next.js의 `Prerender Error`입니다. **pre-rendering은 Next.js가 JS로 만든 페이지를 보여주기 전 각 페이지의 HTML 파일을 미리 만들어서 보여주는 것을 의미**합니다. 즉 라이브러리에서 제공하는 useLocalStorage를 적용하는 과정에서 에러가 발생했다는 메시지입니다. **useLocalstorage는 ClientSide에서만 사용할 수 있는데, 정적 페이지를 생성하는 과정에 이를 Serverside에서 처리 하려고 하여 발생한 문제**입니다. **해당 문제 해결을 위해 mount 되었는지 확인하는 단계를 추가**했습니다.
 
 ```tsx
-  const [hasMounted, setHasMounted] = useState(false);
+const [hasMounted, setHasMounted] = useState(false);
 
-  useEffect(() => {
-    setHasMounted(true);
-  }, []);
+useEffect(() => {
+  setHasMounted(true);
+}, []);
 
-  if (hasMounted) {
-    return [storedValue, setValue] as const;
-  }
+if (hasMounted) {
+  return [storedValue, setValue] as const;
+}
 
-  return [initialValue, setValue] as const;
+return [initialValue, setValue] as const;
 ```
 
 ### 전체 코드
@@ -146,17 +146,17 @@ export default useLocalStorage;
 
 ## localstorage 사용을 배제하자
 
-Next.js에서 로컬 스토리지 사용은 생각보다 까다로웠습니다. CSR과 SSR을 구분하여, **CSR 컴포넌트에서 작업을 진행**해야 했습니다. 더불어 useLocalStorge hook을 활용하게 되면, 해당 hook이 mount되는 것을 기다려야 했기에, **한번 더 useEffect()를 활용해서 localstorage 동기화 작업이 이루어지는 환경을 보장**해주어야 했습니다. 
+Next.js에서 로컬 스토리지 사용은 생각보다 까다로웠습니다. CSR과 SSR을 구분하여, **CSR 컴포넌트에서 작업을 진행**해야 했습니다. 더불어 useLocalStorge hook을 활용하게 되면, 해당 hook이 mount되는 것을 기다려야 했기에, **한번 더 useEffect()를 활용해서 localstorage 동기화 작업이 이루어지는 환경을 보장**해주어야 했습니다.
 
 Next.js의 가장 큰 장점은 클라이언트에서 처리해야 하는 작업을 서버에게 위임하여 SEO와 렌더링 속도를 향상 시키는 것으로 생각합니다. 이러한 점에서 localstorage를 활용해야 한다면, 해당 데이터의 구조를 다시금 고민해보아야 할 것 같습니다.
 
-프로젝트에서 사용하는 jwt에는 민감한 정보 없이, 사용자가 해당 페이지에서의 답안 작성 여부만을 검사하기 위해 발급하는 용도입니다. 해당 로직을 client측이 아닌, 서버 측에서 하는 방법을 고민할 필요가 있는 것 같습니다. 
+프로젝트에서 사용하는 jwt에는 민감한 정보 없이, 사용자가 해당 페이지에서의 답안 작성 여부만을 검사하기 위해 발급하는 용도입니다. 해당 로직을 client측이 아닌, 서버 측에서 하는 방법을 고민할 필요가 있는 것 같습니다.
 
 ## jwt를 활용해서 api 요청하기
 
-사용자가 답변한 정보를 서버에서 받아오는 과정, 답변을 생성하는 과정에서 jwt 값이 필요했습니다. 따라서 localStorage에 저장된 token 값이 있을 경우에만 요청을 해야 합니다. 따라서 useEffect를 활용해서 token값이 mount 된 경우에만 데이터 요청을 해야 합니다. 
+사용자가 답변한 정보를 서버에서 받아오는 과정, 답변을 생성하는 과정에서 jwt 값이 필요했습니다. 따라서 localStorage에 저장된 token 값이 있을 경우에만 요청을 해야 합니다. 따라서 useEffect를 활용해서 token값이 mount 된 경우에만 데이터 요청을 해야 합니다.
 
-이때 의도하지 않은 페이지 변경을 유저에게 노출 시키지 않기 위해서 loading 페이지를 만들었습니다. 데이터가 모두 fetch 된 이후에 페이지를 볼 수 있도록 하였습니다. 
+이때 의도하지 않은 페이지 변경을 유저에게 노출 시키지 않기 위해서 loading 페이지를 만들었습니다. 데이터가 모두 fetch 된 이후에 페이지를 볼 수 있도록 하였습니다.
 
 ```tsx
 'use client';

@@ -1,3 +1,19 @@
 {
-  "extends": ["next/core-web-vitals", "plugin:prettier/recommended"]
+  "extends": [
+    "next/core-web-vitals",
+    "plugin:prettier/recommended",
+    "plugin:mdx/recommended"
+  ],
+  "settings": {
+    "mdx/code-blocks": true // MDX 파일 내의 코드 블록도 ESLint 규칙을 따르게 함
+  },
+  "overrides": [
+    {
+      "files": ["*.mdx"],
+      "extends": ["plugin:mdx/recommended"],
+      "rules": {
+        // MDX 파일에 적용할 추가 규칙을 여기에 작성
+      }
+    }
+  ]
 }

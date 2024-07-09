@@ -1,226 +1,225 @@
 ---
 title: babel
-date : 2023-04-07
-id : babel
-tag: 
-   - babel
-   - javascript
+date: 2023-04-07
+id: babel
+tag:
+  - babel
+  - javascript
 brand: blog
-description: babel이 무엇인지, babel의 필요성, babel의 사용벙에 대해서 정리합니다. 
+description: babel이 무엇인지, babel의 필요성, babel의 사용벙에 대해서 정리합니다.
 ---
 
 ## What is Babel
 
 > Babel is a toolchain that is mainly used to convert ECMAScript 2015+ code into a backwards compatible version of JavaScript in current and older browsers or environments. Here are the main things Babel can do for you.
+
 - 바벨은 브라우저에서 ES6 이상의 기능들을 사용하기 위해서 이전 버전의 자바스크립트 코드로 변환해주는 도구입니다. (트랜스파일러)
 - 바벨은 총 세 단계를 거쳐서 코드를 변환합니다.
-    1. 파싱(Parsing)
-    2. 변환(Transforming)
-    3. 출력 (Printing)
-    
-    코드를 읽고 추상 구문 트리(AST)로 변환하는 단계를 **파싱**이라고 합니다. 이것은 빌드 작업을 처리하기에 적합한 자료구조인데 컴파일러 이론에 사용되는 개념입니다. 
-    
-    추상 구문 트리를 변경하는 것이 **변환** 단계입니다. 실제로 코드를 변경하는 작업을 합니다. 
-    
-    변경된 결과물을 **출력**하는 것을 마지막으로 작업을 완료합니다.
-    
 
-    > **AST**
-    >
-    > - 컴퓨터 과학에서 추상 구문 트리(abstract syntax tree, AST), 또는 간단히 구문 트리(syntax tree)는 프로그래밍 언어로 작성된 소스 코드의 추상 구문 구조의 트리입니다. 
-    > 이 트리의 각 노드는 소스 코드에서 발생되는 구조를 나타냅니다. 
-    > 구문이 추상적이라는 의미는 실제 구문에서 나타나는 모든 세세한 정보를 나타내지는 않는다는 것을 의미합니다. 
-    >  들어, 그룹핑을 위한 괄호는 암시적으로 트리 구조를 가지며, 분리된 노드로 표현되지 않습니다. 
-    > 마찬가지로, if-condition-then 표현식과 같은 구문 구조는 3개의 가지에 1개의 노드가 달린 구조로 표기됩니다.
-    >
-    > - 예시 원본코드
-    >
-    >   ```jsx
-    >     function square(n) {
-    >       return n * n
-    >     }
-    >   ```
-    >
-    > - AST 변환 코드
-    >    
-    >    ```jsx
-    >    {
-    >      "type": "Program",
-    >      "start": 0,
-    >      "end": 36,
-    >      "loc": {
-    >        "start": {
-    >          "line": 1,
-    >          "column": 0
-    >        },
-    >        "end": {
-    >          "line": 3,
-    >          "column": 1
-    >        }
-    >      },
-    >      "range": [0, 36],
-    >      "errors": [],
-    >      "comments": [],
-    >      "sourceType": "module",
-    >      "body": [
-    >        {
-    >          "type": "FunctionDeclaration",
-    >          "start": 0,
-    >          "end": 36,
-    >          "loc": {
-    >            "start": {
-    >              "line": 1,
-    >              "column": 0
-    >            },
-    >            "end": {
-    >              "line": 3,
-    >              "column": 1
-    >            }
-    >          },
-    >          "range": [0, 36],
-    >          "id": {
-    >            "type": "Identifier",
-    >            "start": 9,
-    >            "end": 15,
-    >            "loc": {
-    >              "start": {
-    >                "line": 1,
-    >                "column": 9
-    >              },
-    >              "end": {
-    >                "line": 1,
-    >                "column": 15
-    >              },
-    >              "identifierName": "square"
-    >            },
-    >            "range": [9, 15],
-    >            "name": "square",
-    >            "_babelType": "Identifier"
-    >          },
-    >          "generator": false,
-    >          "async": false,
-    >          "expression": false,
-    >          "params": [
-    >            {
-    >              "type": "Identifier",
-    >              "start": 16,
-    >              "end": 17,
-    >              "loc": {
-    >                "start": {
-    >                  "line": 1,
-    >                  "column": 16
-    >                },
-    >                "end": {
-    >                  "line": 1,
-    >                  "column": 17
-    >                },
-    >                "identifierName": "n"
-    >              },
-    >              "range": [16, 17],
-    >              "name": "n",
-    >              "_babelType": "Identifier"
-    >            }
-    >          ],
-    >          "body": {
-    >            "type": "BlockStatement",
-    >            "start": 18,
-    >            "end": 36,
-    >            "loc": {
-    >              "start": {
-    >                "line": 1,
-    >                "column": 18
-    >              },
-    >              "end": {
-    >                "line": 3,
-    >                "column": 1
-    >              }
-    >            },
-    >            "range": [18, 36],
-    >            "body": [
-    >              {
-    >                "type": "ReturnStatement",
-    >                "start": 22,
-    >                "end": 34,
-    >                "loc": {
-    >                  "start": {
-    >                    "line": 2,
-    >                    "column": 2
-    >                  },
-    >                  "end": {
-    >                    "line": 2,
-    >                    "column": 14
-    >                  }
-    >                },
-    >                "range": [22, 34],
-    >                "argument": {
-    >                  "type": "BinaryExpression",
-    >                  "start": 29,
-    >                  "end": 34,
-    >                  "loc": {
-    >                    "start": {
-    >                      "line": 2,
-    >                      "column": 9
-    >                    },
-    >                    "end": {
-    >                      "line": 2,
-    >                      "column": 14
-    >                    }
-    >                  },
-    >                  "range": [29, 34],
-    >                  "left": {
-    >                    "type": "Identifier",
-    >                    "start": 29,
-    >                    "end": 30,
-    >                    "loc": {
-    >                      "start": {
-    >                        "line": 2,
-    >                        "column": 9
-    >                      },
-    >                      "end": {
-    >                        "line": 2,
-    >                        "column": 10
-    >                      },
-    >                      "identifierName": "n"
-    >                    },
-    >                    "range": [29, 30],
-    >                    "name": "n",
-    >                    "_babelType": "Identifier"
-    >                  },
-    >                  "operator": "*",
-    >                  "right": {
-    >                    "type": "Identifier",
-    >                    "start": 33,
-    >                    "end": 34,
-    >                    "loc": {
-    >                      "start": {
-    >                        "line": 2,
-    >                        "column": 13
-    >                      },
-    >                      "end": {
-    >                        "line": 2,
-    >                        "column": 14
-    >                      },
-    >                      "identifierName": "n"
-    >                    },
-    >                    "range": [33, 34],
-    >                    "name": "n",
-    >                    "_babelType": "Identifier"
-    >                  },
-    >                  "_babelType": "BinaryExpression"
-    >                },
-    >                "_babelType": "ReturnStatement"
-    >              }
-    >            ],
-    >            "_babelType": "BlockStatement"
-    >          },
-    >          "_babelType": "FunctionDeclaration"
-    >        }
-    >      ]
-    >    }
-    >    ```
-    
-바벨은 파싱과 출력만 담당하고 변환 작업은 **플러그인**이 처리합니다. 
-바벨에는 다양한 플러그인이 있습니다. 하지만 각각 필요한 플러그인을 찾아서 일일이 적용하는 것은 번거롭습니다. 
+  1. 파싱(Parsing)
+  2. 변환(Transforming)
+  3. 출력 (Printing)
+
+  코드를 읽고 추상 구문 트리(AST)로 변환하는 단계를 **파싱**이라고 합니다. 이것은 빌드 작업을 처리하기에 적합한 자료구조인데 컴파일러 이론에 사용되는 개념입니다.
+
+  추상 구문 트리를 변경하는 것이 **변환** 단계입니다. 실제로 코드를 변경하는 작업을 합니다.
+
+  변경된 결과물을 **출력**하는 것을 마지막으로 작업을 완료합니다.
+
+  > **AST**
+  >
+  > - 컴퓨터 과학에서 추상 구문 트리(abstract syntax tree, AST), 또는 간단히 구문 트리(syntax tree)는 프로그래밍 언어로 작성된 소스 코드의 추상 구문 구조의 트리입니다.
+  >   이 트리의 각 노드는 소스 코드에서 발생되는 구조를 나타냅니다.
+  >   구문이 추상적이라는 의미는 실제 구문에서 나타나는 모든 세세한 정보를 나타내지는 않는다는 것을 의미합니다.
+  >   들어, 그룹핑을 위한 괄호는 암시적으로 트리 구조를 가지며, 분리된 노드로 표현되지 않습니다.
+  >   마찬가지로, if-condition-then 표현식과 같은 구문 구조는 3개의 가지에 1개의 노드가 달린 구조로 표기됩니다.
+  > - 예시 원본코드
+  >
+  >   ```jsx
+  >   function square(n) {
+  >     return n * n;
+  >   }
+  >   ```
+  >
+  > - AST 변환 코드
+  >   ```jsx
+  >   {
+  >     "type": "Program",
+  >     "start": 0,
+  >     "end": 36,
+  >     "loc": {
+  >       "start": {
+  >         "line": 1,
+  >         "column": 0
+  >       },
+  >       "end": {
+  >         "line": 3,
+  >         "column": 1
+  >       }
+  >     },
+  >     "range": [0, 36],
+  >     "errors": [],
+  >     "comments": [],
+  >     "sourceType": "module",
+  >     "body": [
+  >       {
+  >         "type": "FunctionDeclaration",
+  >         "start": 0,
+  >         "end": 36,
+  >         "loc": {
+  >           "start": {
+  >             "line": 1,
+  >             "column": 0
+  >           },
+  >           "end": {
+  >             "line": 3,
+  >             "column": 1
+  >           }
+  >         },
+  >         "range": [0, 36],
+  >         "id": {
+  >           "type": "Identifier",
+  >           "start": 9,
+  >           "end": 15,
+  >           "loc": {
+  >             "start": {
+  >               "line": 1,
+  >               "column": 9
+  >             },
+  >             "end": {
+  >               "line": 1,
+  >               "column": 15
+  >             },
+  >             "identifierName": "square"
+  >           },
+  >           "range": [9, 15],
+  >           "name": "square",
+  >           "_babelType": "Identifier"
+  >         },
+  >         "generator": false,
+  >         "async": false,
+  >         "expression": false,
+  >         "params": [
+  >           {
+  >             "type": "Identifier",
+  >             "start": 16,
+  >             "end": 17,
+  >             "loc": {
+  >               "start": {
+  >                 "line": 1,
+  >                 "column": 16
+  >               },
+  >               "end": {
+  >                 "line": 1,
+  >                 "column": 17
+  >               },
+  >               "identifierName": "n"
+  >             },
+  >             "range": [16, 17],
+  >             "name": "n",
+  >             "_babelType": "Identifier"
+  >           }
+  >         ],
+  >         "body": {
+  >           "type": "BlockStatement",
+  >           "start": 18,
+  >           "end": 36,
+  >           "loc": {
+  >             "start": {
+  >               "line": 1,
+  >               "column": 18
+  >             },
+  >             "end": {
+  >               "line": 3,
+  >               "column": 1
+  >             }
+  >           },
+  >           "range": [18, 36],
+  >           "body": [
+  >             {
+  >               "type": "ReturnStatement",
+  >               "start": 22,
+  >               "end": 34,
+  >               "loc": {
+  >                 "start": {
+  >                   "line": 2,
+  >                   "column": 2
+  >                 },
+  >                 "end": {
+  >                   "line": 2,
+  >                   "column": 14
+  >                 }
+  >               },
+  >               "range": [22, 34],
+  >               "argument": {
+  >                 "type": "BinaryExpression",
+  >                 "start": 29,
+  >                 "end": 34,
+  >                 "loc": {
+  >                   "start": {
+  >                     "line": 2,
+  >                     "column": 9
+  >                   },
+  >                   "end": {
+  >                     "line": 2,
+  >                     "column": 14
+  >                   }
+  >                 },
+  >                 "range": [29, 34],
+  >                 "left": {
+  >                   "type": "Identifier",
+  >                   "start": 29,
+  >                   "end": 30,
+  >                   "loc": {
+  >                     "start": {
+  >                       "line": 2,
+  >                       "column": 9
+  >                     },
+  >                     "end": {
+  >                       "line": 2,
+  >                       "column": 10
+  >                     },
+  >                     "identifierName": "n"
+  >                   },
+  >                   "range": [29, 30],
+  >                   "name": "n",
+  >                   "_babelType": "Identifier"
+  >                 },
+  >                 "operator": "*",
+  >                 "right": {
+  >                   "type": "Identifier",
+  >                   "start": 33,
+  >                   "end": 34,
+  >                   "loc": {
+  >                     "start": {
+  >                       "line": 2,
+  >                       "column": 13
+  >                     },
+  >                     "end": {
+  >                       "line": 2,
+  >                       "column": 14
+  >                     },
+  >                     "identifierName": "n"
+  >                   },
+  >                   "range": [33, 34],
+  >                   "name": "n",
+  >                   "_babelType": "Identifier"
+  >                 },
+  >                 "_babelType": "BinaryExpression"
+  >               },
+  >               "_babelType": "ReturnStatement"
+  >             }
+  >           ],
+  >           "_babelType": "BlockStatement"
+  >         },
+  >         "_babelType": "FunctionDeclaration"
+  >       }
+  >     ]
+  >   }
+  >   ```
+
+바벨은 파싱과 출력만 담당하고 변환 작업은 **플러그인**이 처리합니다.
+바벨에는 다양한 플러그인이 있습니다. 하지만 각각 필요한 플러그인을 찾아서 일일이 적용하는 것은 번거롭습니다.
 따라서 등장한 것이 **프리셋**입니다.
 
 ```
@@ -229,36 +228,39 @@ description: babel이 무엇인지, babel의 필요성, babel의 사용벙에 �
 "@babel/plugin-transform-strict-mode", //stric mode 적용
 ```
 
-| 패키지/플러그인 | 패키지 이름 | 설명 |
-| --- | --- | --- |
-| Babel | @babel/cli | 터미널로 바벨을 사용할 수 있게 한다. |
-| Babel | @bable/core | 바벨의 핵심적인 기능 (파싱과 출력을 담당) |
-| Babel 프리셋 | @babel/preset-env | 프리셋은 다양한 플러그인을 모아둔 것이다. (변환을 담당) |
+| 패키지/플러그인 | 패키지 이름       | 설명                                                    |
+| --------------- | ----------------- | ------------------------------------------------------- |
+| Babel           | @babel/cli        | 터미널로 바벨을 사용할 수 있게 한다.                    |
+| Babel           | @bable/core       | 바벨의 핵심적인 기능 (파싱과 출력을 담당)               |
+| Babel 프리셋    | @babel/preset-env | 프리셋은 다양한 플러그인을 모아둔 것이다. (변환을 담당) |
+
 - Babel이 제공하는 공식 Babel 프리셋은 다음과 같다.
-    - **@babel/preset-env**
-    - **@babel/preset-flow**
-    - **@babel/preset-react**
-    - **@babel/preset-typescript**
+  - **@babel/preset-env**
+  - **@babel/preset-flow**
+  - **@babel/preset-react**
+  - **@babel/preset-typescript**
 - preset-env는 ECMAScript2015+를 변환할 때 사용합니다. 바벨7 이전 버전에는 연도별로 각 프리셋을 제공했지만 지금은 env 하나로 합쳐졌습니다.
 - preset-flow, preset-react, preset-typescript는 flow, 리액트, 타입스크립트를 변환하기 위한 프리셋입니다.
 
 ### Polyfill
+
 <img src="/images/babel/babel.png" alt="img" width="500" height="500" />
 
 polyfill은 충전 솜을 의미합니다. 부족한 솜을 채운다는 의미를 가지고 있습니다.
+
 > A polyfill is a piece of code(usually JavaScript on the Web) used to provides modern functionality on older browsers that do not natively support it.
 
 **즉 구현 브라우저에서 지원하지 않는 최신 기능을 가져와 사용하는 코드 뭉치**입니다.
-ES6이상 에서 새롭게 추가된 `Promise`, `Map`, `Set` 같은 전역 객체들이나, `String.padStart`등  ES5에서 변환할 수 있는 대상이 없는 경우 에러가 발생합니다. 
+ES6이상 에서 새롭게 추가된 `Promise`, `Map`, `Set` 같은 전역 객체들이나, `String.padStart`등 ES5에서 변환할 수 있는 대상이 없는 경우 에러가 발생합니다.
 전역 객체에 추가된 메서드 등 컴파일-타임의 코드 변환으로는 해결하기 어렵기 때문에 폴리필(polyfill)이 필요합니다.
 **즉, 구 브라우저에서 최신 자바스크립트 코드를 사용하기 위해 Babel을 이용했지만, 일부 기능들은 polyfill로 추가해줘야 합니다.**
 
-바벨에서 Preset, Plugin을 통해 코드 변환을 할 때, Promise 와 같은 최신 기능을 변환해주지 않을 수 있습니다. 
+바벨에서 Preset, Plugin을 통해 코드 변환을 할 때, Promise 와 같은 최신 기능을 변환해주지 않을 수 있습니다.
 따라서 Polyfill은 빌트 인 환경에서 최신 메서드가 포함되어 있지 않는다면, 이를 추가해서 바벨이 변환을 할 수 있게 만들어줘야 합니다.
-그래서 **@babel/polyfill**을 사용했지만, 7.4 이후부터 사용하지 않습니다. 이후부터는 **core-js**를 사용합니다. 
+그래서 **@babel/polyfill**을 사용했지만, 7.4 이후부터 사용하지 않습니다. 이후부터는 **core-js**를 사용합니다.
 이를 위해서 `babel.config.json`에 `useBuiltIns option`이 생겼습니다.
 하지만 `core-js`만을 단독으로 사용하면 **전역 스코프 오염이 발생할 수 있습니다.**
-따라서 @babel/plugin-transform-runtime을 함께 사용해줍니다. 
+따라서 @babel/plugin-transform-runtime을 함께 사용해줍니다.
 
 ```jsx
 var global = require('../internals/global');
@@ -272,45 +274,70 @@ var IS_DENO = require('../internals/engine-is-deno');
 var IS_PURE = require('../internals/is-pure');
 var V8_VERSION = require('../internals/engine-v8-version');
 
-var NativePromisePrototype = NativePromiseConstructor && NativePromiseConstructor.prototype;
+var NativePromisePrototype =
+  NativePromiseConstructor && NativePromiseConstructor.prototype;
 var SPECIES = wellKnownSymbol('species');
 var SUBCLASSING = false;
 var NATIVE_PROMISE_REJECTION_EVENT = isCallable(global.PromiseRejectionEvent);
 
 var FORCED_PROMISE_CONSTRUCTOR = isForced('Promise', function () {
   var PROMISE_CONSTRUCTOR_SOURCE = inspectSource(NativePromiseConstructor);
-  var GLOBAL_CORE_JS_PROMISE = PROMISE_CONSTRUCTOR_SOURCE !== String(NativePromiseConstructor);
+  var GLOBAL_CORE_JS_PROMISE =
+    PROMISE_CONSTRUCTOR_SOURCE !== String(NativePromiseConstructor);
   // V8 6.6 (Node 10 and Chrome 66) have a bug with resolving custom thenables
   // https://bugs.chromium.org/p/chromium/issues/detail?id=830565
   // We can't detect it synchronously, so just check versions
   if (!GLOBAL_CORE_JS_PROMISE && V8_VERSION === 66) return true;
   // We need Promise#{ catch, finally } in the pure version for preventing prototype pollution
-  if (IS_PURE && !(NativePromisePrototype['catch'] && NativePromisePrototype['finally'])) return true;
+  if (
+    IS_PURE &&
+    !(NativePromisePrototype['catch'] && NativePromisePrototype['finally'])
+  )
+    return true;
   // We can't use @@species feature detection in V8 since it causes
   // deoptimization and performance degradation
   // https://github.com/zloirock/core-js/issues/679
-  if (!V8_VERSION || V8_VERSION < 51 || !/native code/.test(PROMISE_CONSTRUCTOR_SOURCE)) {
+  if (
+    !V8_VERSION ||
+    V8_VERSION < 51 ||
+    !/native code/.test(PROMISE_CONSTRUCTOR_SOURCE)
+  ) {
     // Detect correctness of subclassing with @@species support
-    var promise = new NativePromiseConstructor(function (resolve) { resolve(1); });
+    var promise = new NativePromiseConstructor(function (resolve) {
+      resolve(1);
+    });
     var FakePromise = function (exec) {
-      exec(function () { /* empty */ }, function () { /* empty */ });
+      exec(
+        function () {
+          /* empty */
+        },
+        function () {
+          /* empty */
+        },
+      );
     };
-    var constructor = promise.constructor = {};
+    var constructor = (promise.constructor = {});
     constructor[SPECIES] = FakePromise;
-    SUBCLASSING = promise.then(function () { /* empty */ }) instanceof FakePromise;
+    SUBCLASSING =
+      promise.then(function () {
+        /* empty */
+      }) instanceof FakePromise;
     if (!SUBCLASSING) return true;
-  // Unhandled rejections tracking support, NodeJS Promise without it fails @@species test
-  } return !GLOBAL_CORE_JS_PROMISE && (IS_BROWSER || IS_DENO) && !NATIVE_PROMISE_REJECTION_EVENT;
+    // Unhandled rejections tracking support, NodeJS Promise without it fails @@species test
+  }
+  return (
+    !GLOBAL_CORE_JS_PROMISE &&
+    (IS_BROWSER || IS_DENO) &&
+    !NATIVE_PROMISE_REJECTION_EVENT
+  );
 });
 
 module.exports = {
   CONSTRUCTOR: FORCED_PROMISE_CONSTRUCTOR,
   REJECTION_EVENT: NATIVE_PROMISE_REJECTION_EVENT,
-  SUBCLASSING: SUBCLASSING
+  SUBCLASSING: SUBCLASSING,
 };
 ```
-
-
 
 ## 바벨 적용하기
 
@@ -329,6 +356,7 @@ module.exports = {
 프로젝트 내에 서드 파티 라이브러리가 바벨에 의해 트렌스폼되기를 바라지 않는 경우, 특정 부분만 적용하고 싶은 경우 사용합니다.
 
 ### 타겟 브라우져
+
 `target`옵션에 브라우져 버전 명만 지정하면 env 프리셋은 이에 맞는 플러그인들을 찾아 최적의 코드를 출력합니다.
 
 ```json
@@ -355,7 +383,8 @@ module.exports = {
 {
   "presets": [
     [
-    "@babel/preset-env",{
+      "@babel/preset-env",
+      {
         "useBuiltIns": "usage", // 폴리필 사용 방식 지정
         "corejs": "3.6.5" // 폴리필 버전 지정
       }
@@ -372,13 +401,14 @@ module.exports = {
 - 더불어 vanilla JS에서 바벨을 사용할 경우 일반적으로 webpack 과 함께 사용합니다.
 
 ### @babel/node
->babel-node is a CLI that works exactly the same as the Node.js CLI, with the added benefit of compiling with Babel presets and plugins before running it.
-Node.js와 같은 역할을 하지만 실행 이전에 바벨 프리셋을 통해 코드를 변환 시켜서 실행시켜 준다,
+
+> babel-node is a CLI that works exactly the same as the Node.js CLI, with the added benefit of compiling with Babel presets and plugins before running it.
+> Node.js와 같은 역할을 하지만 실행 이전에 바벨 프리셋을 통해 코드를 변환 시켜서 실행시켜 준다,
 
 ### nodemon
 
 > nodemon is a tool that helps develop Node.js based applications by automatically restarting the node application when file changes in the directory are detected.
-nodemon은 지정된 파일을 감지하면서 코드가 변화하면 자동으로 서버를 재 실행 시켜준다.
+> nodemon은 지정된 파일을 감지하면서 코드가 변화하면 자동으로 서버를 재 실행 시켜준다.
 
 [npm: nodemon](https://www.npmjs.com/package/nodemon)
 

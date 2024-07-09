@@ -43,7 +43,7 @@ const Post = defineDocumentType(() => ({
       required: false,
     },
     carousel: {
-      type: 'string',
+      type: 'boolean',
       description: '글의 케러셀 포함 여부를 결정',
       required: false,
     },

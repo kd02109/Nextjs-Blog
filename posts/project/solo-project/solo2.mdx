@@ -1,10 +1,10 @@
 ---
 title: Shopping App 회고 refactoring
-date : 2023-05-18
-id : Shopping App 회고 refactoring
-tag: 
-   - project
-   - shopping-app
+date: 2023-05-18
+id: Shopping App 회고 refactoring
+tag:
+  - project
+  - shopping-app
 brand: project
 description: solo-project 작성후 진행한 refactoring 방식을 정리합니다.
 carousel: true
@@ -19,13 +19,13 @@ carousel: true
 - 코드를 다음과 같이 수정하였으며, 공통된 데이터는 redux로 관리하도록 수정하였습니다.
 
 ```js
-import { Outlet } from "react-router-dom";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import ToastContainer from "./components/ToastContainer";
-import Modal from "./components/Modal";
+import { Outlet } from 'react-router-dom';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import ToastContainer from './components/ToastContainer';
+import Modal from './components/Modal';
 function App() {
- //....
+  //....
   return (
     <>
       <Header />
@@ -74,11 +74,13 @@ export default getRandomForSlice(data){
 - 이렇게 해서 새로운 배열을 만들고 이를 state로 관리 할때 문제가 발생하였다. bookmark가 될시 별 마크의 색이 변화해야 하는데, 기존의 state형태를 고정으로 가지고 있기에 redux와 연동된 새로운 데이터를 받아오지 못하고 setState를 자식 컴포넌트에게 넘겨 수정해주어야 했다. 이는 불필요한 작업이라고 느껴서 기존의 방식처럼 number 데이터를 넘겨주는 형식을 사용하는 것으로 채택하였다.
 - 만약 이렇게 뽑아온 배열을 state로 관리하지 않을시 북마크 클릭시 모든 상품 리스트가 재렌더링 되기 때문에, 사용 측면에서 불편함을 경험했다.
 - 그래서 기존의 RandomNum을 뽑아주는 형식을 사용하였고 코드를 최종적으로 다음과 같이 수정하였다.
+
 ```js
 `export default function getRandomForSlice(data, chooseNum) {
   return Math.floor(Math.random() * data.length - chooseNum);
-}`
+}`;
 ```
+
 - 뿌려줄 데이터의 개수가 변경, 혹은 전체 데이터의 개수가 변경될 것을 고려했습니다.
 - 렌더링 할 데이터의 개수가 변화할 경우 Home에서 상수로 관리하고 있는 변수만 조절할 경우 자동으로 렌더링 되도록 수정했습니다.
 
@@ -90,8 +92,8 @@ export default getRandomForSlice(data){
 ## 5. Toast UI 작동 방식 refactioring.
 
 - 최상위 컴포넌트인 APP에서 전역으로 toast관련 state를 설정하여 각각의 페이지의 카드 컴포넌트에 뿌려주는 방식으로 tost UI를 만들었습니다. 이때 마주친 문제는 총 두 가지 였습니다.
-    1. state 관리가 어려웠습니다. 그렇게 깊은 구조도 아니지만, state가 잘못 되었을 시 수정 하는 방법이 쉽지 않았습니다.
-    2. 하나의 toast ui를 관리하는 것은 충분했지만, 배열 형식으로 state를 관리하고자 할때 하드 코딩이 되고 하나의 state에 너무 많은 값을 관리하게 되었습니다.
+  1. state 관리가 어려웠습니다. 그렇게 깊은 구조도 아니지만, state가 잘못 되었을 시 수정 하는 방법이 쉽지 않았습니다.
+  2. 하나의 toast ui를 관리하는 것은 충분했지만, 배열 형식으로 state를 관리하고자 할때 하드 코딩이 되고 하나의 state에 너무 많은 값을 관리하게 되었습니다.
 - Vite.+.React.1.mp4
 - useReducer를 활용하면 데이터가 복잡해지는 구조는 해결할 수 있지만, 여전히 state 관리가 어렵다는 문제가 있었습니다. 따라서 contextAPI와 함께 사용을 해야 했습니다. 하지만 현재 전역 상태관리로 redux를 사용하고 있기 때문에 redux를 활용하기로 하였습니다.
 - 비동기로 동작하여 데이터를 처리해야 하기 때문에 관련 middleware인 redux-thunk를 설치하여 새로운 reducer를 만들었습니다. (toastReducer)
@@ -110,27 +112,25 @@ export default getRandomForSlice(data){
 
 ```jsx
 // ./pages/home.js
-            <section>
-              <Title>상품 리스트</Title>
-              <List>
-                {state
-                  .slice(randomNumber, randomNumber + CHOOSENUMBER)
-                  .map((item) => (
-                    <li key={item.id}>
-                      <Card data={item} />
-                    </li>
-                  ))}
-              </List>
-            </section>
+<section>
+  <Title>상품 리스트</Title>
+  <List>
+    {state.slice(randomNumber, randomNumber + CHOOSENUMBER).map(item => (
+      <li key={item.id}>
+        <Card data={item} />
+      </li>
+    ))}
+  </List>
+</section>
 ```
 
 - 위의 코드를 다음과 같이 Component로 분리하여 수정하였습니다.
 
 ```jsx
-            <CardList
-              title={"상품 리스트"}
-              state={state.slice(randomNumber, randomNumber + CHOOSENUMBER)}
-            />
+<CardList
+  title={'상품 리스트'}
+  state={state.slice(randomNumber, randomNumber + CHOOSENUMBER)}
+/>
 ```
 
 ### 2. 문자열을 객체로 관리
@@ -141,10 +141,10 @@ export default getRandomForSlice(data){
 ```jsx
 // ./src/components/Description.jsx
 const cardType = {
-  product: "Product",
-  category: "Category",
-  brand: "Brand",
-  exhibition: "Exhibition",
+  product: 'Product',
+  category: 'Category',
+  brand: 'Brand',
+  exhibition: 'Exhibition',
 };
 ```
 
@@ -156,19 +156,20 @@ const cardType = {
 ### 4. 숫자 타입을 통한 페이지 관리의 불명확성
 
 - 숫자 타입으로 필터 컴포넌트를 관리하여 뿌려줄 데이터를 정했습니다.
+
 ```js
 const [numState, setNumState] = useState(0);
- {numState === 0 &&
-            state
-              .filter((item) => item.bookmarked)
-              .map((item) => (
-                <li key={item.id}>
-                  <Card data={item} />
-                </li>
-              ))}`
-
+{
+  numState === 0 &&
+    state
+      .filter(item => item.bookmarked)
+      .map(item => (
+        <li key={item.id}>
+          <Card data={item} />
+        </li>
+      ));
+}
 ```
-
 
 - 이때의 문제점은 어떤 데이터를 적용하는지가 명확하지 않았으며, 데이터를 분류하는 방법도 명확히 알기 힘들다는 점을 알 수 있었습니다. 그래서 숫자가 아닌 상품 타입을 문자열로 작성하여 관리하도록 하였습니다.
 
@@ -194,15 +195,15 @@ const filterSet = {
 
 ```json
 {
-"devDependencies":{
-	"@types/react": "^18.0.28",
-	"@types/react-dom": "^18.0.11",
-	"@types/redux": "^3.6.0",
-	"@types/styled-components": "^5.1.26",
-	"@typescript-eslint/eslint-plugin": "^5.59.8",
-	"@typescript-eslint/parser": "^5.59.8",
-	"typescript": "^5.0.4",
-	}
+  "devDependencies": {
+    "@types/react": "^18.0.28",
+    "@types/react-dom": "^18.0.11",
+    "@types/redux": "^3.6.0",
+    "@types/styled-components": "^5.1.26",
+    "@typescript-eslint/eslint-plugin": "^5.59.8",
+    "@typescript-eslint/parser": "^5.59.8",
+    "typescript": "^5.0.4"
+  }
 }
 ```
 
@@ -218,38 +219,38 @@ module.exports = {
     node: true,
   },
   extends: [
-    "eslint:recommended",
-    "plugin:react/recommended",
-    "plugin:react/jsx-runtime",
-    "plugin:react-hooks/recommended",
-    "plugin:prettier/recommended",
-    "plugin:storybook/recommended",
-    "plugin:@typescript-eslint/recommended",
+    'eslint:recommended',
+    'plugin:react/recommended',
+    'plugin:react/jsx-runtime',
+    'plugin:react-hooks/recommended',
+    'plugin:prettier/recommended',
+    'plugin:storybook/recommended',
+    'plugin:@typescript-eslint/recommended',
   ],
-  parser: "@typescript-eslint/parser",
+  parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaVersion: "latest",
-    sourceType: "module",
+    ecmaVersion: 'latest',
+    sourceType: 'module',
   },
   settings: {
     react: {
-      version: "18.2",
+      version: '18.2',
     },
   },
-  ignorePatterns: ["!.storybook"],
-  plugins: ["react-refresh"],
+  ignorePatterns: ['!.storybook'],
+  plugins: ['react-refresh'],
   rules: {
-    "react-refresh/only-export-components": "warn",
-    "prettier/prettier": [
-      "error",
+    'react-refresh/only-export-components': 'warn',
+    'prettier/prettier': [
+      'error',
       {
-        endOfLine: "auto",
+        endOfLine: 'auto',
         parser: 0,
       },
     ],
-    "no-unused-vars": 0, //사용하지 않는 변수
-    "no-fallthrough": 0, //case문 default
-    "@typescript-eslint/no-non-null-assertion": 0,
+    'no-unused-vars': 0, //사용하지 않는 변수
+    'no-fallthrough': 0, //case문 default
+    '@typescript-eslint/no-non-null-assertion': 0,
   },
 };
 ```

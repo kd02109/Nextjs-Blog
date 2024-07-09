@@ -1,14 +1,13 @@
 ---
 title: URL & URLSearchParams
-date : 2023-04-02
-id : urlsearchparams
-tag: 
-   - javascript
-   - Web Api
+date: 2023-04-02
+id: urlsearchparams
+tag:
+  - javascript
+  - Web Api
 brand: blog
 description: URL객체와 URLSearchParams에 대해 정리합니다.
 ---
-
 
 ## URLSearchParams
 
@@ -16,24 +15,41 @@ description: URL객체와 URLSearchParams에 대해 정리합니다.
 
 ```jsx
 const url = new URL('https://example.com/search?q=javascript&page=1');
-console.dir(url)
+console.dir(url);
 ```
-<img src="/images/URLSearchParams/URLSearchParams.png" alt="img" width="1000" height="600" />
+
+<img
+  src="/images/URLSearchParams/URLSearchParams.png"
+  alt="img"
+  width="1000"
+  height="600"
+/>
 
 ```jsx
 const searchParams = new URLSearchParams(url.search);
-console.dir(searchParams)
+console.dir(searchParams);
 ```
 
-<img src="/images/URLSearchParams/URLSearchParams1.png" alt="img" width="1000" height="600" />
+<img
+  src="/images/URLSearchParams/URLSearchParams1.png"
+  alt="img"
+  width="1000"
+  height="600"
+/>
 
 ```jsx
-for (let p of searchParams) { //q=javascript&page=1
+for (let p of searchParams) {
+  //q=javascript&page=1
   console.log(p);
 }
 ```
 
-<img src="/images/URLSearchParams/URLSearchParams2.png" alt="img" width="1000" height="600" />
+<img
+  src="/images/URLSearchParams/URLSearchParams2.png"
+  alt="img"
+  width="1000"
+  height="600"
+/>
 
 - 키가 `q`이고 벨류는 `javascript`인 쿼리를 배열로 저장하고 있다.
 
