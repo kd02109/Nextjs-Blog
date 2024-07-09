@@ -10,10 +10,11 @@
   "overrides": [
     {
       "files": ["*.mdx"],
-      "extends": ["plugin:mdx/recommended"],
-      "rules": {
-        // MDX 파일에 적용할 추가 규칙을 여기에 작성
-      }
+      "extends": ["plugin:mdx/recommended"]
     }
-  ]
+  ],
+  "rules": {
+    /*... */
+    "prettier/prettier": ["error", { "endOfLine": "auto" }]
+  }
 }

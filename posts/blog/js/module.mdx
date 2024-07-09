@@ -151,22 +151,22 @@ console.log(module);
 /*
 Module {
   id: '.',
-  path: 'C:\\Users\\js953\\Desktop\\Github\\codestate\\deepJs',
+  path: 'C:\\Users\\name\\Desktop\\Github\\codestate\\deepJs',
   exports: {
     plus: [Function: plus],
     minus: [Function: minus],
     multi: [Function: multi],
     division: [Function: division]
   },
-  filename: 'C:\\Users\\js953\\Desktop\\Github\\codestate\\deepJs\\Math.js',
+  filename: 'C:\\Users\\name\\Desktop\\Github\\codestate\\deepJs\\Math.js',
   loaded: false,
   children: [],
   paths: [
-    'C:\\Users\\js953\\Desktop\\Github\\codestate\\deepJs\\node_modules',
-    'C:\\Users\\js953\\Desktop\\Github\\codestate\\node_modules',
-    'C:\\Users\\js953\\Desktop\\Github\\node_modules',
-    'C:\\Users\\js953\\Desktop\\node_modules',
-    'C:\\Users\\js953\\node_modules',
+    'C:\\Users\\name\\Desktop\\Github\\codestate\\deepJs\\node_modules',
+    'C:\\Users\\name\\Desktop\\Github\\codestate\\node_modules',
+    'C:\\Users\\name\\Desktop\\Github\\node_modules',
+    'C:\\Users\\name\\Desktop\\node_modules',
+    'C:\\Users\\name\\node_modules',
     'C:\\Users\\node_modules',
     'C:\\node_modules'
   ]
@@ -219,7 +219,7 @@ console.log(math.multi(3, 4)); //12
 - NodeJS에서 import module을 사용하기 위해서는 다음과 같이 package.json의 수정이 필요하다.
   type: ‘module’로 변경해주어야 한다. default type은 `CommonJs`이기에 `require` 방식으로 모듈화가 진행되기 때문이다. 이를 변경하지 않으면 다음과 같은 Error를 볼 수 있다.
   `”SyntaxError: Cannot use import statement outside a module”`
-  `json
+  ```json
   {
     "name": "deepjs",
     "version": "1.0.0",
@@ -236,7 +236,7 @@ console.log(math.multi(3, 4)); //12
     },
     "type": "module"
   }
-  `
+  ```
 - 이는 브라우저에서 `script` 방식으로 JS 파일을 로드할 때도 같다. JS 파일에 모듈화를 적용하여 이를 브라우저에서 활용하려면 `script`의 `type` attribute에 `module` 을 설정해야 한다.
 
   ```html
