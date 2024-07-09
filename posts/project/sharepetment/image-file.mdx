@@ -1,21 +1,21 @@
 ---
 title: 이미지 파일을 다루어 보자! (Base64, Blob, File)
-date : 2023-07-14
-id : image-file
-tag: 
-   - react
-   - image
-   - project
-   - sharepetment
+date: 2023-07-14
+id: image-file
+tag:
+  - react
+  - image
+  - project
+  - sharepetment
 brand: project
-description: project에서 이미지 파일 업로드 및 자르기를 구현하는 과정을 정리했습니다. 
+description: project에서 이미지 파일 업로드 및 자르기를 구현하는 과정을 정리했습니다.
 ---
 
 ## 목표
 
-이전 프로젝트에서 FileReader와 File을 활용해서 서버와 이미지를 전송하는 과정을 가졌습니다. 당시에는 큰 고민 사항 없이 파일을 주고 받는 것에 만족을 하였는데, 이번에는 **이미지 자르기, 파일 변환, 파일 압축 등을 고려해서 코드를 작성해보고자 하였습니다. 이때 Base64 인코딩, File, Blob에 대한 이해가 더 필요하다 여겨 정리를 하게 되었습니다.** 
+이전 프로젝트에서 FileReader와 File을 활용해서 서버와 이미지를 전송하는 과정을 가졌습니다. 당시에는 큰 고민 사항 없이 파일을 주고 받는 것에 만족을 하였는데, 이번에는 **이미지 자르기, 파일 변환, 파일 압축 등을 고려해서 코드를 작성해보고자 하였습니다. 이때 Base64 인코딩, File, Blob에 대한 이해가 더 필요하다 여겨 정리를 하게 되었습니다.**
 
-프리 프로젝트시 정리한 사항은 해당 페이지에  있습니다. [image 파일 서버로 전송 및 미리보기](https://www.notion.so/image-4f5a08572e8144fc91d50b74d22f5310?pvs=21) 
+프리 프로젝트시 정리한 사항은 해당 페이지에 있습니다. [image 파일 서버로 전송 및 미리보기](https://www.notion.so/image-4f5a08572e8144fc91d50b74d22f5310?pvs=21)
 
 ## Base64 인코딩
 
@@ -32,7 +32,7 @@ description: project에서 이미지 파일 업로드 및 자르기를 구현하
 
 ## Blob
 
-JavaScript에서 Blob(Binary Large Object)은 이미지, 사운드, 비디오와 같은 멀티미디어 데이터를 다룰 때 사용할 수 있습니다.  Blob은 Binary 데이터로 되어 있으며, size 값과 type 값을 가지고 있습니다. type은 MIME 타입으로 해당 파일의 형식을 알려주고 있습니다. 
+JavaScript에서 Blob(Binary Large Object)은 이미지, 사운드, 비디오와 같은 멀티미디어 데이터를 다룰 때 사용할 수 있습니다. Blob은 Binary 데이터로 되어 있으며, size 값과 type 값을 가지고 있습니다. type은 MIME 타입으로 해당 파일의 형식을 알려주고 있습니다.
 
 ![Blob](/images/pet-image/blob.png)
 
@@ -48,72 +48,71 @@ JavaScript에서 File 형식은 prototype으로 Blob을 받고 있습니다. 즉
 - 이미지 압축은 browser-image-compression을 활용하여 구현하였습니다.
 
 ```tsx
-
 const handleProfile = (e: ChangeEvent<HTMLInputElement>) => {
-    let file: File | undefined;
-    if (e.target.files) {
-			// input의 이미지 파일을 가지고 옵니다.
-      file = e.target.files[0];
-			// Cropper 라이브러리를 활성화 시키는 state 값을 true로 변경합니다.
-      setIsViewImageCropper(true);
-      const reader = new FileReader();
-			// file 객체를 Base64로 인코딩을 진행하여 web 상에서 이미지 파일을 볼 수 있도록 합니다.
-      reader.readAsDataURL(file);
-      return new Promise<void>(resolve => {
-        reader.onload = () => {
-          setImage(reader.result as string); // 파일의 컨텐츠
-          resolve();
-        };
-        reader.onerror = () => {
-          setIsError(true);
-        };
-      });
-    }
-  };
+  let file: File | undefined;
+  if (e.target.files) {
+    // input의 이미지 파일을 가지고 옵니다.
+    file = e.target.files[0];
+    // Cropper 라이브러리를 활성화 시키는 state 값을 true로 변경합니다.
+    setIsViewImageCropper(true);
+    const reader = new FileReader();
+    // file 객체를 Base64로 인코딩을 진행하여 web 상에서 이미지 파일을 볼 수 있도록 합니다.
+    reader.readAsDataURL(file);
+    return new Promise<void>(resolve => {
+      reader.onload = () => {
+        setImage(reader.result as string); // 파일의 컨텐츠
+        resolve();
+      };
+      reader.onerror = () => {
+        setIsError(true);
+      };
+    });
+  }
+};
 ```
 
-Cropper 라이브러리를 활용해서 자른 이미지를 file로 가지고 오는 코드를 작성합니다. 
+Cropper 라이브러리를 활용해서 자른 이미지를 file로 가지고 오는 코드를 작성합니다.
 
 ```tsx
 const getCropData = async () => {
-    try {
-      const cropper = cropperRef.current?.cropper;
-      if (cropper) {
-				// 파일 변환 과정 동안 loding 창을 보여줍니다.
-        setIsLoading(true);
+  try {
+    const cropper = cropperRef.current?.cropper;
+    if (cropper) {
+      // 파일 변환 과정 동안 loding 창을 보여줍니다.
+      setIsLoading(true);
 
-				// cropper Canvas img를 base64로 변환합니다.
-        const image = cropper.getCroppedCanvas().toDataURL();
+      // cropper Canvas img를 base64로 변환합니다.
+      const image = cropper.getCroppedCanvas().toDataURL();
 
-				// fileRedear를 통해 보여주는 이미지를 state로 저장합니다.
-        setImage(image);
+      // fileRedear를 통해 보여주는 이미지를 state로 저장합니다.
+      setImage(image);
 
-        // file 형태로 변환
-        const cropfile = await fetch(cropper.getCroppedCanvas().toDataURL())
-          .then(res => res.blob())
-          .then(async blob => {
-            const file = new File([blob], 'newAvatar.jpeg', {
-              type: 'image/jpeg',
-            });
-						// 변환한 파일을 browser-image-compression을 활용하여 압축합니다.
-            const compressedFile = await imageCompression(file, option);
-            return compressedFile;
-          })
-          .catch(() => {
-            setIsError(true);
+      // file 형태로 변환
+      const cropfile = await fetch(cropper.getCroppedCanvas().toDataURL())
+        .then(res => res.blob())
+        .then(async blob => {
+          const file = new File([blob], 'newAvatar.jpeg', {
+            type: 'image/jpeg',
           });
-        if (cropfile) {
-          setFile(cropfile);
-          setIsLoading(false);
-        }
+          // 변환한 파일을 browser-image-compression을 활용하여 압축합니다.
+          const compressedFile = await imageCompression(file, option);
+          return compressedFile;
+        })
+        .catch(() => {
+          setIsError(true);
+        });
+      if (cropfile) {
+        setFile(cropfile);
+        setIsLoading(false);
       }
-      setIsViewImageCropper(false);
-    } catch (err) {
-      console.error(err);
-      setIsError(true);
-      setIsLoading(false);
     }
-  };
+    setIsViewImageCropper(false);
+  } catch (err) {
+    console.error(err);
+    setIsError(true);
+    setIsLoading(false);
+  }
+};
 ```
 
 ### 전체 코드

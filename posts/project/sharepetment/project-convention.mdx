@@ -1,20 +1,17 @@
 ---
 title: 프로젝트 컨벤션 결정하기(git, code)
-date : 2023-06-30
-id : project-convention
-tag: 
-   - project
-   - sharepetment
+date: 2023-06-30
+id: project-convention
+tag:
+  - project
+  - sharepetment
 brand: project
 description: 프로젝트에서 협업을 위한 git, code 컨벤션을 결정합니다.
 ---
 
-  
-    
-
 ## React vs React Native
 
-- 현재 SNS 및 커뮤케이션 기능이 주요 기능이기 때문에, 웹 어플리케이션을 만들기 보다는 앱 어플리케이션을 만드는 것이 유저에게 더 친화적이라고 생각했습니다. SNS 사용 비율은 컴퓨터 보다는 휴대폰 앱으로 더 많이 사용하기 때문입니다.  하지만 React Native를 도입하기가 어려웠던 점은 아무리 React와 비슷하다고 하여도 웹 기반 프로그래밍과 휴대폰 기반 프로그래밍에 대한 차이에 대한 이해가 없다는 점이 어려웠습니다. 기본적인 기능을 구현할 수 있다고 해도 휴대폰 환경에서 최적의 css 작업과 기능 개선을 할 수 있는가? 하는 질문에서 팀원 모두 회의감을 느꼈습니다. 이러한 점에서 리엑트를 사용해서 웹을 기반으로 작업을 하도록 결정했습니다.
+- 현재 SNS 및 커뮤케이션 기능이 주요 기능이기 때문에, 웹 어플리케이션을 만들기 보다는 앱 어플리케이션을 만드는 것이 유저에게 더 친화적이라고 생각했습니다. SNS 사용 비율은 컴퓨터 보다는 휴대폰 앱으로 더 많이 사용하기 때문입니다. 하지만 React Native를 도입하기가 어려웠던 점은 아무리 React와 비슷하다고 하여도 웹 기반 프로그래밍과 휴대폰 기반 프로그래밍에 대한 차이에 대한 이해가 없다는 점이 어려웠습니다. 기본적인 기능을 구현할 수 있다고 해도 휴대폰 환경에서 최적의 css 작업과 기능 개선을 할 수 있는가? 하는 질문에서 팀원 모두 회의감을 느꼈습니다. 이러한 점에서 리엑트를 사용해서 웹을 기반으로 작업을 하도록 결정했습니다.
 
 ## PWA를 통한 대안책 도입
 
@@ -22,7 +19,7 @@ description: 프로젝트에서 협업을 위한 git, code 컨벤션을 결정�
 
 ## Git Convention
 
-일관된 commit, pr, isuue 작성을 위한 convention을 작성했습니다.  이때 commit 컨벤션은 git commit시 커스텀 컨벤션 파일을 통해 commit을 하도록 설정하였습니다. 
+일관된 commit, pr, isuue 작성을 위한 convention을 작성했습니다. 이때 commit 컨벤션은 git commit시 커스텀 컨벤션 파일을 통해 commit을 하도록 설정하였습니다.
 
 ## Git Commit Convention
 
@@ -32,9 +29,9 @@ description: 프로젝트에서 협업을 위한 git, code 컨벤션을 결정�
 - convetion 예시 양식은 다음과 같습니다.
 
 ```
-Feat: Add signin, signup  
-  
-회원가입 기능, 로그인 기능 추가(예시를 위해 간단히 작성)  
+Feat: Add signin, signup
+
+회원가입 기능, 로그인 기능 추가(예시를 위해 간단히 작성)
 
 Resolves: #1
 ```
@@ -77,12 +74,12 @@ Resolves: #1
 #   Can use multiple lines with "-" for bullet points in body
 #     본문에 목록을 나타낼때는 "-"로 시작한다.
 # ------------------
-#   <꼬리말>  
-#   필수가 아닌 optioanl  
-#   Fixes        : 이슈 수정중 (아직 해결되지 않은 경우)  
-#   Resolves     : 이슈 해결했을 때 사용  
-#   Ref          : 참고할 이슈가 있을 때 사용  
-#   Related to   : 해당 커밋에 관련된 이슈번호 (아직 해결되지 않은 경우)  
+#   <꼬리말>
+#   필수가 아닌 optioanl
+#   Fixes        : 이슈 수정중 (아직 해결되지 않은 경우)
+#   Resolves     : 이슈 해결했을 때 사용
+#   Ref          : 참고할 이슈가 있을 때 사용
+#   Related to   : 해당 커밋에 관련된 이슈번호 (아직 해결되지 않은 경우)
 #   ex) Fixes: #47 Related to: #32, #21
 ```
 
@@ -102,18 +99,18 @@ Resolves: #1
 
 ### **Footer Rule**
 
-1.  **`유형: #이슈 번호`**의 형식으로 작성
-2.  이슈 트래커 ID를 작성
-3.  여러개의 이슈 번호는 ,로 구분
+1.  **`유형: #이슈 번호`**의 형식으로 작성
+2.  이슈 트래커 ID를 작성
+3.  여러개의 이슈 번호는 ,로 구분
 
 **4.**  이슈 트래커 유형은 아래와 같다
 
-| Issue Tracker | 설명 |
-| --- | --- |
-| Fixes: | 이슈 수정중(아직 해결되지 않은 경우) |
-| Resolves: | 이슈를 해결한 경우 |
-| Ref: | 참조할 이슈가 있을 때 사용 |
-| Related to: | 해당 커밋에 관련된 이슈 번호(아직 해결되지 않은 경우) |
+| Issue Tracker | 설명                                                  |
+| ------------- | ----------------------------------------------------- |
+| Fixes:        | 이슈 수정중(아직 해결되지 않은 경우)                  |
+| Resolves:     | 이슈를 해결한 경우                                    |
+| Ref:          | 참조할 이슈가 있을 때 사용                            |
+| Related to:   | 해당 커밋에 관련된 이슈 번호(아직 해결되지 않은 경우) |
 
 ex) Footer에 **`Fixes: #1`** 이라고 작성하고 commit을 할 경우, 자동으로 issue #1과 매칭이 된다.
 
@@ -121,25 +118,25 @@ ex) Footer에 **`Fixes: #1`** 이라고 작성하고 commit을 할 경우, 자
 
 ## Template 적용시키기
 
-1. 원하는 경로에 .git-commit-template파일을 생성합니다. 
-2. 파일에 내용은 위의 템플릿 양식을 복사 붙여넣기 합니다. 
+1. 원하는 경로에 .git-commit-template파일을 생성합니다.
+2. 파일에 내용은 위의 템플릿 양식을 복사 붙여넣기 합니다.
 3. 터미널에 다음과 같이 명령어를 입력합니다.
-    
-    **`$ git config --global commit.template C:\**.git-commit-template ****`
-    
-    `git config --global commit.template <.git-commit-template 경로>`
-    
-    해당 경로는 본인이 .git-commit-template을 저장한 경로를 입력합니다.
-    
+
+   **`$ git config --global commit.template C:\*\*.git-commit-template \*\***`
+
+   `git config --global commit.template <.git-commit-template 경로>`
+
+   해당 경로는 본인이 .git-commit-template을 저장한 경로를 입력합니다.
+
 4. CLI가 아닌 VScode에서 template 창을 띄우고 싶다면 다음과 같은 명령어를 cli에 추가로 입력합니다.
-    
-    `git config --global core.editor "code --wait"`
-    
+
+   `git config --global core.editor "code --wait"`
+
 - 이 설정을 통해서 git commit을 입력하면 vim의 메시지가 보입니다.
 
 ## Git PR Convention
 
-pr 컨벤션 또한 commit convention과 유사하게 결정을 하였습니다. 
+pr 컨벤션 또한 commit convention과 유사하게 결정을 하였습니다.
 
 - **PR 제목 컨벤션**
 
@@ -152,7 +149,7 @@ pr 컨벤션 또한 commit convention과 유사하게 결정을 하였습니다.
 #   remove  : 코드/파일 삭제
 
 ex. [Feat]: 질문 페이지 생성
-		[Feat]: sql 연동 
+		[Feat]: sql 연동
 ```
 
 ```
@@ -169,37 +166,37 @@ ex. [Feat]: 질문 페이지 생성
 - (필수) ⇒ gif, video, png 상관없음
 ```
 
-추가적으로 각 pr이 담당했던 기능이 무엇인지를 명시하기 위해 자체적으로 label을 작성하였습니다. 라벨은 다음과 같이 정하였습니다. 
+추가적으로 각 pr이 담당했던 기능이 무엇인지를 명시하기 위해 자체적으로 label을 작성하였습니다. 라벨은 다음과 같이 정하였습니다.
 
 - 빌드, 리첵토링, 문서, 버그, 부기능, 삭제, 수정, 스타일, 주기능, 추가, 테스트
 
 ## Git Issue Convention
 
-프로젝트 진행 방식을 스크럼 방식을 채택했습니다. 스크럼 방식으로 칸반을 도입하였고 이를 github issue와 연동해야 했습니다. 이를 위해서 issue 또한 convention을 작성하기로 하였습니다. 이를 위해 issue template을 작성하였습니다. template 형식은 다음과 같습니다. 
+프로젝트 진행 방식을 스크럼 방식을 채택했습니다. 스크럼 방식으로 칸반을 도입하였고 이를 github issue와 연동해야 했습니다. 이를 위해서 issue 또한 convention을 작성하기로 하였습니다. 이를 위해 issue template을 작성하였습니다. template 형식은 다음과 같습니다.
 
 ## Issue Template
 
-```tsx
-Template name 
+```
+Template name
 [FE]/[BE][Feat]: backlog
 
-About 할 일을 작성해주세요 
+About 할 일을 작성해주세요
 
 # Todo
 - [ ]
 - [ ]
 - [ ]
-- [ ] 
+- [ ]
 ```
 
 ## Bug Template
 
-```tsx
+```
 Template name
 [FE]/[BE][Bug]: backlog
- 
+
 About
-버그를 작성해주세요 
+버그를 작성해주세요
 
 ## 설명
 발견한 버그에 대한 간단한 설명을 작성해주세요
@@ -221,32 +218,32 @@ Prettier, ESlint, husky, tailwind, TS를 적용해서 코드 컨벤션을 맞추
 
 ```json
 {
-    "singleQuote": true, 
-    "endOfLine": "auto",
-    "tabWidth": 2,
-    "arrowParens": "avoid" ,
-    "bracketSpacing": true,
-    "bracketSameLine": true,
-    "printWidth": 80,
-    "trailingComma": "all"
+  "singleQuote": true,
+  "endOfLine": "auto",
+  "tabWidth": 2,
+  "arrowParens": "avoid",
+  "bracketSpacing": true,
+  "bracketSameLine": true,
+  "printWidth": 80,
+  "trailingComma": "all"
 }
 ```
 
 ### ESlint
 
 - 기본적인 react와 eslint recommended를 설정해서 코드 작성 규칙을 통일했습니다.
-- import가 무분별하게 작성이 되기 때문에 `"eslint-import-resolver-typescript": "^3.5.5"`,  `"eslint-plugin-import": "^2.27.5"` 를 적용해서 자동으로 import 규칙이 통일되도록 설정을 했습니다.  기본적인 import 순서는 다음과 같습니다.   `groups: ['builtin', 'external', 'parent', 'sibling', 'index']`
-    - **error**
-        - 순서를 위반할 경우 에러메시지를 뛰웁니다.
-    - **group**
-        - bultin은 내장 모듈을 의미합니다.
-        - external은 외부 모듈을 의미합니다.
-        - parent는 부모 폴더로부터 가까이 있는 모듈 순으로 import가 진행됩니다.
-        - sibling은 상위 폴더에서 하위 폴더 순으로 정렬합니다.
-        - index는 현재 디렉토리에 있는 파일을 정렬합니다.
-    - **alphabetize**
-        - `order: 'asc'` 오름차순
-        - `caseInsensitive: true` 대소문자 구
+- import가 무분별하게 작성이 되기 때문에 `"eslint-import-resolver-typescript": "^3.5.5"`, `"eslint-plugin-import": "^2.27.5"` 를 적용해서 자동으로 import 규칙이 통일되도록 설정을 했습니다. 기본적인 import 순서는 다음과 같습니다. `groups: ['builtin', 'external', 'parent', 'sibling', 'index']`
+  - **error**
+    - 순서를 위반할 경우 에러메시지를 뛰웁니다.
+  - **group**
+    - bultin은 내장 모듈을 의미합니다.
+    - external은 외부 모듈을 의미합니다.
+    - parent는 부모 폴더로부터 가까이 있는 모듈 순으로 import가 진행됩니다.
+    - sibling은 상위 폴더에서 하위 폴더 순으로 정렬합니다.
+    - index는 현재 디렉토리에 있는 파일을 정렬합니다.
+  - **alphabetize**
+    - `order: 'asc'` 오름차순
+    - `caseInsensitive: true` 대소문자 구
 
 ```
 npm install eslint-plugin-import @typescript-eslint/parser eslint-import-resolver-typescript
@@ -308,9 +305,7 @@ module.exports = {
 ### Husky
 
 - husky 설정은 이전에 작성한 글을 토대로 진행을 하였습니다.
-    
-    [ESlint](https://www.notion.so/ESlint-cde4ab470a9745c987f32d795d706ab3?pvs=21) 
-    
+  [ESlint](https://www.notion.so/ESlint-cde4ab470a9745c987f32d795d706ab3?pvs=21)
 
 ### Tailwindcss
 
@@ -405,15 +400,15 @@ body {
 ## 그 이외의 것들
 
 - 이벤트 관련 함수
-    - handle—
-        - ex) handlePopUp, handleLogIn
+  - handle—
+    - ex) handlePopUp, handleLogIn
 - 상수
-    - ex) const MAX_NUMBER = 10
+  - ex) const MAX_NUMBER = 10
 - state 변수같은 변수는 명사처리
-    - const [ isLogIn, setIsLogIn ] = useState( );
+  - const [ isLogIn, setIsLogIn ] = useState( );
 - 함수
-    - 동사로 처리한다.
-    - ext) const getLocalStorage = () ⇒ {}
+  - 동사로 처리한다.
+  - ext) const getLocalStorage = () ⇒ {}
 - types
-    - 객체 타입 지정은 interface 이외에는 type을 사용한다.
-    - 중복으로 사용되는 type은 types 폴더 내에서 정의한다.
+  - 객체 타입 지정은 interface 이외에는 type을 사용한다.
+  - 중복으로 사용되는 type은 types 폴더 내에서 정의한다.

@@ -1,23 +1,30 @@
 ---
 title: Session
-date : 2023-05-02
-id : session
-tag: 
-   - session
-   - javascript
-   - login
+date: 2023-05-02
+id: session
+tag:
+  - session
+  - javascript
+  - login
 brand: blog
-description: session의 역할과 활용 방법에 대해 정리합니다. 
+description: session의 역할과 활용 방법에 대해 정리합니다.
 ---
+
 ## Session
+
 - **중요 데이터를 서버에 저장합니다.**
 - 서버가 쿠키를 보낼 때 **쿠키에 유일하고 암호화된 ID를 부여합니다.**
-  <img src="/images/session/session.png" alt="session" height="800" width="800" />
+  <img
+    src="/images/session/session.png"
+    alt="session"
+    height="800"
+    width="800"
+  />
 - 서버와 클라이언트에 각각 필요한 것은 다음과 같습니다.
-    - **서버** : 사용자가 인증에 성공했음을 알고 있어야 합니다.
-    - **클라이언트** : 인증 성공을 증명할 수단을 갖고 있어야 합니다.
+  - **서버** : 사용자가 인증에 성공했음을 알고 있어야 합니다.
+  - **클라이언트** : 인증 성공을 증명할 수단을 갖고 있어야 합니다.
 - **사용자가 인증에 성공한 상태는 세션이라고 부릅니다**.
-    - **서버는 일종의 저장소에 세션을 저장**합니다. (그림에서 2번) 주로 in-memory(자바스크립트 객체를 생각하면 됩니다), 또는 세션 스토어(redis 등과 같은 트랜잭션이 빠른 DB)에 저장합니다.
+  - **서버는 일종의 저장소에 세션을 저장**합니다. (그림에서 2번) 주로 in-memory(자바스크립트 객체를 생각하면 됩니다), 또는 세션 스토어(redis 등과 같은 트랜잭션이 빠른 DB)에 저장합니다.
 - 세션이 만들어지면, 각 세션을 구분할 수 있는 **세션 아이디**도 만들어지는데(그림에서 3번), 보통 클라이언트에 세션 성공을 증명할 수단으로써 세션 아이디를 전달합니다. (그림에서 4번)
 
 ### Session으로 로그아웃 구현
@@ -31,16 +38,25 @@ description: session의 역할과 활용 방법에 대해 정리합니다.
 
 ### Session과 Cookie 비교
 
-<img src="/images/session/session6.png" alt="session" height="300" width="800" />
+<img
+  src="/images/session/session6.png"
+  alt="session"
+  height="300"
+  width="800"
+/>
 
 ### Session 단점
 
-기본적으로 session은 서버에 데이터를 저장합니다. 
+기본적으로 session은 서버에 데이터를 저장합니다.
 따라서 서버 사용자가 매우 많다면, 메모리 등의 저장 공간 일부를 항상 차지하고 있으므로 서버의 성능이 저하됩니다.
 또한 여전히 쿠키를 사용하고 있습니다. 따라서 XSS 공격으로 세션 쿠키 탈취가 가능합니다.
-    
-<img src="/images/session/session2.png" alt="session" height="300" width="800" />
-    
+
+<img
+  src="/images/session/session2.png"
+  alt="session"
+  height="300"
+  width="800"
+/>
 
 ## express-session
 
@@ -65,7 +81,7 @@ app.use(
       httpOnly: false,
       secure: true,
     },
-  })
+  }),
 );
 ```
 
@@ -80,19 +96,19 @@ app.use(
 세션을 재생성하려면 메서드를 호출하기만 하면 됩니다. 완료되면 req.session에서 새 SID 및 `session`인스턴스가 초기화되고 `callback`이 호출됩니다.
 
 ```jsx
-req.session.regenerate(function(err) {
+req.session.regenerate(function (err) {
   // will have a new session here
-})
+});
 ```
 
 ### Session.destroy(callback)
 
-세션을 파괴하고 `req.session` 속성을 해제합니다. 완료되면 `callback`  호출됩니다.
+세션을 파괴하고 `req.session` 속성을 해제합니다. 완료되면 `callback` 호출됩니다.
 
 ```jsx
-req.session.destroy(function(err) {
+req.session.destroy(function (err) {
   // cannot access session here
-})
+});
 ```
 
 ### Session.reload(callback)
@@ -100,49 +116,63 @@ req.session.destroy(function(err) {
 스토어에서 세션 데이터를 다시 로드하고 `req.session` 객체를 다시 채웁니다. 완료되면 `callback`이 호출됩니다.
 
 ```jsx
-req.session.reload(function(err) {
+req.session.reload(function (err) {
   // session updated
-})
+});
 ```
 
 ## Session 로그인 유지 구현
 
-<img src="/images/session/session3.png" alt="session" height="300" width="800" />
+<img
+  src="/images/session/session3.png"
+  alt="session"
+  height="300"
+  width="800"
+/>
 
 - session으로 전달 받은 cookie의 형태
-<img src="/images/session/session4.png" alt="session" height="200" width="800" />
+  <img
+    src="/images/session/session4.png"
+    alt="session"
+    height="200"
+    width="800"
+  />
 
-<img src="/images/session/session5.png" alt="session" height="200" width="800" />
-
+<img
+  src="/images/session/session5.png"
+  alt="session"
+  height="200"
+  width="800"
+/>
 
 - 2번에서 요청을 처리해서 응답을 할시 이를 세션으로 처리 합니다.
 
 ```jsx
 // server/index.js
-const cors = require("cors");
-const session = require("express-session");
+const cors = require('cors');
+const session = require('express-session');
 // session middleware 설정
 app.use(
   session({
-    secret: "@sessionTest",
+    secret: '@sessionTest',
     resave: false,
     saveUninitialized: true,
     cookie: {
-      domain: "localhost",
-      path: "/",
+      domain: 'localhost',
+      path: '/',
       httpOnly: true,
-      sameSite: "strict",
+      sameSite: 'strict',
     },
-  })
+  }),
 );
 
 //CORS 설정
 app.use(
   cors({
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST", "OPTIONS"],
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST', 'OPTIONS'],
     credentials: true,
-  })
+  }),
 );
 ```
 
@@ -154,42 +184,40 @@ module.exports = (req, res) => {
 
   const userInfo = {
     ...USER_DATA.filter(
-      (user) => user.userId === userId && user.password === password
+      user => user.userId === userId && user.password === password,
     )[0],
   };
   if (userInfo.id === undefined) {
-    return res.status(401).send("로그인에 실패했습니다.");
-  } 
-	else if (checkedKeepLogin) {
-		// session 설정은 req.session으로 설정합니다. request에서 설정을 진행한다.
-		// 이는 정해진 사용법이다!
+    return res.status(401).send('로그인에 실패했습니다.');
+  } else if (checkedKeepLogin) {
+    // session 설정은 req.session으로 설정합니다. request에서 설정을 진행한다.
+    // 이는 정해진 사용법이다!
     req.session.cookie.maxAge = 1000 * 60 * 30;
     req.session.sessionId = userInfo.id;
-  } 
-	else {
+  } else {
     req.session.sessionId = userInfo.id;
   }
-  return res.redirect("/userinfo");
+  return res.redirect('/userinfo');
 };
 ```
 
 ```jsx
 // server/controllers/userinfo.js
-const { USER_DATA } = require("../../db/data");
+const { USER_DATA } = require('../../db/data');
 
 module.exports = (req, res) => {
   const {
     session: { sessionId },
   } = req;
-	/* session을 받아와서 진행한다. 이때 암호화된 session은 express-session middleware를
+  /* session을 받아와서 진행한다. 이때 암호화된 session은 express-session middleware를
 		 통해서 자동으로 복호화 된다. 
   */
   const userInfo = {
-    ...USER_DATA.filter((user) => user.id === sessionId)[0],
+    ...USER_DATA.filter(user => user.id === sessionId)[0],
   };
 
   if (!sessionId || !userInfo.id) {
-    return res.status(401).send("Not Authorized");
+    return res.status(401).send('Not Authorized');
   } else {
     delete userInfo.password;
     return res.send(userInfo);
