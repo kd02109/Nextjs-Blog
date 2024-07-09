@@ -1,10 +1,10 @@
 import { defineDocumentType, makeSource } from 'contentlayer/source-files';
-import highlight from 'rehype-highlight';
-import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
+import highlight from 'rehype-highlight';
+import rehypeImgSize from 'rehype-img-size';
+import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeSlug from 'rehype-slug';
 import remarkGfm from 'remark-gfm';
-import rehypeImgSize from 'rehype-img-size';
 
 const Post = defineDocumentType(() => ({
   name: 'Post',
