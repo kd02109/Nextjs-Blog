@@ -1,10 +1,10 @@
 ---
 title: Google analytics 등록하기
-date : 2023-09-20
-id : google-analytics
-tag: 
-   - project
-   - nextJs
+date: 2023-09-20
+id: google-analytics
+tag:
+  - project
+  - nextJs
 brand: project
 description: Google Analytics(GA)를 Next.js 13 app에 적용하는 방법과 마주친 문제를 정리합니다.
 ---
@@ -17,10 +17,14 @@ web을 기반으로 한 사용자 행동 분석 시스템입니다. **사용자�
 
 ```html
 <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=uniqueID"></script>
+<script
+  async
+  src="https://www.googletagmanager.com/gtag/js?id=uniqueID"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
+  function gtag() {
+    dataLayer.push(arguments);
+  }
   gtag('js', new Date());
 
   gtag('config', 'uniqueID');
@@ -31,152 +35,148 @@ web을 기반으로 한 사용자 행동 분석 시스템입니다. **사용자�
 
 - nextjs 공식 문서를 확인해보면 다음과 같이 안내하고 있습니다.
 - 공식문서의 예시는 모두 javascript를 활용하기 떄문에, type 설정을 위해서 해당 라이브러리를 설치해야 합니다.
-    
-    ```
-    npm i @types/gtag.js -D
-    ```
-    
+  ```
+  npm i @types/gtag.js -D
+  ```
 - nextJS 공식문서의 예시 코드를 활용하면 되겠습니다.
-    
-    ```jsx
-    // lib/gata.ts
-    export const GA_TRACKING_ID! = process.env.NEXT_PUBLIC_GA_ID
-    
-    // https://developers.google.com/analytics/devguides/collection/gtagjs/pages
-    export const pageview = (url:URL) => {
-      window.gtag('config', GA_TRACKING_ID, {
-        page_path: url,
-      })
-    }
-    
-    // https://developers.google.com/analytics/devguides/collection/gtagjs/events
-    export const event = ({ action, category, label, value }) => {
-      window.gtag('event', action, {
-        event_category: category,
-        event_label: label,
-        value: value,
-      })
-    }
-    ```
-    
-    ```jsx
-    // src/page/_app.tsx
-    "use client"
-    import type { AppProps } from 'next/app'
-    import Head from 'next/head'
-    import { useRouter } from 'next/router'
-    import Script from 'next/script'
-    import { useEffect } from 'react'
-    import * as gtag from '../lib/gtag'
-     
-    export default function MyApp({ Component, pageProps }: AppProps) {
-      const router = useRouter()
-      useEffect(() => {
-        const handleRouteChange = (url) => {
-          gtag.pageview(url)
-        }
-        router.events.on('routeChangeComplete', handleRouteChange)
-        return () => {
-          router.events.off('routeChangeComplete', handleRouteChange)
-        }
-      }, [router.events])
-    
-      return (
-        <>
-          <Head>
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `
-                  window.dataLayer = window.dataLayer || [];
-                  function gtag(){dataLayer.push(arguments);}
-                  gtag('js', new Date());
-    
-                  gtag('config', '${gtag.GA_TRACKING_ID}', {
-                    page_path: window.location.pathname,
-                  });
-                `,
-              }}
-            />
-          </Head>
-          {/* Global Site Tag (gtag.js) - Google Analytics */}
-          <Script
-            strategy="afterInteractive"
-            src={`https://www.googletagmanager.com/gtag/js?id=${gtag.GA_TRACKING_ID}`}
-          />
-          <Component {...pageProps} />
-        </>
-      )
-    }
-    ```
-    
 
-## 문제 해결하기
+  ```jsx
+  // lib/gata.ts
+  export const GA_TRACKING_ID! = process.env.NEXT_PUBLIC_GA_ID
 
-- 현재 재가 사용하고 있는 nextJS의 버전은 13이고 app router를 사용하고 있습니다. 이러한 상황에서 _app은 page 라우터의 방식이었습니다. app router와 page router를 함께 사용할 경우 우선순위는 app router에 있기 때문에 해당 로직을 app router에 통일 시켰습니다.
-- 이때 문제점은 페이지 이동 시 추적을 위해 사용한  `{ useRouter } from 'next/router'` 에 있었습니다. “use client”에서는 사용할 수 없는 서버 컴포넌트였고 클라이언트 컴포넌트에서 사용하기 위해서는  `{ useRouter } from 'next/navigation'` 에서 사용을 해야 했습니다. 하지만 더이상 `**events**`를 지원하지 않기에 custom hook을 통해 직접 기능 구현을 해야 했습니다. 해당 문제는 많은 분들이 겪고 있는 듯 하였습니다.  ([링크](https://github.com/vercel/next.js/discussions/42016))
-- 다음과 같은 방식으로 구현을 변경하였습니다. `lib/gata.ts`는 동일합니다.
-    
-    ```jsx
-    // src/conponents/GoogleAnalytics.tsx
-    import Script from 'next/script';
-    import * as gtag from '../lib/gtag';
-    
-    export default function GoogleAnalytics() {
-      return (
-        <>
+  // https://developers.google.com/analytics/devguides/collection/gtagjs/pages
+  export const pageview = (url:URL) => {
+    window.gtag('config', GA_TRACKING_ID, {
+      page_path: url,
+    })
+  }
+
+  // https://developers.google.com/analytics/devguides/collection/gtagjs/events
+  export const event = ({ action, category, label, value }) => {
+    window.gtag('event', action, {
+      event_category: category,
+      event_label: label,
+      value: value,
+    })
+  }
+  ```
+
+  ```jsx
+  // src/page/_app.tsx
+  "use client"
+  import type { AppProps } from 'next/app'
+  import Head from 'next/head'
+  import { useRouter } from 'next/router'
+  import Script from 'next/script'
+  import { useEffect } from 'react'
+  import * as gtag from '../lib/gtag'
+
+  export default function MyApp({ Component, pageProps }: AppProps) {
+    const router = useRouter()
+    useEffect(() => {
+      const handleRouteChange = (url) => {
+        gtag.pageview(url)
+      }
+      router.events.on('routeChangeComplete', handleRouteChange)
+      return () => {
+        router.events.off('routeChangeComplete', handleRouteChange)
+      }
+    }, [router.events])
+
+    return (
+      <>
+        <Head>
           <script
             dangerouslySetInnerHTML={{
               __html: `
-                  window.dataLayer = window.dataLayer || [];
-                  function gtag(){dataLayer.push(arguments);}
-                  gtag('js', new Date());
-    
-                  gtag('config', '${gtag.GA_TRACKING_ID}', {
-                    page_path: window.location.pathname,
-                  });
-                `,
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+
+                gtag('config', '${gtag.GA_TRACKING_ID}', {
+                  page_path: window.location.pathname,
+                });
+              `,
             }}
           />
-          {/* Global Site Tag (gtag.js) - Google Analytics */}
-          <Script
-            strategy="afterInteractive"
-            src={`https://www.googletagmanager.com/gtag/js?id=${gtag.GA_TRACKING_ID}`}
-          />
-        </>
-      );
-    }
-    ```
-    
-    ```jsx
-    // src/app/layout.tsx
-    import '@/styles/globals.css';
-    import { nanum } from '@/font/font';
-    import Header from '@/components/Header';
-    import Footer from '@/components/Footer';
-    import NextThemeProvider from '@/components/ThemeProvider';
-    import GoogleAnalytics from '@/components/GoogleAnalytics';
-    
-    export default function RootLayout({
-      children,
-    }: {
-      children: React.ReactNode;
-    }) {
-      return (
-        <html lang="en">
-          <body
-            className={`mx-auto max-w-3xl px-6 lg:max-w-6xl lg:px-8 ${nanum.className}`}>
-            <GoogleAnalytics />
-            <NextThemeProvider>
-              <Header />
-              <main className="px-2">{children}</main>
-              <Footer />
-            </NextThemeProvider>
-          </body>
-        </html>
-      );
-    }
-    ```
-    
+        </Head>
+        {/* Global Site Tag (gtag.js) - Google Analytics */}
+        <Script
+          strategy="afterInteractive"
+          src={`https://www.googletagmanager.com/gtag/js?id=${gtag.GA_TRACKING_ID}`}
+        />
+        <Component {...pageProps} />
+      </>
+    )
+  }
+  ```
+
+## 문제 해결하기
+
+- 현재 재가 사용하고 있는 nextJS의 버전은 13이고 app router를 사용하고 있습니다. 이러한 상황에서 \_app은 page 라우터의 방식이었습니다. app router와 page router를 함께 사용할 경우 우선순위는 app router에 있기 때문에 해당 로직을 app router에 통일 시켰습니다.
+- 이때 문제점은 페이지 이동 시 추적을 위해 사용한 `{ useRouter } from 'next/router'` 에 있었습니다. “use client”에서는 사용할 수 없는 서버 컴포넌트였고 클라이언트 컴포넌트에서 사용하기 위해서는 `{ useRouter } from 'next/navigation'` 에서 사용을 해야 했습니다. 하지만 더이상 `**events**`를 지원하지 않기에 custom hook을 통해 직접 기능 구현을 해야 했습니다. 해당 문제는 많은 분들이 겪고 있는 듯 하였습니다. ([링크](https://github.com/vercel/next.js/discussions/42016))
+- 다음과 같은 방식으로 구현을 변경하였습니다. `lib/gata.ts`는 동일합니다.
+
+  ```jsx
+  // src/conponents/GoogleAnalytics.tsx
+  import Script from 'next/script';
+  import * as gtag from '../lib/gtag';
+
+  export default function GoogleAnalytics() {
+    return (
+      <>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+  
+                gtag('config', '${gtag.GA_TRACKING_ID}', {
+                  page_path: window.location.pathname,
+                });
+              `,
+          }}
+        />
+        {/* Global Site Tag (gtag.js) - Google Analytics */}
+        <Script
+          strategy="afterInteractive"
+          src={`https://www.googletagmanager.com/gtag/js?id=${gtag.GA_TRACKING_ID}`}
+        />
+      </>
+    );
+  }
+  ```
+
+  ```jsx
+  // src/app/layout.tsx
+  import '@/styles/globals.css';
+  import { nanum } from '@/font/font';
+  import Header from '@/components/Header';
+  import Footer from '@/components/Footer';
+  import NextThemeProvider from '@/components/ThemeProvider';
+  import GoogleAnalytics from '@/components/GoogleAnalytics';
+
+  export default function RootLayout({
+    children,
+  }: {
+    children: React.ReactNode;
+  }) {
+    return (
+      <html lang="en">
+        <body
+          className={`mx-auto max-w-3xl px-6 lg:max-w-6xl lg:px-8 ${nanum.className}`}>
+          <GoogleAnalytics />
+          <NextThemeProvider>
+            <Header />
+            <main className="px-2">{children}</main>
+            <Footer />
+          </NextThemeProvider>
+        </body>
+      </html>
+    );
+  }
+  ```
 
 ## Reference
 

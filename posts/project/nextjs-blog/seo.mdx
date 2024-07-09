@@ -1,13 +1,14 @@
 ---
 title: SEO 등록 과정
-date : 2023-09-22
-id : seo
-tag: 
-   - project
-   - nextJs
+date: 2023-09-22
+id: seo
+tag:
+  - project
+  - nextJs
 brand: project
 description: Next.js SEO 등록 방법과 Google Seach에 sitemap 등록 방법을 정리합니다.
 ---
+
 ## 페이지 별 meta 등록
 
 - 페이지별로 각기 다른 meta title과 description을 제공하도록 하였습니다. 이를 통해서 보다 구체적인 정보를 크롤링 봇에게 제공하고자 하였습니다.
@@ -52,7 +53,7 @@ export const generateMetadata = ({ params }: { params: any }): Metadata => {
 
 **인터넷 프로토콜**의 한 종류로서 2010년에 페이스북이 발표했습니다. 오픈 그래프의 목적은 웹페이지에 대한 정보를 담고 있는 메타데이터의 사용방식을 표준화하여 페이스북 내에서의 링크 공유 시 해당 웹페이지에 대한 정보를 특정 형식의 미리보기 형태로 제공해주는 기능을 **모든 웹페이지에서 가능하게끔 하는 것**이었고, 이후 트위터와 링크드인에서 이를 차용하여 더 나은 UX를 제공하는 데에 활용하고 있습니다.
 
-open graph를 활용하면 썸네일을 포함한 웹페이지 미리보기가 제공이 됩니다. 이를 통해 페이지에 접근하기 전에 어떤 내용을 다루고 있는지 확인할 수 있습니다.  og 태그의 종류는 다음과 같습니다. 
+open graph를 활용하면 썸네일을 포함한 웹페이지 미리보기가 제공이 됩니다. 이를 통해 페이지에 접근하기 전에 어떤 내용을 다루고 있는지 확인할 수 있습니다. og 태그의 종류는 다음과 같습니다.
 
 - og:title
 
@@ -72,19 +73,20 @@ open graph를 활용하면 썸네일을 포함한 웹페이지 미리보기가 �
 
 ```html
 <head>
-<title>The Rock (1996)</title>
-<meta property="og:title" content="The Rock" />
-<meta property="og:type" content="video.movie" />
-<meta property="og:url" content="https://www.imdb.com/title/tt0117500/" />
-<meta property="og:image" content="https://ia.media-imdb.com/images/rock.jpg" />
-...
+  <title>The Rock (1996)</title>
+  <meta property="og:title" content="The Rock" />
+  <meta property="og:type" content="video.movie" />
+  <meta property="og:url" content="https://www.imdb.com/title/tt0117500/" />
+  <meta
+    property="og:image"
+    content="https://ia.media-imdb.com/images/rock.jpg" />
+  ...
 </head>
 ```
 
 ## SEO 등록하기
 
-- [네이버](https://searchadvisor.naver.com/console/board)
--[구글](https://search.google.com/search-console?resource_id=https://nextjs-blog-kd02109.vercel.app/)
+- [네이버](https://searchadvisor.naver.com/console/board) -[구글](https://search.google.com/search-console?resource_id=https://nextjs-blog-kd02109.vercel.app/)
 
 ## Sitemap 등록하기
 
@@ -107,82 +109,81 @@ Sitemap은 웹마스터가 크롤링에 사용할 수 있는 사이트의 페이
 - **next-sitemap**을 활용해도 되지만 간단하게 직접 사이트맵을 구현하였습니다.
 
 1. 파일 생성
-    
-    ```jsx
-    //sitemap.config.ts
-    import { promises as fs, writeFileSync } from 'fs';
-    import postJson from './.contentlayer/generated/Post/_index.json';
-    import { siteConfig } from './src/config';
-    
-    const SITE_URL = 'https://nextjs-blog-kd02109.vercel.app';
-    export default async function stiempaConfig() {
-      const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
-    <url><loc>${SITE_URL}</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
-    ${siteConfig.menus
-      .map(
-        url =>
-          `<url><loc>${SITE_URL}${url.path}</loc><changefreq>daily</changefreq><priority>0.7</priority></url>`,
-      )
-      .join('\n')}
-    ${postJson
-      .map(post => {
-        if (post.url.includes('blog'))
-          return `<url><loc>${SITE_URL}blogs/${post.url}</loc><changefreq>daily</changefreq><priority>0.7</priority></url>`;
-        return `<url><loc>${SITE_URL}projects/${post.url}</loc><changefreq>daily</changefreq><priority>0.7</priority></url>`;
-      })
-      .join('\n')}
-    </urlset>`;
-    
-      await fs.writeFile('public/sitemap.xml', sitemap, {
-        encoding: 'utf-8',
-      });
-    }
-    const createRobotsTxt = () => {
-      const siteUrl = siteConfig.url;
-    
-      const text = `
-    User-agent: *
-    Allow: /
-    Sitemap: ${siteUrl}/sitemap.xml
-    Host: ${siteUrl}
-    `;
-    
-      writeFileSync('public/robots.txt', text.trim(), 'utf-8');
-    };
-    
-    void createRobotsTxt();
-    void stiempaConfig();
-    ```
-    
+
+   ```jsx
+   //sitemap.config.ts
+   import { promises as fs, writeFileSync } from 'fs';
+   import postJson from './.contentlayer/generated/Post/_index.json';
+   import { siteConfig } from './src/config';
+
+   const SITE_URL = 'https://nextjs-blog-kd02109.vercel.app';
+   export default async function stiempaConfig() {
+     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+   <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+   <url><loc>${SITE_URL}</loc><changefreq>daily</changefreq><priority>0.7</priority></url>
+   ${siteConfig.menus
+     .map(
+       url =>
+         `<url><loc>${SITE_URL}${url.path}</loc><changefreq>daily</changefreq><priority>0.7</priority></url>`,
+     )
+     .join('\n')}
+   ${postJson
+     .map(post => {
+       if (post.url.includes('blog'))
+         return `<url><loc>${SITE_URL}blogs/${post.url}</loc><changefreq>daily</changefreq><priority>0.7</priority></url>`;
+       return `<url><loc>${SITE_URL}projects/${post.url}</loc><changefreq>daily</changefreq><priority>0.7</priority></url>`;
+     })
+     .join('\n')}
+   </urlset>`;
+
+     await fs.writeFile('public/sitemap.xml', sitemap, {
+       encoding: 'utf-8',
+     });
+   }
+   const createRobotsTxt = () => {
+     const siteUrl = siteConfig.url;
+
+     const text = `
+   User-agent: *
+   Allow: /
+   Sitemap: ${siteUrl}/sitemap.xml
+   Host: ${siteUrl}
+   `;
+
+     writeFileSync('public/robots.txt', text.trim(), 'utf-8');
+   };
+
+   void createRobotsTxt();
+   void stiempaConfig();
+   ```
+
 2. package.json 설정 (node 환경에서 해당 파일을 실행해야 하므로 ts-node를 설치하였습니다.)
-    
-    ```
-    npm i -D ts-node
-    ```
-    
-    ```json
-    //package.json
-    {
-    	"scripts": {
-    	    "dev": "next dev",
-    	    "build" : "next build && npm run sitemap",
-    	    "sitemap" : "ts-node --project tsconfig.node.json ./sitemap.config.ts",
-    	    "start": "next start",
-    	    "lint": "next lint",
-    	    "prepare": "husky install",
-    	    "lint-staged": "lint-staged"
-    	  },
-    }
-    ```
-    
+
+   ```
+   npm i -D ts-node
+   ```
+
+   ```json
+   //package.json
+   {
+     "scripts": {
+       "dev": "next dev",
+       "build": "next build && npm run sitemap",
+       "sitemap": "ts-node --project tsconfig.node.json ./sitemap.config.ts",
+       "start": "next start",
+       "lint": "next lint",
+       "prepare": "husky install",
+       "lint-staged": "lint-staged"
+     }
+   }
+   ```
+
 3. .gitignore설정
-    
-    ```
-    /public/sitemap*.xml
-    /public/robots.txt
-    ```
-    
+
+   ```
+   /public/sitemap*.xml
+   /public/robots.txt
+   ```
 
 ## Reference
 

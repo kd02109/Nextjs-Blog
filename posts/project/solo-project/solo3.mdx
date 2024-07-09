@@ -1,15 +1,15 @@
 ---
 title: Shopping App 회고 배포하기
-date : 2023-05-18
-id : Shopping App 회고 배포하기
-tag: 
-   - project
-   - shopping-app
-   - react
-   - vite
+date: 2023-05-18
+id: Shopping App 회고 배포하기
+tag:
+  - project
+  - shopping-app
+  - react
+  - vite
 brand: project
-description: solo-project를 github-page로 배포하면서 마주한 문제를 정리합니다.
 carousel: true
+description: solo-project를 github-page로 배포하면서 마주한 문제를 정리합니다.
 ---
 
 ## React 배포하기
@@ -25,22 +25,22 @@ carousel: true
 
 - 우선 두 Router의 차이를 살펴 보겠습니다.
 
-| BrowserRouter | HashRouter |
-| --- | --- |
-| History API를 사용합니다. | URL의 hash를 활용합니다. 주소에 #이 붙습니다.  |
-| 동적 페이지에 적합합니다. | 정적 페이지에 적합합니다. |
-| 새로고침 혹은 주소를 사용하여 페이지 접근시 에러가 발생합니다. (SPA이기 때문입니다.) 따라서 추가적인 설정이 필요합니다.  | 새로고침 혹은 페이지 검색으로 이동시 접근이 가능합니다. |
-| 서버 세팅시 검색엔진에 신경써야 합니다. (위와 같은 맥락이라고 할 수 있습니다.) | 검색 엔진으로 읽지 못합니다. (# 값으로 인해 서버가 페이지를 읽지 못하고 페이지의 유무를 알지 못합니다.) |
-| github pages에서 설정하기 복잡하다.  | github pages에서 설정하기 쉽다. (HashRouter를 사용하면 문제가 해결이 됩니다.) |
+| BrowserRouter                                                                                                           | HashRouter                                                                                              |
+| ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| History API를 사용합니다.                                                                                               | URL의 hash를 활용합니다. 주소에 #이 붙습니다.                                                           |
+| 동적 페이지에 적합합니다.                                                                                               | 정적 페이지에 적합합니다.                                                                               |
+| 새로고침 혹은 주소를 사용하여 페이지 접근시 에러가 발생합니다. (SPA이기 때문입니다.) 따라서 추가적인 설정이 필요합니다. | 새로고침 혹은 페이지 검색으로 이동시 접근이 가능합니다.                                                 |
+| 서버 세팅시 검색엔진에 신경써야 합니다. (위와 같은 맥락이라고 할 수 있습니다.)                                          | 검색 엔진으로 읽지 못합니다. (# 값으로 인해 서버가 페이지를 읽지 못하고 페이지의 유무를 알지 못합니다.) |
+| github pages에서 설정하기 복잡하다.                                                                                     | github pages에서 설정하기 쉽다. (HashRouter를 사용하면 문제가 해결이 됩니다.)                           |
 
 ## BroswerRouter를 통해 배포하기
 
-- github-page를 통해 배포한 사이트의 url은 다음과 같은 형식을 가지고 있습니다. `https://[github-user-id].github.io/[github-repository-name]/`  하지만 로컬에서 router를 사용하여 작업을 할 시에는, router경로가 다음과 같이 시작합니다. `http://localhost:3000/` 이와 같은 이유로 어떠한 설정 없이 배포하면, 배포 파일은 시작 URL을 `https://[github-user-id].github.io/` 로 인식합니다. 따라서 이를 수정해야 할 필요가 있습니다.
+- github-page를 통해 배포한 사이트의 url은 다음과 같은 형식을 가지고 있습니다. `https://[github-user-id].github.io/[github-repository-name]/` 하지만 로컬에서 router를 사용하여 작업을 할 시에는, router경로가 다음과 같이 시작합니다. `http://localhost:3000/` 이와 같은 이유로 어떠한 설정 없이 배포하면, 배포 파일은 시작 URL을 `https://[github-user-id].github.io/` 로 인식합니다. 따라서 이를 수정해야 할 필요가 있습니다.
 
 ### BASE_URL 설정하기
 
 - 다음과 같은 문제를 해결하기 위해서 BASE_URL을 설정하여 문제를 해결할 수 있습니다.
-- 이는 router에게 기본 URL을 제공하여  베이스 url을 새롭게 인식하도록 만들 수 있습니다.
+- 이는 router에게 기본 URL을 제공하여 베이스 url을 새롭게 인식하도록 만들 수 있습니다.
 
 ```tsx
 // React CRA
@@ -56,63 +56,61 @@ carousel: true
 - vite를 사용할 시에는 vite.config.ts 혹은 vite.config.js에 BASE_URL을 설정해주어야 합니다.
 
 ```tsx
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: "[해당 Github Repo 이름]",
+  base: '[해당 Github Repo 이름]',
   plugins: [react()],
 });
 ```
 
 - 만약 v6에서 제공하는 createBrowserRouter를 사용한다면 해당 페이지를 통해 인수 전달을 어떻게 하는지 확인할 수 있습니다.
-    
-    [createBrowserRouter v6.15.0](https://reactrouter.com/en/main/routers/create-browser-router)
-    
-    ```tsx
-    function createBrowserRouter(
-      routes: RouteObject[],
-      opts?: {
-        basename?: string;
-        future?: FutureConfig;
-        hydrationData?: HydrationState;
-        window?: Window;
-      }
-    ): RemixRouter;
-    ```
-    
-    ```tsx
-    //예시
-    
-    const router = createBrowserRouter(
-      [
-        {
-          path: "/",
-          element: <App />,
-          children: [
-            {
-              path: Path.HOME,
-              element: <Home />,
-            },
-            {
-              path: Path.PRODUCT,
-              element: <ProductLists />,
-            },
-            {
-              path: Path.BOOKMARK,
-              element: <Bookmark />,
-            },
-          ],
-          errorElement: <NotFound />,
-        },
-      ],
-      { basename: import.meta.env.BASE_URL }
-    );
-    
-    export default router;
-    ```
-    
+  [createBrowserRouter v6.15.0](https://reactrouter.com/en/main/routers/create-browser-router)
+
+  ```tsx
+  function createBrowserRouter(
+    routes: RouteObject[],
+    opts?: {
+      basename?: string;
+      future?: FutureConfig;
+      hydrationData?: HydrationState;
+      window?: Window;
+    },
+  ): RemixRouter;
+  ```
+
+  ```tsx
+  //예시
+
+  const router = createBrowserRouter(
+    [
+      {
+        path: '/',
+        element: <App />,
+        children: [
+          {
+            path: Path.HOME,
+            element: <Home />,
+          },
+          {
+            path: Path.PRODUCT,
+            element: <ProductLists />,
+          },
+          {
+            path: Path.BOOKMARK,
+            element: <Bookmark />,
+          },
+        ],
+        errorElement: <NotFound />,
+      },
+    ],
+    { basename: import.meta.env.BASE_URL },
+  );
+
+  export default router;
+  ```
 
 ## 배포하기
 
@@ -135,6 +133,7 @@ export default defineConfig({
 - 정상적으로 배포가 되는 것을 확인할 수 있습니다.
 
 ## Reference
+
 - [npm: gh-pages](https://www.npmjs.com/package/gh-pages)
 
 - [[React] react-router 적용한 React 앱을 github pages로 배포하는 법](https://medium.com/@_diana_lee/react-react-router-적용한-react-앱을-github-pages로-배포하는-법-5f6119c6a5d9)

@@ -1,9 +1,9 @@
 ---
 title: Next.js Server Action
-date : 2024-01-22
-id : server-action
-tag: 
-   - nextJs
+date: 2024-01-22
+id: server-action
+tag:
+  - nextJs
 brand: blog
 description: Next.js에서 서버 업데이트를 활용하여 form을 활용하는 server action에 대해서 정리합니다.
 ---
@@ -14,9 +14,9 @@ Next.js 14 버전부터 client에서 서버에 직접 접근할 수 있는 방�
 
 Next.js에서 직접 DB를 찌를 수 있게 되었습니다. 이러한 방식이 예전의 php와 거의 차이가 없기 때문에, 비판의 소리도 많이 있습니다. 각 역할의 분리가 모호하고, client와 server의 경계가 모호하기 때문에 현재의 체계에 맞지 않다는 목소리도 많습니다.
 
-그렇지만 이러한 방식이 어떻게 동작하는지 알아야 할 것 같습니다. 
+그렇지만 이러한 방식이 어떻게 동작하는지 알아야 할 것 같습니다.
 
-server action을 활용하기 위해서는 위에서 언급했듯이 해당 코드의 제일 상단에 `server action`을 붙이기만 하면 됩니다. 이제 해당 함수, 혹은 서버 컴포넌트에서 정의된 함수는 서버에서 실행되기 때문에, 브라우저에서 보이지 않습니다. 
+server action을 활용하기 위해서는 위에서 언급했듯이 해당 코드의 제일 상단에 `server action`을 붙이기만 하면 됩니다. 이제 해당 함수, 혹은 서버 컴포넌트에서 정의된 함수는 서버에서 실행되기 때문에, 브라우저에서 보이지 않습니다.
 
 ```tsx
 // Server Component
@@ -24,24 +24,24 @@ export default function Page() {
   // Server Action
   async function create() {
     'use server'
- 
+
     // ...
   }
- 
+
   return (
     // ...
   )
 }
 ```
 
-**server action은 클라이언트에서 활용할 수도 있습니다.** module을 활용해서 서버에서 구동하는 함수 모듈을 import 해서 form, btn 등에 연결해서 사용할 수 있습니다.  이때 form이 동작하는 방식은 이전과 같이 handler를 다는 방식이 아닌 action 속성에 server action을 연결합니다.
+**server action은 클라이언트에서 활용할 수도 있습니다.** module을 활용해서 서버에서 구동하는 함수 모듈을 import 해서 form, btn 등에 연결해서 사용할 수 있습니다. 이때 form이 동작하는 방식은 이전과 같이 handler를 다는 방식이 아닌 action 속성에 server action을 연결합니다.
 
 ```tsx
-"use client"
-import onSubmit from "@/lib/signup";
+'use client';
+import onSubmit from '@/lib/signup';
 const CustomForm = () => {
-	return <form action={onSubmit}> </form>
-}
+  return <form action={onSubmit}> </form>;
+};
 ```
 
 - 서버 컴포넌트는 기본적으로 점진적 향상 기능을 지원하므로 JavaScript가 아직 로드되지 않았거나 비활성화되어 있어도 양식이 제출됩니다.
@@ -54,50 +54,50 @@ form 요소에 server action을 연결한 경우 `FormData`를 활용합니다. 
 
 이때 form 내부 요소의 input tag에는 name 속성이 필요합니다. FormData 요소의 내부 input 접근은 input 요소의 name 속성을 통해 구분하기 때문입니다. name 속성이 key가 되고, value는 input에 입력한 값, 업로드한 이미지 파일이 됩니다.
 
-button 요소에 server action을 설정한다면, 해당 button 요소의 `type(submit, reset)`을 명시해야 합니다.  type을 명시하지 않을 경우 클라이언트 측 스크립트 즉 이벤트를 연결하겠다는 것을 의미하고, 버튼이 클릭 되었을 때, 어떠한 동작도 하지 않습니다.
+button 요소에 server action을 설정한다면, 해당 button 요소의 `type(submit, reset)`을 명시해야 합니다. type을 명시하지 않을 경우 클라이언트 측 스크립트 즉 이벤트를 연결하겠다는 것을 의미하고, 버튼이 클릭 되었을 때, 어떠한 동작도 하지 않습니다.
 
 ```tsx
 export default function Page() {
   async function createInvoice(formData: FormData) {
-    'use server'
- 
+    'use server';
+
     const rawFormData = {
       customerId: formData.get('customerId'),
       amount: formData.get('amount'),
       status: formData.get('status'),
-    }
- 
+    };
+
     // mutate data
     // revalidate cache
   }
- 
-  return (<form action={formAction}>
-	          <input id="id" type="text" name="id" />
-	          <input id="nickname" type="text" name="nickname" />
-	          <input id="password" type="password" name="password" />
-	          <input id="image" name="image" type="file" accept="image/*" />
-	          <button type="submit">
-	            가입하기
-	          </button>
-        </form>)
+
+  return (
+    <form action={formAction}>
+      <input id="id" type="text" name="id" />
+      <input id="nickname" type="text" name="nickname" />
+      <input id="password" type="password" name="password" />
+      <input id="image" name="image" type="file" accept="image/*" />
+      <button type="submit">가입하기</button>
+    </form>
+  );
 }
 ```
 
 ## Client Component에서 server action에 따른 데이터 활용하기
 
-server action을 모듈화 해서 client component에 연결할 수 있다고 했습니다. 이때 더 이상 input 변경 값을 ref, state로 관리하지 않고 있습니다. 
+server action을 모듈화 해서 client component에 연결할 수 있다고 했습니다. 이때 더 이상 input 변경 값을 ref, state로 관리하지 않고 있습니다.
 
-그 대신 react-dom에서 관리하는 hook `useFormStatus`, `useFormState` 를 활용합니다. 이를 통해 form에서 데이터를 처리하는 동안의 UI 조작, form에서 data fetch를 실패 했을 때의 UI 변동을 처리할 수 있습니다. 
+그 대신 react-dom에서 관리하는 hook `useFormStatus`, `useFormState` 를 활용합니다. 이를 통해 form에서 데이터를 처리하는 동안의 UI 조작, form에서 data fetch를 실패 했을 때의 UI 변동을 처리할 수 있습니다.
 
-Next.js 또한 react에서 제공하는 두 훅을 활용해서 pending, error 등을 처리하고 있습니다. 
+Next.js 또한 react에서 제공하는 두 훅을 활용해서 pending, error 등을 처리하고 있습니다.
 
 ### useFormState
 
 **useFormState는 form 작업 결과에 따라 상태를 업데이트할 수 있는 Hook입니다.**
 
-useFormState는 server action 함수를 첫 번째 인자로, initialState를 두 번째 인자로 받습니다. 
+useFormState는 server action 함수를 첫 번째 인자로, initialState를 두 번째 인자로 받습니다.
 
-반환 값은 useState와 유사합니다. 
+반환 값은 useState와 유사합니다.
 
 - state의 경우 initialState와 일치합니다. action이 실행된 이후에는 action이 반환한 값입니다.
 - form 요소의 action 속성에 전달할 수 있는 새로운 action을 반환합니다. 해당 action의 실행 결과에 의해 state 값이 갱신 됩니다.
@@ -107,76 +107,80 @@ const [state, formAction] = useFormState(fn, initialState);
 ```
 
 - **사용 예시**
-    
-    useFormState에서 사용되는 server action은 두 개의 인자를 받습니다. 첫 번째 인자는 form의 현재 상태를 받게 됩니다. 처음 제출할 때는 initialState 값이 되고 이후 action이 실행한 이후에는 action이 반환한 값이 됩니다. 
-    
-    ```tsx
-    // onSubmit
-    'use server';
-    
-    import { redirect } from "next/navigation";
-    
-    export const onSubmit = async (prevState : any ,formDate: FormData) => {
-        if (!formDate.get('id') || (formDate.get('id') as string).trim() === "") {
-          return { message: 'no id' };
-        }
-        if (!formDate.get('password') || (formDate.get('password') as string).trim() === "") {
-          return { message: 'no password' };
-        }
-        if (!formDate.get('nickname') || (formDate.get('nickname') as string).trim() === "") {
-          return { message: 'no nickname' };
-        }
-        if (!formDate.get('image')) {
-          return { message: 'no image' };
-        }
-    
-        let isRedirect = false;
-        // 브라우저에 노출이 되지 않습니다.
-        try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/users`, {
-            method: 'POST',
-            body: formDate,
-            credentials: 'include',
-          });
-          if (response.status === 403) {
-            return {message: "user_exists"};
-          }
-          isRedirect = true;
-        } catch (err) {
-          if (err instanceof Error) console.error(err.message);
-          return {message: "error"}
-        }
-        // redirect는 try/catch 문에서 사용 불가
-        if (isRedirect) {
-          redirect('/home');
-        }
-    		return {message: "done"}
-      }
-    ```
-    
-    ```tsx
-    "use client"
-    import { onSubmit } from '@/app/(logout)/_lib/signup';
-    import { useFormState } from 'react-dom';
-    
-    export default function SignupModal() {
-    
-     const [state, formAction] = useFormState(onSubmit, {message: ""});
-    
-      return (
-    			<form action={formAction}>
-    	          <input id="id" type="text" name="id" />
-    	          <input id="nickname" type="text" name="nickname" />
-    	          <input id="password" type="password" name="password" />
-    	          <input id="image" name="image" type="file" accept="image/*" />
-    	          <button type="submit">
-    	            가입하기
-    	          </button>
-          </form>
-      );
+  useFormState에서 사용되는 server action은 두 개의 인자를 받습니다. 첫 번째 인자는 form의 현재 상태를 받게 됩니다. 처음 제출할 때는 initialState 값이 되고 이후 action이 실행한 이후에는 action이 반환한 값이 됩니다.
+
+  ```tsx
+  // onSubmit
+  'use server';
+
+  import { redirect } from 'next/navigation';
+
+  export const onSubmit = async (prevState: any, formDate: FormData) => {
+    if (!formDate.get('id') || (formDate.get('id') as string).trim() === '') {
+      return { message: 'no id' };
     }
-    ```
-    
+    if (
+      !formDate.get('password') ||
+      (formDate.get('password') as string).trim() === ''
+    ) {
+      return { message: 'no password' };
+    }
+    if (
+      !formDate.get('nickname') ||
+      (formDate.get('nickname') as string).trim() === ''
+    ) {
+      return { message: 'no nickname' };
+    }
+    if (!formDate.get('image')) {
+      return { message: 'no image' };
+    }
+
+    let isRedirect = false;
+    // 브라우저에 노출이 되지 않습니다.
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/users`,
+        {
+          method: 'POST',
+          body: formDate,
+          credentials: 'include',
+        },
+      );
+      if (response.status === 403) {
+        return { message: 'user_exists' };
+      }
+      isRedirect = true;
+    } catch (err) {
+      if (err instanceof Error) console.error(err.message);
+      return { message: 'error' };
+    }
+    // redirect는 try/catch 문에서 사용 불가
+    if (isRedirect) {
+      redirect('/home');
+    }
+    return { message: 'done' };
+  };
+  ```
+
+  ```tsx
+  'use client';
+  import { onSubmit } from '@/app/(logout)/_lib/signup';
+  import { useFormState } from 'react-dom';
+
+  export default function SignupModal() {
+    const [state, formAction] = useFormState(onSubmit, { message: '' });
+
+    return (
+      <form action={formAction}>
+        <input id="id" type="text" name="id" />
+        <input id="nickname" type="text" name="nickname" />
+        <input id="password" type="password" name="password" />
+        <input id="image" name="image" type="file" accept="image/*" />
+        <button type="submit">가입하기</button>
+      </form>
+    );
+  }
+  ```
 
 ### useFromStatus
 
@@ -189,70 +193,70 @@ const { pending, data, method, action } = useFormStatus();
 - pending : Boolean, true 이면 form이 제출 대기 중인 상태입니다. 제출이 완료되었으면 false입니다.
 - method, action : 부모 form의 method, action에 대한 참조입니다. 부모 form이 없는 경우 null 입니다.
 - data : FormData를 구현하는 객체입니다. 이는 부모 컴포넌트가 form인 경우 유효한 데이터를 출력할 수 있습니다. 부모 form이 없는 경우 null 입니다.
-    
-    ```tsx
-    // app.js
-    import UsernameForm from './UsernameForm';
-    import { submitForm } from "./actions.js";
-    
-    export default function App() {
-      return (
-        <form action={submitForm}>
-          <UsernameForm />
-        </form>
-      );
-    }
-    ```
-    
-    ```tsx
-    import {useState, useMemo, useRef} from 'react';
-    import {useFormStatus} from 'react-dom';
-    
-    export default function UsernameForm() {
-      const {pending, data} = useFormStatus();
-    
-      const [showSubmitted, setShowSubmitted] = useState(false);
-      const submittedUsername = useRef(null);
-      const timeoutId = useRef(null);
-    
-      useMemo(() => {
-        if (pending) {
-          submittedUsername.current = data?.get('username');
-          if (timeoutId.current != null) {
-            clearTimeout(timeoutId.current);
-          }
-    
-          timeoutId.current = setTimeout(() => {
-            timeoutId.current = null;
-            setShowSubmitted(false);
-          }, 2000);
-          setShowSubmitted(true);
-        }
-      }, [pending, data]);
-    
-      return (
-        <>
-          <label>Request a Username: </label><br />
-          <input type="text" name="username" />
-          <button type="submit" disabled={pending}>
-            {pending ? 'Submitting...' : 'Submit'}
-          </button>
-          {showSubmitted ? (
-            <p>Submitted request for username: {submittedUsername.current}</p>
-          ) : null}
-        </>
-      );
-    }
-    ```
-    
 
-`useFromStatus` 는 주로 pending 값을 활용합니다. form 데이터의 제출 여부에 따라 UI를 변경할 수 있습니다. 이때 `useFromStatus` 의 pending 프로퍼티를 활용하기 위해서는 form에 연결하는 것이 아닌, button 요소에 연결해서 pending 속성을 활용해야 합니다. 
+  ```tsx
+  // app.js
+  import UsernameForm from './UsernameForm';
+  import { submitForm } from './actions.js';
+
+  export default function App() {
+    return (
+      <form action={submitForm}>
+        <UsernameForm />
+      </form>
+    );
+  }
+  ```
+
+  ```tsx
+  import { useState, useMemo, useRef } from 'react';
+  import { useFormStatus } from 'react-dom';
+
+  export default function UsernameForm() {
+    const { pending, data } = useFormStatus();
+
+    const [showSubmitted, setShowSubmitted] = useState(false);
+    const submittedUsername = useRef(null);
+    const timeoutId = useRef(null);
+
+    useMemo(() => {
+      if (pending) {
+        submittedUsername.current = data?.get('username');
+        if (timeoutId.current != null) {
+          clearTimeout(timeoutId.current);
+        }
+
+        timeoutId.current = setTimeout(() => {
+          timeoutId.current = null;
+          setShowSubmitted(false);
+        }, 2000);
+        setShowSubmitted(true);
+      }
+    }, [pending, data]);
+
+    return (
+      <>
+        <label>Request a Username: </label>
+        <br />
+        <input type="text" name="username" />
+        <button type="submit" disabled={pending}>
+          {pending ? 'Submitting...' : 'Submit'}
+        </button>
+        {showSubmitted ? (
+          <p>Submitted request for username: {submittedUsername.current}</p>
+        ) : null}
+      </>
+    );
+  }
+  ```
+
+`useFromStatus` 는 주로 pending 값을 활용합니다. form 데이터의 제출 여부에 따라 UI를 변경할 수 있습니다. 이때 `useFromStatus` 의 pending 프로퍼티를 활용하기 위해서는 form에 연결하는 것이 아닌, button 요소에 연결해서 pending 속성을 활용해야 합니다.
 
 ## 정리
 
-Next.js는 이외에도 Server action을 활용한 다양한 방식의 fetch 방법을 알려주고 있습니다. server action을 활용한 데이터 활용 뿐만 아니라, 낙관적 업데이트 또한 가능하다는 점을 소개 하고 있습니다. 
+Next.js는 이외에도 Server action을 활용한 다양한 방식의 fetch 방법을 알려주고 있습니다. server action을 활용한 데이터 활용 뿐만 아니라, 낙관적 업데이트 또한 가능하다는 점을 소개 하고 있습니다.
 
-더불어 action 속성을 활용하지 않고 기존의 이벤트 연결을 통해 server action을 구현하는 방법도 안내하고 있습니다. 더욱 깊은 활용 방식을 학습하기 위해서는 공식 문서의 server-actions-and-mutations을 참고하면 좋을 것 같습니다. 
+더불어 action 속성을 활용하지 않고 기존의 이벤트 연결을 통해 server action을 구현하는 방법도 안내하고 있습니다. 더욱 깊은 활용 방식을 학습하기 위해서는 공식 문서의 server-actions-and-mutations을 참고하면 좋을 것 같습니다.
 
 ## 참조
 
