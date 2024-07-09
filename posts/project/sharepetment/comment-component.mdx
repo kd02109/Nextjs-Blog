@@ -1,12 +1,12 @@
 ---
 title: 댓글 Component 작성하기
-date : 2023-07-08
-id : comment-component
-tag: 
-   - project
-   - sharepetment
+date: 2023-07-08
+id: comment-component
+tag:
+  - project
+  - sharepetment
 brand: project
-description: 공통 컴포넌트로 활용되는 댓글 컴포넌트 작성하기 
+description: 공통 컴포넌트로 활용되는 댓글 컴포넌트 작성하기
 ---
 
 ## 목표
@@ -26,58 +26,60 @@ Prop으로 적절한 정보만을 제공한다면, 댓글을 작성, 수정, 삭
 - createdAt (작성 날짜)
 - walkMatePostId (해당 게시글 id)
 
-이를 적절하게 보여주고 만약 댓글을 작성한 본인이라면, 수정 삭제 버튼을 보여주도록 하였습니다. 이때 본인 여부 판단은 ContextAPI에 저장된 memberId와 prop으로 전달받은 userId가 일치하는 경우에만 보여주도록 하였습니다. 
+이를 적절하게 보여주고 만약 댓글을 작성한 본인이라면, 수정 삭제 버튼을 보여주도록 하였습니다. 이때 본인 여부 판단은 ContextAPI에 저장된 memberId와 prop으로 전달받은 userId가 일치하는 경우에만 보여주도록 하였습니다.
 
 ```tsx
-{userId === `${memberId}` && (
-              <BtnBox>
-                <EditBtn
-                  onClick={() => {
-                    setIsEdited(prev => !prev);
-                  }}>
-                  수정
-                </EditBtn>
-                <DeleteBtn
-                  onClick={() => {
-                    setIsDeleted(true);
-                  }}>
-                  삭제
-                </DeleteBtn>
-              </BtnBox>
-            )}
+{
+  userId === `${memberId}` && (
+    <BtnBox>
+      <EditBtn
+        onClick={() => {
+          setIsEdited(prev => !prev);
+        }}>
+        수정
+      </EditBtn>
+      <DeleteBtn
+        onClick={() => {
+          setIsDeleted(true);
+        }}>
+        삭제
+      </DeleteBtn>
+    </BtnBox>
+  );
+}
 ```
 
 수정, 삭제 등의 요청은 react-query의mutation을 활용하여 작업을 하였습니다. mutation의 onError 옵션을 활용해서 해당 API작업이 실패 시 팝업을 띄우도록 구현하였습니다. 더불어 react-query에서 캐시된 시간이 지나지 않을 경우에는 기존에 캐싱된 데이터를 보여주기 때문에 수정과 삭제된 댓글이 실시간으로 반영이 되지 않는 문제가 있었습니다. 이를 해결하기 위해 무효화 옵션(invalidation)을 활용해서 문제를 해결하였습니다.
 
 ```tsx
 const mutation = useMutation({
-    mutationFn: editComment,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['walkFeed', walkMatePostId] });
-      setIsEdited(false);
-    },
-    onError: () => {
-      setIsCommentError(true);
-    },
-  });
+  mutationFn: editComment,
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['walkFeed', walkMatePostId] });
+    setIsEdited(false);
+  },
+  onError: () => {
+    setIsCommentError(true);
+  },
+});
 
-  const deleteCommentMutaion = useMutation({
-    mutationFn: deleteComment,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['walkFeed', walkMatePostId] });
-    },
-    onError: () => {
-      setIsDeletError(true);
-    },
-  });
+const deleteCommentMutaion = useMutation({
+  mutationFn: deleteComment,
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['walkFeed', walkMatePostId] });
+  },
+  onError: () => {
+    setIsDeletError(true);
+  },
+});
 ```
 
 댓글 수정시 나타나는 input의 경우 react hook form 라이브러리를 활용했습니다. 다른 input 창을 모두 react hook form을 통해 작업을 진행하는 중이었기에 굳이 일반 input과 form을 사용할 필요를 느끼지 못했습니다. react hook form의 장점은 validation 처리를 매우 용이하게 해주며, 이에 따른 UI css 작업도 수월하게 할 수 있다는 점이었습니다. reactHookFrom의 setFocus 메서드를 활용해서 수정 버튼을 클릭할 경우 해당 input 창에 focus 되도록 설정하였습니다.
 
 ```tsx
 useEffect(() => {
-    setFocus('comment');
-  }, [setFocus, isEdited]);
+  setFocus('comment');
+}, [setFocus, isEdited]);
 ```
 
 ## 결과
