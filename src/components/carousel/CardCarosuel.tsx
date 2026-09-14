@@ -1,7 +1,7 @@
 'use client';
 import Article from '@/components/Article';
 import MultiCarousel from '@/components/carousel/MultiCarousel';
-import { Post } from 'contentlayer/generated';
+import type { Post } from '@/lib/content';
 
 export default function CardCarousel({ posts }: { posts: Post[] }) {
   return (

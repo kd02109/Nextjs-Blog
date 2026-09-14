@@ -4,7 +4,7 @@ import PostCard from '@/components/PostCard';
 import { content } from '@/util/content';
 import getPosts from '@/util/getPosts';
 import { useState, ChangeEvent, useEffect } from 'react';
-import { Post } from 'contentlayer/generated';
+import type { Post } from '@/lib/content';
 import Spiner from '@/components/Spiner';
 import { motion } from 'framer-motion';
 export default function BlogPage() {

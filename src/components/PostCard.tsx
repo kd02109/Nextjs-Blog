@@ -5,7 +5,7 @@ import useSupabaseCount from '@/components/hook/useSupabaseCount';
 import { getCookieClient, makeCookieClient } from '@/util/cookie/cookieClient';
 
 import { supabaseIncrement, supabaseViewCount } from '@/util/supabase';
-import { Post } from 'contentlayer/generated';
+import type { Post } from '@/lib/content';
 import { format, parseISO } from 'date-fns';
 
 import { useRouter } from 'next/navigation';

@@ -1,4 +1,4 @@
-import { allPosts } from 'contentlayer/generated';
+import { getAllPosts } from '@/lib/content';
 import { compareDesc } from 'date-fns';
 
 export default function getPosts(
@@ -6,6 +6,7 @@ export default function getPosts(
   key?: string,
   search?: string,
 ) {
+  const allPosts = getAllPosts();
   let posts =
     key === undefined || key === 'all'
       ? allPosts

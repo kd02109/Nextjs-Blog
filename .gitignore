@@ -44,8 +44,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# contentlayer
+# generated content
 .contentlayer
+.velite
 
 #husky
 .husky

@@ -1,5 +1,5 @@
 import { MarkdownKey } from '@/util/markdownBadge';
-import { Post } from 'contentlayer/generated';
+import type { Post } from '@/lib/content';
 
 export type ProjectType = {
   name: string;
