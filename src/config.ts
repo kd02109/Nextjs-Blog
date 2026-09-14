@@ -1,7 +1,3 @@
-import { DefaultSeoProps } from 'next-seo';
-
-export const headerConfig = {};
-
 export const siteConfig = {
   url: 'https://sonblog.vercel.app/',
   title: `Son's blog`,
@@ -36,24 +32,6 @@ export const siteConfig = {
     {
       label: 'Contact',
       path: '/contact',
-    },
-  ],
-};
-
-export const seoConfig: DefaultSeoProps = {
-  title: siteConfig.title,
-  description: siteConfig.description,
-  canonical: siteConfig.url,
-  openGraph: {
-    type: 'website',
-    locale: 'ko-KR',
-    url: siteConfig.url,
-    siteName: siteConfig.title,
-  },
-  additionalMetaTags: [
-    {
-      name: 'author',
-      content: siteConfig.author.name,
     },
   ],
 };

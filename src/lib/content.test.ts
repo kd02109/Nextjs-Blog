@@ -126,4 +126,48 @@ describe('content facade', () => {
   it('returns undefined for an unknown slug', () => {
     expect(getPostBySlug('blog/not-a-real-post')).toBeUndefined();
   });
+
+  it('does not let callers reorder the backing post collection', () => {
+    const exposedPosts = getAllPosts();
+    const originalFirstUrl = exposedPosts[0].url;
+
+    exposedPosts.reverse();
+    const firstUrlAfterMutation = getAllPosts()[0].url;
+
+    // Restore the old implementation's shared array so this RED test cannot
+    // contaminate the rest of the suite.
+    if (firstUrlAfterMutation !== originalFirstUrl) exposedPosts.reverse();
+
+    expect(firstUrlAfterMutation).toBe(originalFirstUrl);
+  });
+
+  it('does not let callers mutate posts retained by the facade', () => {
+    const slug = 'blog/js/URLSearchParams';
+    const exposedPost = getAllPosts().find(post => post.url === slug);
+    expect(exposedPost).toBeDefined();
+
+    const original = {
+      title: exposedPost!.title,
+      tags: [...exposedPost!.tag],
+      raw: exposedPost!.body.raw,
+    };
+
+    exposedPost!.title = 'mutated title';
+    exposedPost!.tag.splice(0, exposedPost!.tag.length, 'mutated tag');
+    exposedPost!.body.raw = 'mutated body';
+
+    const reread = getPostBySlug(slug);
+    const observed = {
+      title: reread?.title,
+      tags: reread?.tag,
+      raw: reread?.body.raw,
+    };
+
+    // Restore shared nested state when running against the vulnerable facade.
+    exposedPost!.title = original.title;
+    exposedPost!.tag.splice(0, exposedPost!.tag.length, ...original.tags);
+    exposedPost!.body.raw = original.raw;
+
+    expect(observed).toEqual(original);
+  });
 });

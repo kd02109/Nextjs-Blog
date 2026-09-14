@@ -26,10 +26,14 @@ export const generateMetadata = async ({
 
   if (!post) notFound();
 
+  const canonicalPath = `/blogs/${post.url}`;
+
   return {
     title: post.title,
     description: post.description,
+    alternates: { canonical: canonicalPath },
     openGraph: {
+      url: canonicalPath,
       title: post.title,
       images: 'https://source.unsplash.com/random/300×300',
       description: post.description,

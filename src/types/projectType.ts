@@ -15,7 +15,4 @@ export type ProjectType = {
 export type carouselType = Post & { index: number };
 
 export type ProjectName =
-  | 'mbtmi'
-  | 'nextjs-blog'
-  | 'sharepetment'
-  | 'solo-project';
+  'mbtmi' | 'nextjs-blog' | 'sharepetment' | 'solo-project';

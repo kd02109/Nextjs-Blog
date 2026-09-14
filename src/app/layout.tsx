@@ -5,12 +5,27 @@ import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
 import NextThemeProvider from '@/components/ThemeProvider';
 import GoogleAnalytics from '@/components/layout/GoogleAnalytics';
+import { siteConfig } from '@/config';
 
 export const revalidate = 360;
 
 export const metadata: Metadata = {
-  title: "Son's blog",
+  metadataBase: new URL(siteConfig.url),
+  title: {
+    default: siteConfig.title,
+    template: `%s | ${siteConfig.title}`,
+  },
   description: '웹 개발 관련 학습한 내용, 회고, 프로젝트 등을 정리합니다.',
+  authors: [{ name: siteConfig.author.name }],
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    locale: 'ko-KR',
+    url: '/',
+    siteName: siteConfig.title,
+    title: siteConfig.title,
+    description: siteConfig.description,
+  },
 };
 
 export default function RootLayout({

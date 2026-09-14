@@ -6,6 +6,7 @@ import Github from '@/components/svg/Github';
 import { projectObj } from '@/util/project';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 
 type Props = {
   params: Promise<{
@@ -13,7 +14,9 @@ type Props = {
   }>;
 };
 
-export const generateMetadata = async ({ params }: Props) => {
+export const generateMetadata = async ({
+  params,
+}: Props): Promise<Metadata> => {
   const { slug } = await params;
   const oneProject = projectObj.find(item => item.link === slug);
 
@@ -22,7 +25,9 @@ export const generateMetadata = async ({ params }: Props) => {
   return {
     title: oneProject.name,
     description: oneProject.description,
+    alternates: { canonical: `/projects/${oneProject.link}` },
     openGraph: {
+      url: `/projects/${oneProject.link}`,
       title: oneProject.name,
       images: 'https://source.unsplash.com/random/300×300',
       description: oneProject.description,

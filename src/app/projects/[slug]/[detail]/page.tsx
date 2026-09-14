@@ -6,6 +6,7 @@ import { incrementView } from '@/server/supabase';
 import { createViewVisitorHash } from '@/server/view-visitor';
 import { notFound } from 'next/navigation';
 import { headers } from 'next/headers';
+import type { Metadata } from 'next';
 
 type Props = {
   params: Promise<{
@@ -14,16 +15,22 @@ type Props = {
   }>;
 };
 
-export const generateMetadata = async ({ params }: Props) => {
+export const generateMetadata = async ({
+  params,
+}: Props): Promise<Metadata> => {
   const { detail, slug } = await params;
   const post = getPostBySlug(slug.trim() + '/' + detail.trim());
 
   if (!post) notFound();
 
+  const canonicalPath = `/projects/${post.url}`;
+
   return {
     title: post.title,
     description: post.description,
+    alternates: { canonical: canonicalPath },
     openGraph: {
+      url: canonicalPath,
       title: post.title,
       images: 'https://source.unsplash.com/random/300×300',
       description: post.description,

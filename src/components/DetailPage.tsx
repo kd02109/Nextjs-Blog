@@ -12,11 +12,10 @@ import { ProjectName } from '@/types/projectType';
 import { makeCookieClient } from '@/util/cookie/cookieClient';
 import { findH } from '@/util/findH';
 import type { Post } from '@/lib/content';
+import { evaluateMdx } from '@/lib/mdx-evaluator';
 import { format, parseISO } from 'date-fns';
 import Image from 'next/image';
 import { useEffect, useMemo } from 'react';
-import type { ComponentType } from 'react';
-import * as jsxRuntime from 'react/jsx-runtime';
 
 type Prop = {
   post: Post;
@@ -44,14 +43,6 @@ const mdxComponents = {
   pre: CodeBlock,
 };
 
-const getMDXComponent = (code: string) => {
-  const evaluate = new Function(code) as (runtime: typeof jsxRuntime) => {
-    default: ComponentType<{ components: typeof mdxComponents }>;
-  };
-
-  return evaluate({ ...jsxRuntime }).default;
-};
-
 export default function DetailPage({
   post,
   tags,
@@ -59,7 +50,7 @@ export default function DetailPage({
   projectFooter,
 }: Prop) {
   const content = useMemo(() => {
-    const Content = getMDXComponent(post.body.code);
+    const Content = evaluateMdx<typeof mdxComponents>(post.body.code);
     return <Content components={mdxComponents} />;
   }, [post.body.code]);
   const slugMap = findH(post.body.raw);

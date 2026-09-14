@@ -17,10 +17,18 @@ const posts: Post[] = (generatedPosts as GeneratedPost[])
   }))
   .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-export const getAllPosts = (): Post[] => posts;
+const clonePost = (post: Post): Post => ({
+  ...post,
+  tag: [...post.tag],
+  body: { ...post.body },
+});
 
-export const getPostBySlug = (slug: string): Post | undefined =>
-  posts.find(post => post.url === slug.trim());
+export const getAllPosts = (): Post[] => posts.map(clonePost);
+
+export const getPostBySlug = (slug: string): Post | undefined => {
+  const post = posts.find(post => post.url === slug.trim());
+  return post ? clonePost(post) : undefined;
+};
 
 export const getAllTags = (): Record<string, number> =>
   posts.reduce<Record<string, number>>(
