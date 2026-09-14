@@ -5,6 +5,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getCookieServer } from '@/util/cookie/cookieServer';
 import { incrementView } from '@/server/supabase';
+import { createViewVisitorHash } from '@/server/view-visitor';
+import { headers } from 'next/headers';
 
 type Props = {
   params: Promise<{ slug: string[] }>;
@@ -48,7 +50,8 @@ const PostLayout = async ({ params }: Props) => {
 
   if (!isCookie) {
     try {
-      await incrementView(slug);
+      const visitorHash = createViewVisitorHash(await headers());
+      await incrementView(slug, visitorHash);
     } catch {
       // View metrics must not prevent the post from rendering.
     }

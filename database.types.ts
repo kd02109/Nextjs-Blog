@@ -35,6 +35,7 @@ export type Database = {
       increment_view: {
         Args: {
           slug_text: string;
+          visitor_hash_text: string;
         };
         Returns: number;
       };

@@ -11,6 +11,8 @@ vi.mock('server-only', () => ({}));
 import { incrementView } from './supabase';
 
 describe('server Supabase view mutations', () => {
+  const visitorHash = 'a'.repeat(64);
+
   beforeEach(() => {
     Object.assign(process.env, {
       NEXT_PUBLIC_SUPABASE_URL: 'https://example.supabase.co',
@@ -24,7 +26,9 @@ describe('server Supabase view mutations', () => {
   });
 
   it('uses the server-only credential to invoke increment_view', async () => {
-    await expect(incrementView('URLSearchParams')).resolves.toBe(8);
+    await expect(incrementView('URLSearchParams', visitorHash)).resolves.toBe(
+      8,
+    );
 
     expect(createClient).toHaveBeenCalledWith(
       'https://example.supabase.co',
@@ -43,6 +47,7 @@ describe('server Supabase view mutations', () => {
     );
     expect(rpc).toHaveBeenCalledWith('increment_view', {
       slug_text: 'URLSearchParams',
+      visitor_hash_text: visitorHash,
     });
   });
 
@@ -52,7 +57,7 @@ describe('server Supabase view mutations', () => {
       error: { message: 'postgres://internal.example secret detail' },
     });
 
-    await expect(incrementView('URLSearchParams')).rejects.toThrow(
+    await expect(incrementView('URLSearchParams', visitorHash)).rejects.toThrow(
       'Unable to increment view.',
     );
   });

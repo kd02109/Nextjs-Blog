@@ -42,9 +42,43 @@ using (true);
 revoke all on table public.views from public, anon, authenticated;
 grant select on table public.views to anon, authenticated;
 
-drop function if exists public.increment_view(text);
+create schema if not exists private;
 
-create function public.increment_view(slug_text text)
+revoke all on schema private from public, anon, authenticated;
+
+create table if not exists private.view_events (
+  slug text not null references public.views (slug) on delete cascade,
+  visitor_hash text not null check (visitor_hash ~ '^[0-9a-f]{64}$'),
+  viewed_on date not null default ((current_timestamp at time zone 'UTC')::date),
+  primary key (slug, visitor_hash, viewed_on)
+);
+
+alter table private.view_events enable row level security;
+
+do $migration$
+declare
+  existing_policy record;
+begin
+  for existing_policy in
+    select policyname
+    from pg_policies
+    where schemaname = 'private' and tablename = 'view_events'
+  loop
+    execute format(
+      'drop policy %I on private.view_events',
+      existing_policy.policyname
+    );
+  end loop;
+end
+$migration$;
+
+revoke all on table private.view_events
+from public, anon, authenticated, service_role;
+
+drop function if exists public.increment_view(text);
+drop function if exists public.increment_view(text, text);
+
+create function public.increment_view(slug_text text, visitor_hash_text text)
 returns bigint
 language plpgsql
 security definer
@@ -52,6 +86,7 @@ set search_path = public, pg_temp
 as $function$
 declare
   next_view_count bigint;
+  recorded_view boolean;
 begin
   if
     slug_text is null
@@ -63,21 +98,49 @@ begin
       message = 'invalid view slug';
   end if;
 
+  if
+    visitor_hash_text is null
+    or visitor_hash_text !~ '^[0-9a-f]{64}$'
+  then
+    raise exception using
+      errcode = '22023',
+      message = 'invalid visitor hash';
+  end if;
+
   insert into public.views as existing_view (slug, view_count)
-  values (slug_text, 1)
-  on conflict (slug) do update
-    set view_count = coalesce(existing_view.view_count, 0) + 1
-  returning view_count into next_view_count;
+  values (slug_text, 0)
+  on conflict (slug) do nothing;
+
+  insert into private.view_events (slug, visitor_hash, viewed_on)
+  values (
+    slug_text,
+    visitor_hash_text,
+    (current_timestamp at time zone 'UTC')::date
+  )
+  on conflict (slug, visitor_hash, viewed_on) do nothing
+  returning true into recorded_view;
+
+  if recorded_view is true then
+    update public.views
+    set view_count = view_count + 1
+    where slug = slug_text
+    returning view_count into next_view_count;
+  else
+    select view_count
+    into next_view_count
+    from public.views
+    where slug = slug_text;
+  end if;
 
   return next_view_count;
 end
 $function$;
 
-alter function public.increment_view(text) owner to postgres;
+alter function public.increment_view(text, text) owner to postgres;
 
-revoke all on function public.increment_view(text)
+revoke all on function public.increment_view(text, text)
 from public, anon, authenticated;
-grant execute on function public.increment_view(text) to service_role;
+grant execute on function public.increment_view(text, text) to service_role;
 
 do $migration$
 begin
