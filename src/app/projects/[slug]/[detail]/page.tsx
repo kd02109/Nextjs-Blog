@@ -3,7 +3,9 @@ import DetailPage from '@/components/DetailPage';
 import { ProjectName } from '@/types/projectType';
 import { getCookieServer } from '@/util/cookie/cookieServer';
 import { incrementView } from '@/server/supabase';
+import { createViewVisitorHash } from '@/server/view-visitor';
 import { notFound } from 'next/navigation';
+import { headers } from 'next/headers';
 
 type Props = {
   params: Promise<{
@@ -39,7 +41,8 @@ export default async function ProjectDetailPage({ params }: Props) {
   const isCookie = await getCookieServer(slug);
   if (!isCookie) {
     try {
-      await incrementView(slug);
+      const visitorHash = createViewVisitorHash(await headers());
+      await incrementView(slug, visitorHash);
     } catch {
       // View metrics must not prevent the project post from rendering.
     }

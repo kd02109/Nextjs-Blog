@@ -1,5 +1,6 @@
 import { getAllPosts } from '@/lib/content';
 import { incrementView } from '@/server/supabase';
+import { createViewVisitorHash } from '@/server/view-visitor';
 import { NextResponse } from 'next/server';
 
 const MAX_SLUG_LENGTH = 120;
@@ -12,7 +13,7 @@ type RouteContext = {
   params: Promise<{ slug: string }>;
 };
 
-export async function POST(_request: Request, context: RouteContext) {
+export async function POST(request: Request, context: RouteContext) {
   const { slug } = await context.params;
 
   if (slug.length > MAX_SLUG_LENGTH || !SLUG_PATTERN.test(slug)) {
@@ -30,7 +31,8 @@ export async function POST(_request: Request, context: RouteContext) {
   }
 
   try {
-    const viewCount = await incrementView(slug);
+    const visitorHash = createViewVisitorHash(request.headers);
+    const viewCount = await incrementView(slug, visitorHash);
     return NextResponse.json({ viewCount });
   } catch {
     return NextResponse.json(
