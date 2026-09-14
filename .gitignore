@@ -8,6 +8,10 @@
 # testing
 /coverage
 
+# codex isolated worktrees and local audit artifacts
+/.worktrees/
+/.gstack/
+
 # next.js
 /.next/
 /out/
