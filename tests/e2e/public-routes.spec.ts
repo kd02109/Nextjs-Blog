@@ -55,3 +55,31 @@ test('unknown article route returns not found', async ({ page }) => {
 
   expect(response?.status()).toBe(404);
 });
+
+test('root and child routes render one description and complete shared metadata', async ({
+  page,
+}) => {
+  for (const path of ['/', '/blogs']) {
+    const response = await page.goto(path);
+    expect(response?.status()).toBeLessThan(500);
+
+    await expect(page.locator('head meta[name="description"]')).toHaveCount(1);
+    await expect(page.locator('head meta[property="og:type"]')).toHaveAttribute(
+      'content',
+      'website',
+    );
+    await expect(
+      page.locator('head meta[property="og:locale"]'),
+    ).toHaveAttribute('content', 'ko-KR');
+    await expect(
+      page.locator('head meta[property="og:site_name"]'),
+    ).toHaveAttribute('content', "Son's blog");
+    await expect(page.locator('head meta[name="keywords"]')).toHaveCount(1);
+    await expect(
+      page.locator('head meta[name="google-site-verification"]'),
+    ).toHaveAttribute('content', 'vX5KRBC3xVzJD7VebebY5_AuQq9VHZHdA4jom0Q2y9c');
+    await expect(
+      page.locator('head meta[name="naver-site-verification"]'),
+    ).toHaveAttribute('content', 'ef16034ef27e71574bf1c4ae39576acc4e17b002');
+  }
+});

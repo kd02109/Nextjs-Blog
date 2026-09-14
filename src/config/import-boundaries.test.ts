@@ -22,10 +22,31 @@ describe('repository import boundaries', () => {
     expect(messages[0]).toContain('src/lib/content.ts');
   });
 
+  it('rejects the bare generated content module outside the facade', async () => {
+    const messages = await lintRestrictedImports(
+      "import { posts } from '../../../.velite';\nvoid posts;\n",
+      'src/components/bare-content-boundary-probe.ts',
+    );
+
+    expect(messages).toHaveLength(1);
+    expect(messages[0]).toContain('src/lib/content.ts');
+  });
+
   it('rejects Supabase client imports outside the two approved modules', async () => {
     const messages = await lintRestrictedImports(
       "import { createClient } from '@supabase/supabase-js';\nvoid createClient;\n",
       'src/components/supabase-boundary-probe.ts',
+    );
+
+    expect(messages).toHaveLength(1);
+    expect(messages[0]).toContain('src/lib/supabase/browser.ts');
+    expect(messages[0]).toContain('src/server/supabase.ts');
+  });
+
+  it('rejects Supabase client subpath imports outside approved modules', async () => {
+    const messages = await lintRestrictedImports(
+      "import { createClient } from '@supabase/supabase-js/dist/index.mjs';\nvoid createClient;\n",
+      'src/components/supabase-subpath-boundary-probe.ts',
     );
 
     expect(messages).toHaveLength(1);

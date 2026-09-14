@@ -7,6 +7,7 @@ import { getCookieServer } from '@/util/cookie/cookieServer';
 import { incrementView } from '@/server/supabase';
 import { createViewVisitorHash } from '@/server/view-visitor';
 import { headers } from 'next/headers';
+import { sharedOpenGraphMetadata } from '@/config';
 
 type Props = {
   params: Promise<{ slug: string[] }>;
@@ -33,6 +34,7 @@ export const generateMetadata = async ({
     description: post.description,
     alternates: { canonical: canonicalPath },
     openGraph: {
+      ...sharedOpenGraphMetadata,
       url: canonicalPath,
       title: post.title,
       images: 'https://source.unsplash.com/random/300×300',
