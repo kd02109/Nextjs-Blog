@@ -51,6 +51,8 @@ function request(
 describe('POST /api/views/[slug]', () => {
   beforeEach(() => {
     Object.assign(process.env, {
+      NEXT_PUBLIC_SUPABASE_URL: 'https://example.supabase.co',
+      SUPABASE_SERVICE_ROLE_KEY: 'server-service-role-key',
       VERCEL: '1',
       VIEW_COUNT_HASH_SECRET: hashSecret,
     });

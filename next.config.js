@@ -1,6 +1,49 @@
+const contentSecurityPolicy = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' https://giscus.app https://www.googletagmanager.com",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' blob: data: https://source.unsplash.com https://images.unsplash.com https://i.imgur.com https://github.com https://*.githubusercontent.com https://www.google-analytics.com",
+  "font-src 'self' data:",
+  "connect-src 'self' https://giscus.app https://*.google-analytics.com https://*.analytics.google.com https://*.supabase.co wss://*.supabase.co",
+  'frame-src https://giscus.app',
+  "worker-src 'self' blob:",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+  'upgrade-insecure-requests',
+].join('; ');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Content-Security-Policy-Report-Only',
+            value: contentSecurityPolicy,
+          },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()',
+          },
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=63072000; includeSubDomains; preload',
+          },
+          { key: 'X-Frame-Options', value: 'DENY' },
+        ],
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {

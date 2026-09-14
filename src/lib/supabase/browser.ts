@@ -1,13 +1,17 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { getPublicSupabaseEnv } from '@/config/env';
 import type { Database } from '../../../database.types';
 
 let supabase: SupabaseClient<Database> | undefined;
 
 function getSupabase() {
-  supabase ??= createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-  );
+  if (!supabase) {
+    const environment = getPublicSupabaseEnv();
+    supabase = createClient<Database>(
+      environment.NEXT_PUBLIC_SUPABASE_URL,
+      environment.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    );
+  }
 
   return supabase;
 }

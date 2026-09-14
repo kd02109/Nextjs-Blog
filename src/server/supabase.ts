@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { getViewMutationEnv } from '@/config/env';
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '../../database.types';
 
@@ -7,9 +8,10 @@ export async function incrementView(
   slug: string,
   visitorHash: string,
 ): Promise<number> {
+  const environment = getViewMutationEnv();
   const supabase = createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY,
+    environment.NEXT_PUBLIC_SUPABASE_URL,
+    environment.SUPABASE_SERVICE_ROLE_KEY,
     {
       auth: {
         autoRefreshToken: false,
