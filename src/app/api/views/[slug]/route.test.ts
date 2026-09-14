@@ -10,20 +10,31 @@ vi.mock('server-only', () => ({}));
 import { POST } from './route';
 
 const hashSecret = '0123456789abcdef0123456789abcdef';
-const defaultAddress = '203.0.113.10';
+const defaultTrustedAddress = '203.0.113.10';
+const defaultForwardedAddress = '198.51.100.20';
 const defaultUserAgent = 'Test Browser/1.0';
 const defaultVisitorHash =
-  'd960257723ff41489555e2dc0f52f4b5e0fb6fa9cf65b1675fa620920aafb6f4';
+  'dfe993633e8dc89c6fed55b2f4c69b9bcedccd799036a73b585ef5552dfc8e35';
 
 function request(
   slug: string,
   {
-    address = defaultAddress,
+    trustedAddress = defaultTrustedAddress,
+    forwardedAddress = defaultForwardedAddress,
     userAgent = defaultUserAgent,
-  }: { address?: string | null; userAgent?: string | null } = {},
+  }: {
+    trustedAddress?: string | null;
+    forwardedAddress?: string | null;
+    userAgent?: string | null;
+  } = {},
 ) {
   const headers = new Headers();
-  if (address !== null) headers.set('x-forwarded-for', address);
+  if (trustedAddress !== null) {
+    headers.set('x-vercel-forwarded-for', trustedAddress);
+  }
+  if (forwardedAddress !== null) {
+    headers.set('x-forwarded-for', forwardedAddress);
+  }
   if (userAgent !== null) headers.set('user-agent', userAgent);
 
   return POST(
@@ -39,7 +50,10 @@ function request(
 
 describe('POST /api/views/[slug]', () => {
   beforeEach(() => {
-    Object.assign(process.env, { VIEW_COUNT_HASH_SECRET: hashSecret });
+    Object.assign(process.env, {
+      VERCEL: '1',
+      VIEW_COUNT_HASH_SECRET: hashSecret,
+    });
     incrementView.mockReset();
     incrementView.mockResolvedValue(42);
   });
@@ -66,25 +80,46 @@ describe('POST /api/views/[slug]', () => {
     ]);
   });
 
-  it('passes a distinct fingerprint for a different visitor address', async () => {
+  it('does not let User-Agent changes mint a new visitor fingerprint', async () => {
+    await request('URLSearchParams', { userAgent: 'First Browser/1.0' });
+    await request('URLSearchParams', { userAgent: 'Other Browser/99.0' });
+
+    expect(incrementView.mock.calls).toEqual([
+      ['URLSearchParams', defaultVisitorHash],
+      ['URLSearchParams', defaultVisitorHash],
+    ]);
+  });
+
+  it('ignores spoofed x-forwarded-for values', async () => {
+    await request('URLSearchParams', { forwardedAddress: '192.0.2.10' });
+    await request('URLSearchParams', { forwardedAddress: '192.0.2.11' });
+
+    expect(incrementView.mock.calls).toEqual([
+      ['URLSearchParams', defaultVisitorHash],
+      ['URLSearchParams', defaultVisitorHash],
+    ]);
+  });
+
+  it('passes a distinct fingerprint for a different trusted Vercel address', async () => {
     await request('URLSearchParams');
-    await request('URLSearchParams', { address: '203.0.113.11' });
+    await request('URLSearchParams', { trustedAddress: '203.0.113.11' });
 
     expect(incrementView.mock.calls).toEqual([
       ['URLSearchParams', defaultVisitorHash],
       [
         'URLSearchParams',
-        'c8e8ac2613adb1901e27428c1b7c1c29ab9fa869fa80c929a317b878e1e9efa6',
+        'c88eaf60fc5eba0aa3b71c529f4847acfa17430a785e86e616deb1acc38cd34e',
       ],
     ]);
   });
 
-  it('never passes the raw visitor address or user agent to the RPC boundary', async () => {
+  it('never passes a raw visitor address to the RPC boundary', async () => {
     await request('URLSearchParams');
 
     const rpcArguments = JSON.stringify(incrementView.mock.calls);
     expect(rpcArguments).toContain(defaultVisitorHash);
-    expect(rpcArguments).not.toContain(defaultAddress);
+    expect(rpcArguments).not.toContain(defaultTrustedAddress);
+    expect(rpcArguments).not.toContain(defaultForwardedAddress);
     expect(rpcArguments).not.toContain(defaultUserAgent);
   });
 
@@ -149,15 +184,41 @@ describe('POST /api/views/[slug]', () => {
   );
 
   it.each([
-    ['forwarded address', { address: null }],
-    ['user agent', { userAgent: null }],
-  ])('fails closed when the request has no %s', async (_, headers) => {
-    const response = await request('URLSearchParams', headers);
+    ['missing', undefined],
+    ['unexpected', '0'],
+  ])(
+    'fails closed outside a Vercel runtime when VERCEL is %s',
+    async (_, vercelMarker) => {
+      if (vercelMarker === undefined) {
+        Reflect.deleteProperty(process.env, 'VERCEL');
+      } else {
+        Object.assign(process.env, { VERCEL: vercelMarker });
+      }
 
-    expect(response.status).toBe(500);
-    await expect(response.json()).resolves.toEqual({
-      message: 'Unable to record view.',
-    });
-    expect(incrementView).not.toHaveBeenCalled();
-  });
+      const response = await request('URLSearchParams');
+
+      expect(response.status).toBe(500);
+      await expect(response.json()).resolves.toEqual({
+        message: 'Unable to record view.',
+      });
+      expect(incrementView).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each([
+    ['missing', null],
+    ['malformed', 'not-an-ip'],
+    ['multiple values', '203.0.113.10, 203.0.113.11'],
+  ])(
+    'fails closed for a %s trusted Vercel address',
+    async (_, trustedAddress) => {
+      const response = await request('URLSearchParams', { trustedAddress });
+
+      expect(response.status).toBe(500);
+      await expect(response.json()).resolves.toEqual({
+        message: 'Unable to record view.',
+      });
+      expect(incrementView).not.toHaveBeenCalled();
+    },
+  );
 });
