@@ -1,4 +1,5 @@
 import { ProjectType } from '@/types/projectType';
+import { siteConfig } from '@/config';
 
 export const projectObj: ProjectType[] = [
   {
@@ -44,7 +45,7 @@ export const projectObj: ProjectType[] = [
     name: 'NextJS Blog',
     image: 'https://i.imgur.com/y7xcTyo.png',
     description: 'Next.js를 기반으로 한 개발 블로그를 구현합니다.',
-    href: 'https://sonblog.vercel.app',
+    href: siteConfig.url,
     github: 'https://github.com/kd02109/Nextjs-Blog',
     link: 'nextjs-blog',
     date: '2023-08-30 ~ 2023-09-20',

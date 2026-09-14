@@ -52,7 +52,9 @@ export default function PostCard(post: Post) {
         </div>
 
         <div className="flex gap-2 max-md:flex-wrap">
-          {post.tag?.map(item => <Tag key={item} tag={item} />)}
+          {post.tag?.map(item => (
+            <Tag key={item} tag={item} />
+          ))}
         </div>
       </div>
     </div>

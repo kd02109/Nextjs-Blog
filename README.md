@@ -1,8 +1,8 @@
 # 블로그 작성
 
-- NEXTJS, Contentlayer, typescript, react, tailwindcss를 활용해서 기본적인 블로그를 만들었습니다.
+- Next.js, Velite, TypeScript, React, Tailwind CSS를 활용해서 기본적인 블로그를 만들었습니다.
 - 해당 블로그는 serverless 블로그로서 개발 관련 글을 포스팅 하기 위해서 만들어 졌습니다.
-- 블로그에 관한 자세한 글들은 [블로그](https://nextjs-blog-kd02109.vercel.app/projects/nextjs-blog)에서 확인할 수 있습니다.
+- 블로그에 관한 자세한 글들은 [블로그](https://sonblog.vercel.app/projects/nextjs-blog)에서 확인할 수 있습니다.
 
 ## 로컬 환경
 
@@ -27,6 +27,8 @@ npm audit --omit=dev --audit-level=high
 ```
 
 `npm run check`는 Velite 콘텐츠를 한 번 생성한 뒤 lint, TypeScript, unit test를 순서대로 실행합니다. GitHub Actions는 Node.js 24에서 같은 검증과 기본 production build를 수행하고, high 이상 production dependency audit 및 gitleaks 이력 검사를 별도 job으로 실행합니다. 모든 `uses:` 의존성은 검토한 40자리 commit SHA에 고정하고 사람이 읽을 수 있는 version 주석을 둡니다. Dependabot은 npm과 GitHub Actions의 minor/patch를 주간 그룹으로 제안하며 고정된 SHA도 갱신하고, major 업데이트는 개별 PR로 남깁니다.
+
+Production canonical은 `https://sonblog.vercel.app/`입니다. App Router가 `src/app/sitemap.ts`와 `src/app/robots.ts`에서 `/sitemap.xml`과 `/robots.txt`를 빌드하므로 별도 sitemap 생성 명령이나 생성 파일을 커밋하지 않습니다.
 
 ## 보안 응답 헤더
 
