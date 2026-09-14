@@ -2,10 +2,12 @@ import Project from '@/components/Project';
 import { projectObj } from '@/util/project';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { sharedOpenGraphMetadata } from '@/config';
 
 export const metadata: Metadata = {
   alternates: { canonical: '/projects' },
   openGraph: {
+    ...sharedOpenGraphMetadata,
     url: '/projects',
     title: 'SON의 개발 블로그',
     description: '지금까지 진행한 프로젝트를 확인할 수 있습니다.',

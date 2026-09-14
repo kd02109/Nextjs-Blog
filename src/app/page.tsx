@@ -3,10 +3,12 @@ import getPosts from '@/util/getPosts';
 import CardCarousel from '@/components/carousel/CardCarosuel';
 import getCaruselPosts from '@/util/getCaruselPosts';
 import Link from 'next/link';
+import { sharedOpenGraphMetadata } from '@/config';
 
 export const metadata: Metadata = {
   alternates: { canonical: '/' },
   openGraph: {
+    ...sharedOpenGraphMetadata,
     url: '/',
     title: 'SON의 개발 블로그',
     description: '개발하면서 느낀점, 배운점을 기록합니다.',

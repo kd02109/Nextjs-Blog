@@ -7,6 +7,7 @@ import { projectObj } from '@/util/project';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
+import { sharedOpenGraphMetadata } from '@/config';
 
 type Props = {
   params: Promise<{
@@ -27,6 +28,7 @@ export const generateMetadata = async ({
     description: oneProject.description,
     alternates: { canonical: `/projects/${oneProject.link}` },
     openGraph: {
+      ...sharedOpenGraphMetadata,
       url: `/projects/${oneProject.link}`,
       title: oneProject.name,
       images: 'https://source.unsplash.com/random/300×300',

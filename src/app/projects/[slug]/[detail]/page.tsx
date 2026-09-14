@@ -7,6 +7,7 @@ import { createViewVisitorHash } from '@/server/view-visitor';
 import { notFound } from 'next/navigation';
 import { headers } from 'next/headers';
 import type { Metadata } from 'next';
+import { sharedOpenGraphMetadata } from '@/config';
 
 type Props = {
   params: Promise<{
@@ -30,6 +31,7 @@ export const generateMetadata = async ({
     description: post.description,
     alternates: { canonical: canonicalPath },
     openGraph: {
+      ...sharedOpenGraphMetadata,
       url: canonicalPath,
       title: post.title,
       images: 'https://source.unsplash.com/random/300×300',

@@ -5,7 +5,7 @@ import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
 import NextThemeProvider from '@/components/ThemeProvider';
 import GoogleAnalytics from '@/components/layout/GoogleAnalytics';
-import { siteConfig } from '@/config';
+import { sharedOpenGraphMetadata, siteConfig } from '@/config';
 
 export const revalidate = 360;
 
@@ -16,13 +16,18 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.title}`,
   },
   description: '웹 개발 관련 학습한 내용, 회고, 프로젝트 등을 정리합니다.',
+  keywords: ['react', 'typescript', 'javascript', 'codingTest', 'next.js'],
   authors: [{ name: siteConfig.author.name }],
+  verification: {
+    google: 'vX5KRBC3xVzJD7VebebY5_AuQq9VHZHdA4jom0Q2y9c',
+    other: {
+      'naver-site-verification': 'ef16034ef27e71574bf1c4ae39576acc4e17b002',
+    },
+  },
   alternates: { canonical: '/' },
   openGraph: {
-    type: 'website',
-    locale: 'ko-KR',
+    ...sharedOpenGraphMetadata,
     url: '/',
-    siteName: siteConfig.title,
     title: siteConfig.title,
     description: siteConfig.description,
   },
@@ -36,24 +41,6 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <meta
-          name="google-site-verification"
-          content="vX5KRBC3xVzJD7VebebY5_AuQq9VHZHdA4jom0Q2y9c"
-        />
-        <meta
-          name="naver-site-verification"
-          content="ef16034ef27e71574bf1c4ae39576acc4e17b002"
-        />
-        <meta name="title" content="Son Blog" />
-        <meta
-          name="description"
-          content="개발하면서 느낀점, 배운점을 기록합니다."
-        />
-        <meta
-          name="keywords"
-          content="react, typescript, javascript, codingTest, next.js"
-        />
-
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link
           rel="apple-touch-icon"

@@ -35,3 +35,9 @@ export const siteConfig = {
     },
   ],
 };
+
+export const sharedOpenGraphMetadata = {
+  type: 'website' as const,
+  locale: 'ko-KR',
+  siteName: siteConfig.title,
+};

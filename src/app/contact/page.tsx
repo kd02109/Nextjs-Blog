@@ -1,10 +1,15 @@
 import ContactForm from '@/components/ContactForm';
 import type { Metadata } from 'next';
+import { sharedOpenGraphMetadata } from '@/config';
 
 export const metadata: Metadata = {
   title: 'Contact',
   alternates: { canonical: '/contact' },
-  openGraph: { url: '/contact' },
+  openGraph: {
+    ...sharedOpenGraphMetadata,
+    url: '/contact',
+    title: 'Contact',
+  },
 };
 
 export default async function ContactPage() {

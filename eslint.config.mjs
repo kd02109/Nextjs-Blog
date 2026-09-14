@@ -5,24 +5,27 @@ import nextTypeScript from 'eslint-config-next/typescript';
 import * as mdx from 'eslint-plugin-mdx';
 import prettierRecommended from 'eslint-plugin-prettier/recommended';
 
-const generatedContentRestriction = {
-  patterns: [
-    {
-      group: ['**/.velite/**', 'velite/generated'],
-      message: 'Import generated content through src/lib/content.ts.',
-    },
-  ],
-};
+const generatedContentRestrictions = [
+  {
+    group: [
+      '.velite',
+      '.velite/**',
+      '**/.velite',
+      '**/.velite/**',
+      'velite/generated',
+      'velite/generated/**',
+    ],
+    message: 'Import generated content through src/lib/content.ts.',
+  },
+];
 
-const supabaseRestriction = {
-  paths: [
-    {
-      name: '@supabase/supabase-js',
-      message:
-        'Use src/lib/supabase/browser.ts or src/server/supabase.ts instead.',
-    },
-  ],
-};
+const supabaseRestrictions = [
+  {
+    group: ['@supabase/supabase-js', '@supabase/supabase-js/**'],
+    message:
+      'Use src/lib/supabase/browser.ts or src/server/supabase.ts instead.',
+  },
+];
 
 export default defineConfig([
   ...fixupConfigRules([...nextVitals, ...nextTypeScript]),
@@ -61,20 +64,25 @@ export default defineConfig([
     rules: {
       'no-restricted-imports': [
         'error',
-        { ...generatedContentRestriction, ...supabaseRestriction },
+        {
+          patterns: [...generatedContentRestrictions, ...supabaseRestrictions],
+        },
       ],
     },
   },
   {
     files: ['src/lib/content.ts'],
     rules: {
-      'no-restricted-imports': ['error', supabaseRestriction],
+      'no-restricted-imports': ['error', { patterns: supabaseRestrictions }],
     },
   },
   {
     files: ['src/lib/supabase/browser.ts', 'src/server/supabase.ts'],
     rules: {
-      'no-restricted-imports': ['error', generatedContentRestriction],
+      'no-restricted-imports': [
+        'error',
+        { patterns: generatedContentRestrictions },
+      ],
     },
   },
   {
