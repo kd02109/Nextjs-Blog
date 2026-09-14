@@ -1,23 +1,11 @@
 'use client';
 
 import Tag from '@/components/Tag';
-import getPosts from '@/util/getPosts';
+import { getAllTags } from '@/lib/content';
 import { useSearchParams } from 'next/navigation';
 
 const TagBox = () => {
-  const posts = getPosts();
-  const obj: { [key: string]: number } = { all: posts.length };
-
-  for (let i = 0; i < posts.length; i++) {
-    const tags = posts[i].tag;
-    for (let j = 0; j < tags.length; j++) {
-      if (obj[tags[j]]) {
-        obj[tags[j]] += 1;
-      } else {
-        obj[tags[j]] = 1;
-      }
-    }
-  }
+  const obj = getAllTags();
 
   const keys = Object.keys(obj);
   const values = Object.values(obj);

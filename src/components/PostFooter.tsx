@@ -1,7 +1,7 @@
 import LinkHover from '@/components/LinkHover';
 import LeftArrow from '@/components/svg/LeftArrow';
 import RightArrow from '@/components/svg/RightArrow';
-import { Post } from 'contentlayer/generated';
+import type { Post } from '@/lib/content';
 
 type PostType = Post | undefined;
 

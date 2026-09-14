@@ -18,7 +18,7 @@ export default function WritingList({ tag }: Prop) {
 
       <ul className="flex flex-col">
         {posts.map(item => (
-          <ProjectWitingList key={item._id} {...item} />
+          <ProjectWitingList key={item.url} {...item} />
         ))}
       </ul>
     </section>

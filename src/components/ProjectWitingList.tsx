@@ -1,6 +1,6 @@
 'use client';
 
-import { Post } from 'contentlayer/generated';
+import type { Post } from '@/lib/content';
 import { format, parseISO } from 'date-fns';
 import useSupabaseCount from '@/components/hook/useSupabaseCount';
 import { getCookieClient, makeCookieClient } from '@/util/cookie/cookieClient';
