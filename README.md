@@ -6,7 +6,11 @@
 
 ## 로컬 환경
 
-Node.js 24와 lockfile 기반 설치를 사용합니다.
+Node.js 24와 npm 11.12.1, lockfile 기반 설치를 사용합니다. `packageManager`
+필드와 `npm run verify:toolchain`이 로컬/CI 버전 차이를 차단하며 CI도 clean
+install 전에 npm 11.12.1을 설치합니다. Node 타입은 24 계열에 맞춘
+`@types/node@24.13.4`, 데이터베이스 운영 도구는 `supabase@2.117.0`으로
+고정합니다.
 
 ```bash
 npm ci
@@ -35,6 +39,20 @@ Production canonical은 `https://sonblog.vercel.app/`입니다. App Router가 `s
 모든 경로에 MIME sniffing 방지, strict referrer policy, 카메라·마이크·위치 권한 차단, 2년 HSTS와 framing 차단을 적용합니다. CSP는 기능을 차단하지 않는 `Content-Security-Policy-Report-Only` 단계입니다. `Reporting-Endpoints`/`report-to`와 호환성용 `report-uri`가 같은 origin의 `POST /api/csp-report`로 violation을 보내며, collector는 허용한 최소 필드만 정리해 Vercel Runtime Logs에 기록합니다. 요청 헤더·쿠키·원문 body·referrer·script sample·original policy는 기록하지 않고 URL의 credential, query, fragment를 제거합니다. 지원 media type이 아니거나 schema가 잘못된 요청은 거부하며, 선언 크기와 실제 stream 모두 16 KiB로 제한합니다.
 
 Vercel Runtime Logs를 이 저장소가 소유한 보존·점검 채널로 사용합니다. 7일 관찰을 시작하기 전에 프로젝트 운영자가 로그 접근 권한, 검색 가능 여부, 연속 7일 이상의 보존 기간을 확인해야 합니다. 현재 Vercel plan의 기본 보존 기간이 부족하면 조직이 관리하는 Vercel Log Drain을 먼저 구성해야 하며, 그 확인 전의 배포 기간은 7일 관찰에 포함하지 않습니다. 이 원격 설정은 저장소 변경 범위 밖입니다. 조건을 충족한 뒤 preview/production violation을 최소 7일 동안 점검하고 별도 승인으로 enforcement를 검토합니다.
+
+Velite가 생성한 MDX 함수 본문은 신뢰된 저장소 콘텐츠이며
+`server-only` evaluator와 Server Component에서만 평가합니다. 브라우저에는 이
+evaluator가 전달되지 않으므로 CSP에 `unsafe-eval`을 추가하지 않습니다. production
+Playwright 검증은 브라우저의 `Function` 생성자를 차단한 상태에서도 대표 blog/project
+문서가 렌더링되는지 확인합니다.
+
+CSP는 여전히 report-only입니다. 아래 inline/외부 integration 범위를 실제 트래픽에서
+7일 이상 관찰하고 위반을 분류하기 전에는 `Content-Security-Policy` enforcement로
+바꾸면 안 됩니다. `upgrade-insecure-requests`는 report-only에서 브라우저가 무시하며
+console noise만 만들기 때문에 현재 정책에서는 제외했습니다. enforcement 후속 작업에서
+HTTPS 운영 상태와 함께 다시 검토합니다. Next/React 개발 서버 자체는 디버깅을 위해
+`eval`을 사용할 수 있으므로 로컬 `next dev`에서는 `unsafe-eval` report가 예상되지만,
+production build에서는 앱 MDX evaluator 관련 `unsafe-eval` 위반이 없어야 합니다.
 
 현재 policy의 외부 출처는 Giscus, Google Analytics, Supabase API, 실제 글 이미지 호스트로 제한했습니다. 다음 wildcard 또는 넓은 directive는 런타임 호환성 때문에 report-only 관찰 기간에만 유지합니다.
 

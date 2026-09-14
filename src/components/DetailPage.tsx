@@ -1,7 +1,3 @@
-'use client';
-
-/* eslint-disable react-hooks/static-components -- Velite provides serialized MDX that must be compiled into a component at runtime. */
-
 import BlogComment from '@/components/BlogComment';
 import BlogMenu from '@/components/BlogMenu';
 import CodeBlock from '@/components/CodeBlock';
@@ -9,13 +5,12 @@ import DetailProjectPageList from '@/components/DetailProjectPageList';
 import PostFooter from '@/components/PostFooter';
 import Tag from '@/components/Tag';
 import { ProjectName } from '@/types/projectType';
-import { makeCookieClient } from '@/util/cookie/cookieClient';
 import { findH } from '@/util/findH';
 import type { Post } from '@/lib/content';
 import { evaluateMdx } from '@/lib/mdx-evaluator';
 import { format, parseISO } from 'date-fns';
 import Image from 'next/image';
-import { useEffect, useMemo } from 'react';
+import { createElement } from 'react';
 
 type Prop = {
   post: Post;
@@ -49,16 +44,11 @@ export default function DetailPage({
   postFooter,
   projectFooter,
 }: Prop) {
-  const content = useMemo(() => {
-    const Content = evaluateMdx<typeof mdxComponents>(post.body.code);
-    return <Content components={mdxComponents} />;
-  }, [post.body.code]);
+  const content = createElement(
+    evaluateMdx<typeof mdxComponents>(post.body.code),
+    { components: mdxComponents },
+  );
   const slugMap = findH(post.body.raw);
-  useEffect(() => {
-    const slugs = post.url.split('/');
-    const slug = slugs[slugs.length - 1];
-    makeCookieClient(slug);
-  }, [post.url]);
   return (
     <>
       <article className="py-8 mt-16">

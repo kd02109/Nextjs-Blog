@@ -11,7 +11,6 @@ const contentSecurityPolicy = [
   "base-uri 'self'",
   "form-action 'self'",
   "frame-ancestors 'none'",
-  'upgrade-insecure-requests',
   'report-to csp-endpoint',
   'report-uri /api/csp-report',
 ].join('; ');
@@ -25,6 +24,7 @@ const nextConfig = {
         source: '/:path*',
         headers: [
           {
+            // Enforcement remains gated on the documented observation period.
             key: 'Content-Security-Policy-Report-Only',
             value: contentSecurityPolicy,
           },

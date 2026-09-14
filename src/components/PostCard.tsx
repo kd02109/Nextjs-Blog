@@ -2,7 +2,6 @@
 
 import Tag from '@/components/Tag';
 import useSupabaseCount from '@/components/hook/useSupabaseCount';
-import { getCookieClient, makeCookieClient } from '@/util/cookie/cookieClient';
 
 import { requestViewIncrement } from '@/util/api/views';
 import type { Post } from '@/lib/content';
@@ -19,13 +18,10 @@ export default function PostCard(post: Post) {
 
   const onClick = async () => {
     const slug = ids[ids.length - 1].trim();
-    if (!getCookieClient(slug)) {
-      try {
-        await requestViewIncrement(slug);
-        makeCookieClient(slug);
-      } catch {
-        // View metrics must not prevent navigation.
-      }
+    try {
+      await requestViewIncrement(slug);
+    } catch {
+      // View metrics must not prevent navigation.
     }
 
     const brand = post.brand.trim();

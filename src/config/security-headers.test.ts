@@ -37,6 +37,13 @@ describe('security response headers', () => {
     const policy = headers.get('Content-Security-Policy-Report-Only');
 
     expect(headers.has('Content-Security-Policy')).toBe(false);
+    expect(
+      [...headers.keys()].filter(key =>
+        key.startsWith('Content-Security-Policy'),
+      ),
+    ).toEqual(['Content-Security-Policy-Report-Only']);
+    expect(policy).not.toContain("'unsafe-eval'");
+    expect(policy).not.toContain('upgrade-insecure-requests');
     expect(policy).toContain("default-src 'self'");
     expect(policy).toContain("object-src 'none'");
     expect(policy).toContain("frame-ancestors 'none'");

@@ -18,9 +18,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `npm run dev -- --hostname 127.0.0.1 --port ${port}`,
+    command: `npm run build -- --webpack && npm run start -- --hostname 127.0.0.1 --port ${port}`,
     env: {
-      NEXT_PUBLIC_SUPABASE_URL: 'http://127.0.0.1:54321',
+      NEXT_PUBLIC_SUPABASE_URL: `http://127.0.0.1:${port}`,
       NEXT_PUBLIC_SUPABASE_ANON_KEY: 'test-anon-key',
     },
     url: `http://127.0.0.1:${port}`,
