@@ -3,7 +3,6 @@
 import type { Post } from '@/lib/content';
 import { format, parseISO } from 'date-fns';
 import useSupabaseCount from '@/components/hook/useSupabaseCount';
-import { getCookieClient, makeCookieClient } from '@/util/cookie/cookieClient';
 import { requestViewIncrement } from '@/util/api/views';
 import { useRouter } from 'next/navigation';
 
@@ -14,13 +13,10 @@ export default function ProjectWitingList(prop: Post) {
   const view = useSupabaseCount(slug[slug.length - 1]);
   const onClick = async () => {
     const key = slug[slug.length - 1].trim();
-    if (!getCookieClient(key)) {
-      try {
-        await requestViewIncrement(key);
-        makeCookieClient(key);
-      } catch {
-        // View metrics must not prevent navigation.
-      }
+    try {
+      await requestViewIncrement(key);
+    } catch {
+      // View metrics must not prevent navigation.
     }
     router.push(url);
   };

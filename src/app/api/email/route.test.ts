@@ -59,6 +59,11 @@ describe('POST /api/email', () => {
   it.each([
     ['a subject longer than 120 characters', { subject: 'a'.repeat(121) }],
     ['a message longer than 5,000 characters', { message: 'a'.repeat(5001) }],
+    ['a whitespace-only message', { message: '   \n\t' }],
+    [
+      'an email longer than 254 characters',
+      { from: `${'a'.repeat(243)}@example.com` },
+    ],
     ['an invalid visitor email', { from: 'not-an-email' }],
   ])('returns 400 for %s', async (_description, override) => {
     const response = await POST(

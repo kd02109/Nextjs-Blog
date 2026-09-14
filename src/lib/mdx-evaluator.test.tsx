@@ -1,8 +1,10 @@
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { getPostBySlug } from './content';
+
+vi.mock('server-only', () => ({}));
 
 type EvaluateMdx = (
   code: string,

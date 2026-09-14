@@ -1,7 +1,6 @@
-import { getPostBySlug } from '@/lib/content';
+import { getAllPosts, getPostBySlug } from '@/lib/content';
 import DetailPage from '@/components/DetailPage';
 import { ProjectName } from '@/types/projectType';
-import { getCookieServer } from '@/util/cookie/cookieServer';
 import { incrementView } from '@/server/supabase';
 import { createViewVisitorHash } from '@/server/view-visitor';
 import { notFound } from 'next/navigation';
@@ -15,6 +14,17 @@ type Props = {
     slug: string;
   }>;
 };
+
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return getAllPosts()
+    .filter(post => post.brand.trim() === 'project')
+    .map(post => {
+      const [slug, detail] = post.url.split('/');
+      return { slug, detail };
+    });
+}
 
 export const generateMetadata = async ({
   params,
@@ -47,14 +57,11 @@ export default async function ProjectDetailPage({ params }: Props) {
   const post = getPostBySlug(str);
   if (!post) notFound();
 
-  const isCookie = await getCookieServer(slug);
-  if (!isCookie) {
-    try {
-      const visitorHash = createViewVisitorHash(await headers());
-      await incrementView(slug, visitorHash);
-    } catch {
-      // View metrics must not prevent the project post from rendering.
-    }
+  try {
+    const visitorHash = createViewVisitorHash(await headers());
+    await incrementView(slug, visitorHash);
+  } catch {
+    // View metrics must not prevent the project post from rendering.
   }
   const projectTag = projectSlug.trim() as ProjectName;
   const tags = post.tag;

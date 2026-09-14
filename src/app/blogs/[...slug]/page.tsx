@@ -3,7 +3,6 @@ import getPosts from '@/util/getPosts';
 import DetailPage from '@/components/DetailPage';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getCookieServer } from '@/util/cookie/cookieServer';
 import { incrementView } from '@/server/supabase';
 import { createViewVisitorHash } from '@/server/view-visitor';
 import { headers } from 'next/headers';
@@ -52,15 +51,11 @@ const PostLayout = async ({ params }: Props) => {
   const slug = slugParts.at(-1);
   if (!slug) notFound();
 
-  const isCookie = await getCookieServer(slug);
-
-  if (!isCookie) {
-    try {
-      const visitorHash = createViewVisitorHash(await headers());
-      await incrementView(slug, visitorHash);
-    } catch {
-      // View metrics must not prevent the post from rendering.
-    }
+  try {
+    const visitorHash = createViewVisitorHash(await headers());
+    await incrementView(slug, visitorHash);
+  } catch {
+    // View metrics must not prevent the post from rendering.
   }
 
   const allPostsSort = getPosts('blog');

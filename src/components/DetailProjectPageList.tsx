@@ -9,7 +9,6 @@ import Calender from '@/components/svg/Calender';
 import { format, parseISO } from 'date-fns';
 import List from '@/components/svg/List';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
-import { getCookieClient, makeCookieClient } from '@/util/cookie/cookieClient';
 import { requestViewIncrement } from '@/util/api/views';
 import { useRouter } from 'next/navigation';
 
@@ -33,13 +32,10 @@ export default function DetailProjectPageList({ title, param, date }: Porps) {
   const onLinkClick = async (url: string) => {
     const slugs = url.split('/');
     const slug = slugs[slugs.length - 1];
-    if (!getCookieClient(slug)) {
-      try {
-        await requestViewIncrement(slug);
-        makeCookieClient(slug);
-      } catch {
-        // View metrics must not prevent navigation.
-      }
+    try {
+      await requestViewIncrement(slug);
+    } catch {
+      // View metrics must not prevent navigation.
     }
     router.push(`/projects/${url}`);
   };

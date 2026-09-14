@@ -16,4 +16,15 @@ describe('CI workflow supply-chain contract', () => {
       );
     }
   });
+
+  it('installs and verifies the repository-pinned npm before clean installs', () => {
+    const npmInstallSteps = [...workflow.matchAll(/^\s*run:\s*npm ci$/gm)];
+    const pinnedNpmSteps = [
+      ...workflow.matchAll(/^\s*run:\s*npm install --global npm@11\.12\.1$/gm),
+    ];
+
+    expect(npmInstallSteps).toHaveLength(2);
+    expect(pinnedNpmSteps).toHaveLength(npmInstallSteps.length);
+    expect(workflow).toContain('run: npm run verify:toolchain');
+  });
 });

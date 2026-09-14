@@ -1,3 +1,5 @@
+import 'server-only';
+
 import type { ComponentType } from 'react';
 import * as jsxRuntime from 'react/jsx-runtime';
 
