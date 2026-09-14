@@ -2,6 +2,8 @@ import Script from 'next/script';
 import * as gtag from '../../lib/gtag';
 
 export default function GoogleAnalytics() {
+  if (!gtag.GA_TRACKING_ID) return null;
+
   return (
     <>
       <script

@@ -18,6 +18,8 @@ describe('server Supabase view mutations', () => {
       NEXT_PUBLIC_SUPABASE_URL: 'https://example.supabase.co',
       NEXT_PUBLIC_SUPABASE_ANON_KEY: 'public-anon-key',
       SUPABASE_SERVICE_ROLE_KEY: 'server-service-role-key',
+      VIEW_COUNT_HASH_SECRET: 'v'.repeat(32),
+      VERCEL: '1',
     });
     createClient.mockReset();
     rpc.mockReset();

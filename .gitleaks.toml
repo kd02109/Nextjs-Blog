@@ -1,0 +1,12 @@
+title = "Nextjs-Blog gitleaks configuration"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Deterministic HMAC-only fixture from the view route test"
+condition = "AND"
+commits = ["320f06562fc64373541fc096e5095aac4090c244"]
+paths = ['''^src/app/api/views/\[slug\]/route\.test\.ts$''']
+regexTarget = "secret"
+regexes = ['''^0123456789abcdef0123456789abcdef$''']
