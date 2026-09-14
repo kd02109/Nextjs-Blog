@@ -4,12 +4,12 @@ import Tag from '@/components/Tag';
 import useSupabaseCount from '@/components/hook/useSupabaseCount';
 import { getCookieClient, makeCookieClient } from '@/util/cookie/cookieClient';
 
-import { supabaseIncrement, supabaseViewCount } from '@/util/supabase';
+import { supabaseIncrement } from '@/util/supabase';
 import type { Post } from '@/lib/content';
 import { format, parseISO } from 'date-fns';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 export default function PostCard(post: Post) {
   const ids = useMemo(() => post.url.split('/'), [post.url]);

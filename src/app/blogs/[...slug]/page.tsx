@@ -1,35 +1,53 @@
 import { getPostBySlug } from '@/lib/content';
 import getPosts from '@/util/getPosts';
 import DetailPage from '@/components/DetailPage';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getCookieServer } from '@/util/cookie/cookieServer';
 import { supabaseIncrement } from '@/util/supabase';
 
-export const generateMetadata = ({ params }: { params: any }): Metadata => {
-  const post = getPostBySlug(params.slug.join('/'));
+type Props = {
+  params: Promise<{ slug: string[] }>;
+};
+
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return getPosts('blog').map(post => ({ slug: post.url.split('/') }));
+}
+
+export const generateMetadata = async ({
+  params,
+}: Props): Promise<Metadata> => {
+  const { slug } = await params;
+  const post = getPostBySlug(slug.join('/'));
+
+  if (!post) notFound();
 
   return {
-    title: post?.title,
-    description: post?.description,
+    title: post.title,
+    description: post.description,
     openGraph: {
-      title: post?.title,
+      title: post.title,
       images: 'https://source.unsplash.com/random/300×300',
-      description: post?.description,
+      description: post.description,
     },
   };
 };
 
-const PostLayout = async ({ params }: { params: { slug: string[] } }) => {
-  const str = params.slug.join('/');
+const PostLayout = async ({ params }: Props) => {
+  const { slug: slugParts } = await params;
+  const str = slugParts.join('/');
   const post = getPostBySlug(str);
   if (!post) notFound();
 
-  const slug = params.slug.at(-1);
-  const isCookie = await getCookieServer(slug as string);
+  const slug = slugParts.at(-1);
+  if (!slug) notFound();
+
+  const isCookie = await getCookieServer(slug);
 
   if (!isCookie) {
-    await supabaseIncrement(slug as string);
+    await supabaseIncrement(slug);
   }
 
   const allPostsSort = getPosts('blog');

@@ -5,39 +5,48 @@ import CopyUrl from '@/components/svg/CopyUrl';
 import Github from '@/components/svg/Github';
 import { projectObj } from '@/util/project';
 import Image from 'next/image';
+import { notFound } from 'next/navigation';
+
 type Props = {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 };
 
-export const generateMetadata = ({ params }: Props) => {
-  const oneProject = projectObj.find(item => item.link === params.slug);
+export const generateMetadata = async ({ params }: Props) => {
+  const { slug } = await params;
+  const oneProject = projectObj.find(item => item.link === slug);
+
+  if (!oneProject) notFound();
+
   return {
-    title: oneProject!.name,
-    description: oneProject!.description,
+    title: oneProject.name,
+    description: oneProject.description,
     openGraph: {
-      title: oneProject?.name,
+      title: oneProject.name,
       images: 'https://source.unsplash.com/random/300×300',
-      description: oneProject?.description,
+      description: oneProject.description,
     },
   };
 };
 
-export default function ProjectDetailPages({ params }: Props) {
-  const oneProject = projectObj.find(item => item.link === params.slug);
+export default async function ProjectDetailPages({ params }: Props) {
+  const { slug } = await params;
+  const oneProject = projectObj.find(item => item.link === slug);
+
+  if (!oneProject) notFound();
 
   return (
     <article className="py-4">
       <div className="flex relyativy gap-2 items-center">
-        <h1 className="font-black mb-5 text-3xl">{oneProject!.name}</h1>
+        <h1 className="font-black mb-5 text-3xl">{oneProject.name}</h1>
         <LinkCopy />
       </div>
 
       <div className="flex max-md:flex-col gap-4">
         <Image
-          src={oneProject!.image}
-          alt={oneProject!.name}
+          src={oneProject.image}
+          alt={oneProject.name}
           fill={false}
           width={600}
           height={600}
@@ -54,35 +63,35 @@ export default function ProjectDetailPages({ params }: Props) {
                   <Github />
                 </div>
                 <a
-                  href={oneProject!.github}
+                  href={oneProject.github}
                   target="_blank"
                   className="text-sm font-bold hover:text-yellow-400">
-                  {oneProject!.github}
+                  {oneProject.github}
                 </a>
               </li>
               <li className="flex gap-2 items-center">
                 <CopyUrl />
                 <a
-                  href={oneProject!.href}
+                  href={oneProject.href}
                   target="_blank"
                   className="text-sm overflow-hidden font-bold hover:text-yellow-400">
-                  {oneProject!.href}
+                  {oneProject.href}
                 </a>
               </li>
             </ul>
             <div className="mt-4">
               <h2 className="font-bold text-xl">Description</h2>
-              <p className="text-sm">{oneProject!.description}</p>
+              <p className="text-sm">{oneProject.description}</p>
             </div>
             <div className="mt-4">
               <h2 className="font-bold text-xl">Date</h2>
-              <span className="text-sm">{oneProject!.date}</span>
+              <span className="text-sm">{oneProject.date}</span>
             </div>
           </nav>
         </div>
       </div>
-      <StakList name={oneProject!.name} list={oneProject!.stack} />
-      <WritingList tag={oneProject!.link} />
+      <StakList name={oneProject.name} list={oneProject.stack} />
+      <WritingList tag={oneProject.link} />
     </article>
   );
 }

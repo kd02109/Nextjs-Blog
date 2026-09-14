@@ -15,8 +15,7 @@ export const metadata: Metadata = {
 
 export default async function Home() {
   const posts = getPosts();
-  const { data } = await supabase.from('views').select('*');
-  console.log(data);
+  await supabase.from('views').select('*');
   const carosuelPosts = getCaruselPosts(posts);
   return (
     <section className="max-w-4xl py-8 mx-auto">

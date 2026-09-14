@@ -1,3 +1,9 @@
+/// <reference types="gtag.js" />
+
+interface Window {
+  gtag: Gtag.Gtag;
+}
+
 declare namespace NodeJS {
   interface ProcessEnv {
     readonly NEXT_PUBLIC_GA_ID: string;

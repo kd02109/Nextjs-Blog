@@ -27,6 +27,8 @@ ${posts
     encoding: 'utf-8',
   });
 }
+// Reserved for re-enabling robots.txt generation alongside the sitemap.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const createRobotsTxt = () => {
   const siteUrl = siteConfig.url;
 

@@ -5,7 +5,7 @@ type Prop = {
   list: MarkdownKey[];
 };
 
-export default function StakList({ name, list }: Prop) {
+export default function StakList({ list }: Prop) {
   return (
     <div className="mt-10">
       <h2 className="font-bold text-2xl mb-2">Stack</h2>

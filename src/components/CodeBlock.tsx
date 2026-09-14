@@ -13,7 +13,7 @@ export default function CodeBlock({ children }: React.ComponentProps<'pre'>) {
     try {
       await navigator.clipboard.writeText(text);
       toast.success('코드를 복사했습니다.', { icon: '🖥️' });
-    } catch (e) {
+    } catch {
       toast.error('코드 복사에 실패했습니다.');
     }
   };
