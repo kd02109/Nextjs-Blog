@@ -1,5 +1,5 @@
 import { SupabaseClient, createClient } from '@supabase/supabase-js';
-import { Database } from 'database.types';
+import type { Database } from '../../database.types';
 
 export const supabase: SupabaseClient<Database> = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -7,7 +7,7 @@ export const supabase: SupabaseClient<Database> = createClient(
 );
 
 export const supabaseIncrement = async (slug: string) => {
-  const obj = await supabase.rpc('increment_view', { slug_text: slug });
+  await supabase.rpc('increment_view', { slug_text: slug });
 };
 
 export const supabaseViewCount = async (slug: string) => {
@@ -18,7 +18,7 @@ export const supabaseViewCount = async (slug: string) => {
     .single();
 
   if (viewsError && viewsError.details.includes(`0 rows`)) {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('views')
       .upsert({ slug: slug as string, view_count: 0 }, { onConflict: 'slug' })
       .select('view_count')

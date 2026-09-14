@@ -1,16 +1,23 @@
 'use client';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import { siteConfig } from '@/config';
 import LinkItem from '@/components/LinkItem';
 import DarkSwitch from '@/components/DarkSwitch';
 import Hamburger from '@/components/Hamburger';
 import checkAgent from '@/util/checkAgent';
 
+const subscribe = () => () => undefined;
+const getServerAgent = () => '';
+
 const Header = () => {
   const pathName = usePathname();
   const [isOpened, setIsOpened] = useState(false);
-  const browserUser = checkAgent();
+  const browserUser = useSyncExternalStore(
+    subscribe,
+    checkAgent,
+    getServerAgent,
+  );
 
   return (
     <header

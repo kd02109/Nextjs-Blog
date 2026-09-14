@@ -2,9 +2,9 @@ import '@/styles/globals.css';
 import type { Metadata } from 'next';
 import { nanum } from '@/font/font';
 import Footer from '@/components/layout/Footer';
+import Header from '@/components/layout/Header';
 import NextThemeProvider from '@/components/ThemeProvider';
 import GoogleAnalytics from '@/components/layout/GoogleAnalytics';
-import dynamic from 'next/dynamic';
 
 export const revalidate = 360;
 
@@ -18,11 +18,8 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const HeaderDynamic = dynamic(() => import('@/components/layout/Header'), {
-    ssr: false,
-  });
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta
           name="google-site-verification"
@@ -119,7 +116,7 @@ export default function RootLayout({
         <GoogleAnalytics />
 
         <NextThemeProvider>
-          <HeaderDynamic />
+          <Header />
           <main className="px-6">{children}</main>
           <Footer />
         </NextThemeProvider>

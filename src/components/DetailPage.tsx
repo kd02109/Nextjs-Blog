@@ -1,5 +1,7 @@
 'use client';
 
+/* eslint-disable react-hooks/static-components -- Velite provides serialized MDX that must be compiled into a component at runtime. */
+
 import BlogComment from '@/components/BlogComment';
 import BlogMenu from '@/components/BlogMenu';
 import CodeBlock from '@/components/CodeBlock';
@@ -12,7 +14,7 @@ import { findH } from '@/util/findH';
 import type { Post } from '@/lib/content';
 import { format, parseISO } from 'date-fns';
 import Image from 'next/image';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import type { ComponentType } from 'react';
 import * as jsxRuntime from 'react/jsx-runtime';
 
@@ -56,7 +58,10 @@ export default function DetailPage({
   postFooter,
   projectFooter,
 }: Prop) {
-  const Content = getMDXComponent(post.body.code);
+  const content = useMemo(() => {
+    const Content = getMDXComponent(post.body.code);
+    return <Content components={mdxComponents} />;
+  }, [post.body.code]);
   const slugMap = findH(post.body.raw);
   useEffect(() => {
     const slugs = post.url.split('/');
@@ -85,7 +90,7 @@ export default function DetailPage({
         </div>
         <div className="flex justify-between">
           <section className="prose lg:prose-xl md:prose-lg sm:prose-base prose-slate dark:prose-invert  w-full max-w-3xl">
-            <Content components={mdxComponents} />
+            {content}
           </section>
           <div className="sticky top-[135px] max-md:hidden min-w-[240px] max-w-[260px] self-start lg:block">
             <BlogMenu toc={slugMap} />

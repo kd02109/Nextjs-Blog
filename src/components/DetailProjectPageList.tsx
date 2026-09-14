@@ -1,7 +1,6 @@
 'use client';
 
 import { ProjectName } from '@/types/projectType';
-import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import clsx from 'clsx';
 import getPosts from '@/util/getPosts';

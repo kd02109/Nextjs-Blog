@@ -10,7 +10,7 @@ export default function TagPage() {
   const search = searchParams!.get('key') || 'all';
   const title = search.charAt(0).toUpperCase() + search.slice(1);
 
-  let posts = getPosts(undefined, search);
+  const posts = getPosts(undefined, search);
 
   return (
     <>

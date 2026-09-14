@@ -6,29 +6,33 @@ import { supabaseIncrement } from '@/util/supabase';
 import { notFound } from 'next/navigation';
 
 type Props = {
-  params: {
+  params: Promise<{
     detail: string;
     slug: string;
-  };
+  }>;
 };
 
-export const generateMetadata = ({ params }: Props) => {
-  const post = getPostBySlug(params.slug.trim() + '/' + params.detail.trim());
+export const generateMetadata = async ({ params }: Props) => {
+  const { detail, slug } = await params;
+  const post = getPostBySlug(slug.trim() + '/' + detail.trim());
+
+  if (!post) notFound();
 
   return {
-    title: post?.title,
-    description: post?.description,
+    title: post.title,
+    description: post.description,
     openGraph: {
-      title: post?.title,
+      title: post.title,
       images: 'https://source.unsplash.com/random/300×300',
-      description: post?.description,
+      description: post.description,
     },
   };
 };
 
 export default async function ProjectDetailPage({ params }: Props) {
-  const slug = params.detail.trim();
-  const str = params.slug.trim() + '/' + slug;
+  const { detail, slug: projectSlug } = await params;
+  const slug = detail.trim();
+  const str = projectSlug.trim() + '/' + slug;
   const post = getPostBySlug(str);
   if (!post) notFound();
 
@@ -36,7 +40,7 @@ export default async function ProjectDetailPage({ params }: Props) {
   if (!isCookie) {
     await supabaseIncrement(slug);
   }
-  const projectTag = params.slug.trim() as ProjectName;
+  const projectTag = projectSlug.trim() as ProjectName;
   const tags = post.tag;
 
   return (

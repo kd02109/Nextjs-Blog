@@ -6,7 +6,7 @@ export const findH = (article: string): Toc[] => {
     .filter(line => line.match(/(^#{1,3})\s/));
 
   const toc: Toc[] = findTitle.map(title => {
-    let name = title
+    const name = title
       .replace(/[\*,\~]{2,}/g, '')
       .replace(/(?<=\])\((.*?)\)/g, '')
       .replace(/(?<!\S)((http)(s?):\/\/|www\.).+?(?=\s)/g, '');
