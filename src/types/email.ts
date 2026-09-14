@@ -3,5 +3,3 @@ export type Form = {
   subject: string;
   message: string;
 };
-
-export type EmailData = Form & { host: string };
