@@ -2,7 +2,7 @@ import { getPostBySlug } from '@/lib/content';
 import DetailPage from '@/components/DetailPage';
 import { ProjectName } from '@/types/projectType';
 import { getCookieServer } from '@/util/cookie/cookieServer';
-import { supabaseIncrement } from '@/util/supabase';
+import { incrementView } from '@/server/supabase';
 import { notFound } from 'next/navigation';
 
 type Props = {
@@ -38,7 +38,11 @@ export default async function ProjectDetailPage({ params }: Props) {
 
   const isCookie = await getCookieServer(slug);
   if (!isCookie) {
-    await supabaseIncrement(slug);
+    try {
+      await incrementView(slug);
+    } catch {
+      // View metrics must not prevent the project post from rendering.
+    }
   }
   const projectTag = projectSlug.trim() as ProjectName;
   const tags = post.tag;

@@ -4,7 +4,7 @@ import DetailPage from '@/components/DetailPage';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getCookieServer } from '@/util/cookie/cookieServer';
-import { supabaseIncrement } from '@/util/supabase';
+import { incrementView } from '@/server/supabase';
 
 type Props = {
   params: Promise<{ slug: string[] }>;
@@ -47,7 +47,11 @@ const PostLayout = async ({ params }: Props) => {
   const isCookie = await getCookieServer(slug);
 
   if (!isCookie) {
-    await supabaseIncrement(slug);
+    try {
+      await incrementView(slug);
+    } catch {
+      // View metrics must not prevent the post from rendering.
+    }
   }
 
   const allPostsSort = getPosts('blog');

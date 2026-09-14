@@ -10,7 +10,7 @@ import { format, parseISO } from 'date-fns';
 import List from '@/components/svg/List';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { getCookieClient, makeCookieClient } from '@/util/cookie/cookieClient';
-import { supabaseIncrement } from '@/util/supabase';
+import { requestViewIncrement } from '@/util/api/views';
 import { useRouter } from 'next/navigation';
 
 type Porps = {
@@ -34,8 +34,12 @@ export default function DetailProjectPageList({ title, param, date }: Porps) {
     const slugs = url.split('/');
     const slug = slugs[slugs.length - 1];
     if (!getCookieClient(slug)) {
-      await supabaseIncrement(slug);
-      makeCookieClient(slug);
+      try {
+        await requestViewIncrement(slug);
+        makeCookieClient(slug);
+      } catch {
+        // View metrics must not prevent navigation.
+      }
     }
     router.push(`/projects/${url}`);
   };
