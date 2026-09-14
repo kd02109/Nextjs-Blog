@@ -50,4 +50,16 @@ describe('security response headers', () => {
     expect(policy).toContain('https://github.com');
     expect(policy).toContain('https://*.githubusercontent.com');
   });
+
+  it('routes modern and legacy report-only violations to the owned collector', async () => {
+    const headers = await responseHeaders();
+    const policy = headers.get('Content-Security-Policy-Report-Only');
+
+    expect(headers.get('Reporting-Endpoints')).toBe(
+      'csp-endpoint="/api/csp-report"',
+    );
+    expect(policy).toContain('report-to csp-endpoint');
+    expect(policy).toContain('report-uri /api/csp-report');
+    expect(headers.has('Content-Security-Policy')).toBe(false);
+  });
 });

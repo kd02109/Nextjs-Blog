@@ -12,6 +12,8 @@ const contentSecurityPolicy = [
   "form-action 'self'",
   "frame-ancestors 'none'",
   'upgrade-insecure-requests',
+  'report-to csp-endpoint',
+  'report-uri /api/csp-report',
 ].join('; ');
 
 /** @type {import('next').NextConfig} */
@@ -25,6 +27,10 @@ const nextConfig = {
           {
             key: 'Content-Security-Policy-Report-Only',
             value: contentSecurityPolicy,
+          },
+          {
+            key: 'Reporting-Endpoints',
+            value: 'csp-endpoint="/api/csp-report"',
           },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           {
