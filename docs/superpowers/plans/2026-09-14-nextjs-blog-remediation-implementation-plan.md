@@ -30,7 +30,7 @@
 
 ---
 
-## PR 1 — P0: 문의 메일 HTML 주입 제거 및 최소 테스트 기반 구축
+## Task 1: PR 1 — P0 문의 메일 HTML 주입 제거 및 최소 테스트 기반 구축
 
 **Files:**
 
@@ -109,7 +109,7 @@
 
 ---
 
-## PR 2 — P0: Contentlayer를 Velite로 교체
+## Task 2: PR 2 — P0 Contentlayer를 Velite로 교체
 
 **Files:**
 
@@ -175,7 +175,7 @@
 
 ---
 
-## PR 3 — P0: Node, Next.js, React 및 핵심 패키지 업그레이드
+## Task 3: PR 3 — P0 Node, Next.js, React 및 핵심 패키지 업그레이드
 
 **Files:**
 
@@ -238,7 +238,7 @@
 
 ---
 
-## PR 4 — P1: Supabase 조회수 쓰기 경계와 DB 권한 고정
+## Task 4: PR 4 — P1 Supabase 조회수 쓰기 경계와 DB 권한 고정
 
 **Files:**
 
@@ -306,7 +306,7 @@
 
 ---
 
-## PR 5 — P1/P2: 환경변수 계약, CI, 자동 보안 검사
+## Task 5: PR 5 — P1/P2 환경변수 계약, CI, 자동 보안 검사
 
 **Files:**
 
@@ -369,7 +369,7 @@
 
 ---
 
-## PR 6 — P2/P3: 의존성·코드 구조·SEO 정리
+## Task 6: PR 6 — P2/P3 의존성·코드 구조·SEO 정리
 
 **Files:**
 
