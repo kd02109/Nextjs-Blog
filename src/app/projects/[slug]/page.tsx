@@ -67,23 +67,25 @@ export default async function ProjectDetailPages({ params }: Props) {
           <h2 className="font-bold text-xl mb-3">About</h2>
           <nav>
             <ul>
-              <li className="flex gap-2 items-center mb-3 overflow-hidden">
-                <div>
+              <li className="mb-3 flex min-w-0 items-center gap-2">
+                <div className="shrink-0">
                   <Github />
                 </div>
                 <a
                   href={oneProject.github}
                   target="_blank"
-                  className="text-sm font-bold hover:text-yellow-400">
+                  className="min-w-0 break-all text-sm font-bold hover:text-yellow-400">
                   {oneProject.github}
                 </a>
               </li>
-              <li className="flex gap-2 items-center">
-                <CopyUrl />
+              <li className="flex min-w-0 items-center gap-2">
+                <div className="shrink-0">
+                  <CopyUrl />
+                </div>
                 <a
                   href={oneProject.href}
                   target="_blank"
-                  className="text-sm overflow-hidden font-bold hover:text-yellow-400">
+                  className="min-w-0 break-all text-sm font-bold hover:text-yellow-400">
                   {oneProject.href}
                 </a>
               </li>
