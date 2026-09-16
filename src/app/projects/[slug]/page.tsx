@@ -44,24 +44,26 @@ export default async function ProjectDetailPages({ params }: Props) {
   if (!oneProject) notFound();
 
   return (
-    <article className="py-4">
-      <div className="flex relyativy gap-2 items-center">
-        <h1 className="font-black mb-5 text-3xl">{oneProject.name}</h1>
+    <article className="min-w-0 py-4">
+      <div className="flex min-w-0 items-center gap-2">
+        <h1 className="mb-5 min-w-0 break-words text-3xl font-black">
+          {oneProject.name}
+        </h1>
         <LinkCopy />
       </div>
 
-      <div className="flex max-md:flex-col gap-4">
+      <div className="flex min-w-0 flex-col gap-4 lg:flex-row">
         <Image
           src={oneProject.image}
           alt={oneProject.name}
           fill={false}
           width={600}
           height={600}
-          style={{ width: 'auto', height: 'auto' }}
           priority={true}
-          className="rounded-2xl border-solid border-2 basis-3/4"
+          sizes="(max-width: 1023px) calc(100vw - 3rem), 75vw"
+          className="h-auto w-full min-w-0 rounded-2xl border-2 border-solid lg:basis-3/4"
         />
-        <div className="border-solid border-2 rounded-2xl px-3 py-5  basis-1/4">
+        <div className="min-w-0 rounded-2xl border-2 border-solid px-3 py-5 lg:basis-1/4">
           <h2 className="font-bold text-xl mb-3">About</h2>
           <nav>
             <ul>

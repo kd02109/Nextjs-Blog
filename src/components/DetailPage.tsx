@@ -51,7 +51,7 @@ export default function DetailPage({
   const slugMap = findH(post.body.raw);
   return (
     <>
-      <article className="py-8 mt-16">
+      <article className="mt-16 min-w-0 py-8">
         <div className="mb-8 text-center">
           <h1 className="text-5xl max-sm:text-3xl mb-2">{post.title}</h1>
           <nav className="my-3">
@@ -69,11 +69,11 @@ export default function DetailPage({
             {format(parseISO(post.date), 'LLLL d, yyyy')}
           </time>
         </div>
-        <div className="flex justify-between">
-          <section className="prose lg:prose-xl md:prose-lg sm:prose-base prose-slate dark:prose-invert  w-full max-w-3xl">
+        <div className="flex min-w-0 justify-between gap-8">
+          <section className="prose prose-slate min-w-0 w-full max-w-3xl flex-1 sm:prose-base md:prose-lg lg:prose-xl dark:prose-invert">
             {content}
           </section>
-          <div className="sticky top-[135px] max-md:hidden min-w-[240px] max-w-[260px] self-start lg:block">
+          <div className="sticky top-[135px] hidden min-w-[240px] max-w-[260px] shrink-0 self-start lg:block">
             <BlogMenu toc={slugMap} />
           </div>
         </div>

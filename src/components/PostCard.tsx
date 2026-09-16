@@ -30,14 +30,14 @@ export default function PostCard(post: Post) {
   };
 
   return (
-    <div className="mb-4 p-2 dark:bg-slate-50 dark:text-black border-solded border-2 border-indigo-100 rounded-lg">
-      <button onClick={onClick}>
+    <div className="border-solded mb-4 min-w-0 rounded-lg border-2 border-indigo-100 p-2 dark:bg-slate-50 dark:text-black">
+      <button onClick={onClick} className="min-w-0 max-w-full text-left">
         <h2 className="text-xl font-bold m-1 hover:text-yellow-400 dark:hover:text-yellow-400">
           {post.title}
         </h2>
       </button>
-      <div className="flex justify-between items-center">
-        <div>
+      <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+        <div className="shrink-0">
           <time dateTime={post.date} className="mb-2 p-1 text-xs text-gray-600">
             {format(parseISO(post.date), 'LLLL d, yyyy')}
           </time>
@@ -47,7 +47,7 @@ export default function PostCard(post: Post) {
           </span>
         </div>
 
-        <div className="flex gap-2 max-md:flex-wrap">
+        <div className="flex min-w-0 flex-wrap gap-2 lg:justify-end">
           {post.tag?.map(item => (
             <Tag key={item} tag={item} />
           ))}
