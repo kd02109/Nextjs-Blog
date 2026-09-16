@@ -45,10 +45,10 @@ export default function Hamburger({ pathName, isOpened, setIsOpened }: Prop) {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -100 }}
           transition={{ ease: 'linear', duration: 0.3 }}
-          className="hidden max-md:block"
+          className="hidden h-11 w-11 items-center justify-center max-md:flex"
+          aria-label="메뉴 열기"
           onClick={handleOpen}>
           <HambugerIcon />
-          <span className="hidden">HamburgerIcon</span>
         </motion.button>
       )}
       <AnimatePresence>
@@ -92,11 +92,11 @@ export default function Hamburger({ pathName, isOpened, setIsOpened }: Prop) {
                   </ol>
                 </nav>
                 <button
-                  className="self-start py-4"
+                  className="flex h-11 w-11 shrink-0 items-center justify-center self-start"
+                  aria-label="메뉴 닫기"
                   onClick={() => {
                     setIsOpened(false);
                   }}>
-                  <span className="hidden">Cancle Button</span>
                   <XIcon />
                 </button>
               </div>

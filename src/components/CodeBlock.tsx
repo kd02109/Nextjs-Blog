@@ -24,7 +24,7 @@ export default function CodeBlock({ children }: React.ComponentProps<'pre'>) {
         {children}
       </pre>
       <button
-        className="absolute right-2 top-10 flex h-10 w-10 items-center justify-center rounded-lg bg-neutral-700 text-xs text-neutral-400 hover:text-neutral-300"
+        className="absolute right-2 top-10 flex h-11 w-11 items-center justify-center rounded-lg bg-neutral-700 text-xs text-neutral-400 hover:text-neutral-300"
         aria-label="copy-button"
         onClick={handleCopy}>
         <svg

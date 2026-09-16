@@ -8,7 +8,7 @@ import { ChangeEvent, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 
 const LABEL_STYLE = 'my-4 text-2xl font-bold';
-const INPUT_STYLE = 'px-4 py-2 rounded-lg';
+const INPUT_STYLE = 'min-h-[44px] rounded-lg px-4 py-2';
 
 export default function ContactForm() {
   const [loading, setLoading] = useState(false);

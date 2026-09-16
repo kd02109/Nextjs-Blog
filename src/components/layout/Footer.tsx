@@ -9,12 +9,18 @@ export default function Footer() {
   return (
     <footer className="flex flex-col h-20 justify-center items-end">
       <div className="flex gap-4 py-1 justify-end">
-        <Link href="https://github.com/kd02109" target="_blank">
+        <Link
+          href="https://github.com/kd02109"
+          target="_blank"
+          aria-label="GitHub 프로필 열기"
+          className="flex h-11 w-11 items-center justify-center">
           <Github />
         </Link>
         <Link
           href="https://nostalgic-marquis-7af.notion.site/Front-End-f0f3b7fcec3045c482c1cd33dfcf2abc?pvs=4"
-          target="_blank">
+          target="_blank"
+          aria-label="Notion 프로필 열기"
+          className="flex h-11 w-11 items-center justify-center">
           <Notion />
         </Link>
       </div>

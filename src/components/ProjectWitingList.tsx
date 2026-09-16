@@ -23,7 +23,9 @@ export default function ProjectWitingList(prop: Post) {
   return (
     <li className="border-b-2 mb-4 py-2">
       <section className="flex flex-col">
-        <button onClick={onClick} className="hover:text-yellow-400 text-left">
+        <button
+          onClick={onClick}
+          className="min-h-[44px] w-full text-left hover:text-yellow-400">
           <h2 className="text-xl font-bold">{title}</h2>
         </button>
         <div className="flex items-center text-center">

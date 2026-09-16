@@ -88,13 +88,15 @@ export default function DetailProjectPageList({ title, param, date }: Porps) {
               <button
                 key={post.id}
                 onClick={() => onLinkClick(post.url)}
-                className="text-left">
+                className="min-h-[44px] text-left">
                 <li className="font-bold text-md mb-2">
                   {idx + 1}. {post.title}
                 </li>
               </button>
             ))}
-            <button onClick={onClick}>간략히</button>
+            <button className="min-h-[44px]" onClick={onClick}>
+              간략히
+            </button>
           </motion.ul>
         )}
       </AnimatePresence>

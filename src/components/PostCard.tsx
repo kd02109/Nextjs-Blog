@@ -31,7 +31,9 @@ export default function PostCard(post: Post) {
 
   return (
     <div className="border-solded mb-4 min-w-0 rounded-lg border-2 border-indigo-100 p-2 dark:bg-slate-50 dark:text-black">
-      <button onClick={onClick} className="min-w-0 max-w-full text-left">
+      <button
+        onClick={onClick}
+        className="min-h-[44px] min-w-0 max-w-full text-left">
         <h2 className="text-xl font-bold m-1 hover:text-yellow-400 dark:hover:text-yellow-400">
           {post.title}
         </h2>

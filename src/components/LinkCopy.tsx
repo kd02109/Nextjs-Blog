@@ -17,7 +17,10 @@ export default function LinkCopy() {
   };
 
   return (
-    <button onClick={handleCopy}>
+    <button
+      className="flex h-11 w-11 items-center justify-center"
+      aria-label="현재 페이지 URL 복사"
+      onClick={handleCopy}>
       <CopyUrl />
       <Toaster position="top-right" />
     </button>
