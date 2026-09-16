@@ -1,5 +1,4 @@
 import { MarkdownKey } from '@/util/markdownBadge';
-import type { Post } from '@/lib/content';
 
 export type ProjectType = {
   name: string;
@@ -11,8 +10,6 @@ export type ProjectType = {
   date: string;
   stack: MarkdownKey[];
 };
-
-export type carouselType = Post & { index: number };
 
 export type ProjectName =
   'mbtmi' | 'nextjs-blog' | 'sharepetment' | 'solo-project';

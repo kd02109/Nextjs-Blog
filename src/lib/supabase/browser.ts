@@ -29,3 +29,18 @@ export async function getViewCount(slug: string): Promise<number> {
 
   return data?.view_count ?? 0;
 }
+
+export async function getAllViewCounts(): Promise<Record<string, number>> {
+  const { data, error } = await getSupabase()
+    .from('views')
+    .select('slug, view_count');
+
+  if (error) {
+    throw new Error('Unable to load view counts.');
+  }
+
+  return (data ?? []).reduce<Record<string, number>>((counts, row) => {
+    counts[row.slug] = row.view_count;
+    return counts;
+  }, {});
+}

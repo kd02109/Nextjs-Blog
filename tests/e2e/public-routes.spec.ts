@@ -38,6 +38,17 @@ test.beforeEach(async ({ page }) => {
     const url = new URL(route.request().url());
 
     if (url.pathname.startsWith('/rest/v1/views')) {
+      if (url.searchParams.get('select')?.includes('slug')) {
+        return route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify([
+            { slug: 'react-design-pattern', view_count: 99 },
+            { slug: 'nextjs-with-cookie', view_count: 12 },
+          ]),
+        });
+      }
+
       return route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -74,6 +85,9 @@ test('home route renders the public profile with Korean document language', asyn
   expect(response?.status()).toBe(200);
   await expect(page.locator('html')).toHaveAttribute('lang', 'ko');
   await expect(page.getByRole('heading', { name: 'kd02109' })).toBeVisible();
+  await expect(
+    page.locator('section[aria-labelledby="popular-posts-title"] h3').first(),
+  ).toHaveText('React의 디자인 패턴');
   await expectNoBrowserErrors(page, errors);
 });
 

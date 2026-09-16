@@ -1,25 +1,47 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
-import Article from './Article';
+import HomePostList from './home/HomePostList';
 
 describe('post date rendering', () => {
-  it('formats a real carousel article date after the date-fns major upgrade', () => {
+  it('formats a real home article date after the date-fns major upgrade', () => {
     const html = renderToStaticMarkup(
-      <Article
-        body={{ code: '', raw: '' }}
-        brand="blog"
-        date="2024-06-08T00:00:00.000Z"
-        description="A compatibility fixture"
-        id="date-formatting"
-        index={0}
-        sourcePath="blog/date-formatting.mdx"
-        tag={['test']}
-        title="Date formatting"
-        url="blog/date-formatting"
+      <HomePostList
+        posts={[
+          {
+            brand: 'blog',
+            date: '2024-06-08T00:00:00.000Z',
+            description: 'A compatibility fixture',
+            id: 'date-formatting',
+            tag: ['test'],
+            title: 'Date formatting',
+            url: 'blog/date-formatting',
+          },
+        ]}
       />,
     );
 
-    expect(html).toContain('June 8, 2024');
+    expect(html).toContain('2024.06.08');
+  });
+
+  it('does not present unavailable view data as zero views', () => {
+    const html = renderToStaticMarkup(
+      <HomePostList
+        ranked
+        posts={[
+          {
+            brand: 'blog',
+            date: '2024-06-08T00:00:00.000Z',
+            description: 'A compatibility fixture',
+            id: 'date-formatting',
+            tag: ['test'],
+            title: 'Date formatting',
+            url: 'blog/date-formatting',
+          },
+        ]}
+      />,
+    );
+
+    expect(html).not.toContain('0 views');
   });
 });
