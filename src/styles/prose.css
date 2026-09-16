@@ -1,52 +1,52 @@
-  
 .prose code:not(:where(pre *)) {
-    @apply rounded-lg px-2 py-1 content-none;
-    @apply bg-neutral-200 dark:bg-neutral-600;
+  @apply rounded-lg px-2 py-1 content-none;
+  @apply bg-neutral-200 dark:bg-neutral-600;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  word-break: break-word;
 }
 
-.prose strong{
-    @apply dark:text-yellow-200
+.prose strong {
+  @apply dark:text-yellow-200;
 }
 
 .props blockquote {
-    @apply dark:text-yellow-200
-} 
+  @apply dark:text-yellow-200;
+}
 
-.prose th{
-    @apply bg-slate-200 px-1 py-2 dark:bg-slate-500 text-2xl text-center
+.prose th {
+  @apply bg-slate-200 px-1 py-2 dark:bg-slate-500 text-2xl text-center;
 }
 
 .prose td {
-    @apply p-1 text-center
+  @apply p-1 text-center;
 }
 
 .prose .source {
-    @apply text-2xl text-yellow-400
+  @apply text-2xl text-yellow-400;
 }
 .prose .anchor {
-    @apply my-20
+  @apply my-20;
 }
-.prose h3  {
-    @apply text-2xl
+.prose h3 {
+  @apply text-2xl;
 }
 
 .prose code {
-    font-family:  Consolas, Monaco, 'Andale Mono', monospace;
+  font-family: Consolas, Monaco, 'Andale Mono', monospace;
 }
 
 .prose pre::-webkit-scrollbar {
-display: none;
+  display: none;
 }
 .prose pre {
--ms-overflow-style: none; /* IE and Edge */
-scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 .prose span[data-highlighted-line] {
-    @apply w-full border-l-red-600 border-l-2 inline-block bg-gray-700
-
+  @apply w-full border-l-red-600 border-l-2 inline-block bg-gray-700;
 }
-.prose span[data-line]{
-    @apply px-2
+.prose span[data-line] {
+  @apply px-2;
 }
-
