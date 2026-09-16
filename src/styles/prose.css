@@ -6,6 +6,10 @@
   word-break: break-word;
 }
 
+.prose :where(p, li, a) {
+  overflow-wrap: anywhere;
+}
+
 .prose strong {
   @apply dark:text-yellow-200;
 }

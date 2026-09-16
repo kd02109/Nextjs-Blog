@@ -10,7 +10,7 @@ import type { Post } from '@/lib/content';
 import { evaluateMdx } from '@/lib/mdx-evaluator';
 import { format, parseISO } from 'date-fns';
 import Image from 'next/image';
-import { createElement } from 'react';
+import { createElement, type ComponentProps } from 'react';
 
 type Prop = {
   post: Post;
@@ -36,6 +36,13 @@ const mdxComponents = {
     );
   },
   pre: CodeBlock,
+  table: ({ children, ...props }: ComponentProps<'table'>) => (
+    <div className="my-8 max-w-full overflow-x-auto">
+      <table {...props} className="my-0 w-full min-w-[640px]">
+        {children}
+      </table>
+    </div>
+  ),
 };
 
 export default function DetailPage({
