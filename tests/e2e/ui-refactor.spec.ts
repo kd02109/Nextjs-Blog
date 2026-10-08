@@ -774,3 +774,120 @@ for (const path of ['/about', '/contact'] as const) {
     ).toBeLessThanOrEqual(320);
   });
 }
+
+for (const { path, discussionTerm } of [
+  {
+    path: '/blogs/blog/react/react-hook-form',
+    discussionTerm: 'blogs/blog/react/react-hook-form',
+  },
+  {
+    path: '/projects/nextjs-blog/nextjs-blog-veiws',
+    discussionTerm: 'projects/nextjs-blog/nextjs-blog-veiws',
+  },
+] as const) {
+  test(`${path} keeps a Giscus discussion mapped to its pathname`, async ({
+    page,
+  }) => {
+    await page.route('https://giscus.app/**', route =>
+      route.fulfill({
+        status: 200,
+        contentType: 'text/html',
+        body: '<!doctype html><html lang="ko"><body></body></html>',
+      }),
+    );
+    const response = await page.goto(path);
+
+    expect(response?.status()).toBe(200);
+    const comments = page.locator('section#comments');
+    await expect(comments).toHaveAttribute('aria-labelledby', 'comments-title');
+    await expect(comments.locator('h2#comments-title')).toContainText(
+      '읽은 뒤에 남기는 메모.',
+    );
+    await expect(comments).toContainText(
+      '질문이나 다른 경험이 있다면 이어서 남겨주세요.',
+    );
+
+    const embed = comments.locator('.reading-comments-embed');
+    await expect(embed).toBeVisible();
+    const widget = embed.locator('giscus-widget');
+    await expect(widget).toHaveAttribute('repo', 'kd02109/Nextjs-Blog');
+    await expect(widget).toHaveAttribute('repoid', 'R_kgDOKD_Xgg');
+    await expect(widget).toHaveAttribute('category', 'General');
+    await expect(widget).toHaveAttribute('categoryid', 'DIC_kwDOKD_Xgs4CY7-G');
+    await expect(widget).toHaveAttribute('mapping', 'pathname');
+    await expect(widget).toHaveAttribute('lang', 'ko');
+
+    const frame = widget.locator('iframe[title="Comments"]');
+    await expect(frame).toHaveAttribute('src', /giscus\.app\/ko\/widget/);
+    const frameSource = await frame.getAttribute('src');
+    expect(new URL(frameSource!).searchParams.get('term')).toBe(discussionTerm);
+  });
+
+  test(`${path} reaches comments by keyboard and fits 320px`, async ({
+    page,
+  }) => {
+    await page.route('https://giscus.app/**', route =>
+      route.fulfill({
+        status: 200,
+        contentType: 'text/html',
+        body: '<!doctype html><html lang="ko"><body></body></html>',
+      }),
+    );
+    await page.setViewportSize({ width: 320, height: 800 });
+    await page.goto(path);
+
+    const comments = page.locator('section#comments');
+    const link = page
+      .getByRole('navigation', { name: '글 목차' })
+      .getByRole('link', { name: /댓글로 이어가기/ });
+    await expect(link).toHaveAttribute('href', '#comments');
+    await link.focus();
+    await expect(link).toBeFocused();
+    await link.press('Enter');
+    await expect(page).toHaveURL(/#comments$/);
+    await expect(comments).toBeInViewport();
+    await expect(comments.locator('.reading-comments-embed')).toBeVisible();
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+    ).toBeLessThanOrEqual(320);
+    expect(
+      await page.evaluate(() => document.body.scrollWidth),
+    ).toBeLessThanOrEqual(320);
+  });
+}
+
+test('Giscus follows the resolved light and dark theme', async ({ page }) => {
+  await page.route('https://giscus.app/**', route =>
+    route.fulfill({
+      status: 200,
+      contentType: 'text/html',
+      body: '<!doctype html><html lang="ko"><body></body></html>',
+    }),
+  );
+  await page.emulateMedia({ colorScheme: 'light' });
+  await page.goto('/blogs/blog/react/react-hook-form');
+
+  const widget = page.locator('section#comments giscus-widget');
+  await expect(page.locator('html')).not.toHaveClass(/dark/);
+  await expect(widget).toHaveAttribute('theme', 'noborder_light');
+  await widget.evaluate(element => {
+    (window as Window & { initialGiscusWidget?: Element }).initialGiscusWidget =
+      element;
+  });
+
+  await page.getByRole('button', { name: '다크 모드로 전환' }).click();
+  await expect(page.locator('html')).toHaveClass(/dark/);
+  await expect(widget).toHaveAttribute('theme', 'noborder_dark');
+  expect(
+    await widget.evaluate(
+      element =>
+        element ===
+        (window as Window & { initialGiscusWidget?: Element })
+          .initialGiscusWidget,
+    ),
+  ).toBe(true);
+
+  await page.getByRole('button', { name: '라이트 모드로 전환' }).click();
+  await expect(page.locator('html')).not.toHaveClass(/dark/);
+  await expect(widget).toHaveAttribute('theme', 'noborder_light');
+});

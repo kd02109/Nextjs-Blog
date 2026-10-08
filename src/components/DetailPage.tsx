@@ -77,8 +77,23 @@ export default function DetailPage({
         posts={related}
         backHref={projectFooter ? `/projects/${projectFooter}` : '/blogs'}
       />
-      <section className="reading-comments" id="comments" aria-label="댓글">
-        <BlogComment />
+      <section
+        className="reading-comments"
+        id="comments"
+        aria-labelledby="comments-title">
+        <div className="reading-comments-intro">
+          <p className="reading-comments-kicker">CONVERSATION / NOTES</p>
+          <h2 id="comments-title">
+            읽은 뒤에 <span>남기는 메모.</span>
+          </h2>
+          <p>
+            질문이나 다른 경험이 있다면 이어서 남겨주세요. 좋은 대화는 다음 글의
+            출발점이 됩니다.
+          </p>
+        </div>
+        <div className="reading-comments-embed">
+          <BlogComment />
+        </div>
       </section>
     </div>
   );
