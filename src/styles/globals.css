@@ -1,26 +1,350 @@
 @import './prose.css';
+@import './design-tokens.css';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--site-background);
+  color: var(--site-ink);
+  font-family: var(--site-font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--site-orange);
+  outline-offset: 4px;
+}
+
+::selection {
+  background: var(--site-blue-soft);
+  color: var(--site-heading);
+}
+
+.site-page-shell {
+  width: min(calc(100% - 72px), 1280px);
+  margin-inline: auto;
+}
+
+.site-skip-link {
+  position: absolute;
+  z-index: 50;
+  top: -80px;
+  left: 16px;
+  padding: 10px 16px;
+  background: var(--site-ink);
+  color: var(--site-surface);
+}
+
+.site-skip-link:focus {
+  top: 16px;
+}
+
+.site-header {
+  position: relative;
+  z-index: 20;
+  background: var(--site-background);
+}
+
+.site-masthead {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 94px;
+  gap: 32px;
+  border-bottom: 1px solid var(--site-line);
+}
+
+.site-brand {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 13px;
+  line-height: 1;
+}
+
+.site-brand-mark {
+  color: var(--site-heading);
+  font-family: var(--site-font-mono);
+  font-size: 31px;
+  font-weight: 800;
+  letter-spacing: -0.12em;
+}
+
+.site-brand-mark span,
+.site-footer-brand span {
+  color: var(--site-orange);
+}
+
+.site-brand-caption {
+  padding-left: 13px;
+  border-left: 1px solid var(--site-line);
+  color: var(--site-muted);
+  font-family: var(--site-font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.45;
+}
+
+.site-desktop-nav {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+  margin-left: auto;
+}
+
+.site-nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--site-muted);
+  font-size: 14px;
+  font-weight: 700;
+  transition: color 180ms ease;
+}
+
+.site-nav-link:hover,
+.site-nav-link[aria-current='page'] {
+  color: var(--site-blue);
+}
+
+.site-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.site-theme-toggle,
+.site-menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 43px;
+  height: 43px;
+  border: 1px solid var(--site-line);
+  border-radius: 3px;
+  background: var(--site-surface);
+  color: var(--site-ink);
+  cursor: pointer;
+}
+
+.site-theme-toggle:hover,
+.site-menu-toggle:hover {
+  border-color: var(--site-blue);
+}
+
+.site-mobile-navigation {
+  display: none;
+}
+
+.site-main-inner {
+  min-height: min(70vh, 620px);
+}
+
+.site-footer-inner {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 22px;
+  padding: 38px 0 42px;
+  border-top: 1px solid var(--site-line);
+}
+
+.site-footer-brand {
+  margin: 0 0 8px;
+  color: var(--site-heading);
+  font-family: var(--site-font-mono);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.1em;
+}
+
+.site-footer-note {
+  margin: 0;
+  color: var(--site-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.site-footer-links {
+  display: flex;
+  gap: 22px;
+  color: var(--site-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.site-footer-links a:hover {
+  color: var(--site-blue);
+}
+
+.site-intro {
+  max-width: 780px;
+  padding: 100px 0 120px;
+}
+
+.site-intro-eyebrow {
+  color: var(--site-blue);
+  font-family: var(--site-font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.site-intro h1 {
+  margin: 25px 0;
+  color: var(--site-heading);
+  font-family: var(--site-font-display);
+  font-size: clamp(48px, 7vw, 84px);
+  font-weight: 800;
+  letter-spacing: -0.065em;
+}
+
+.site-intro > p:not(.site-intro-eyebrow) {
+  max-width: 620px;
+  color: var(--site-muted);
+  font-size: 18px;
+  line-height: 1.85;
+}
+
+.site-intro-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  margin-top: 26px;
+  padding: 0 20px;
+  border: 1px solid var(--site-blue);
+  border-radius: 3px;
+  background: var(--site-blue);
+  color: var(--site-background);
+  font-weight: 800;
+  gap: 28px;
+}
+
+@media (max-width: 1100px) {
+  .site-page-shell {
+    width: min(calc(100% - 48px), 1280px);
+  }
+}
+
+@media (max-width: 760px) {
+  .site-page-shell {
+    width: min(calc(100% - 38px), 600px);
+  }
+
+  .site-masthead {
+    min-height: 75px;
+  }
+
+  .site-brand-caption,
+  .site-desktop-nav {
+    display: none;
+  }
+
+  .site-header-actions {
+    margin-left: auto;
+  }
+
+  .site-mobile-navigation {
+    display: block;
+  }
+
+  .site-menu-toggle {
+    font-size: 22px;
+  }
+
+  .site-mobile-nav {
+    position: absolute;
+    top: calc(100% - 1px);
+    right: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px 18px;
+    border: 1px solid var(--site-line);
+    background: var(--site-surface);
+    box-shadow: var(--site-shadow);
+  }
+
+  .site-mobile-nav[hidden] {
+    display: none;
+  }
+
+  .site-mobile-nav .site-nav-link {
+    padding: 12px 2px;
+    border-bottom: 1px solid var(--site-line);
+  }
+
+  .site-mobile-nav .site-nav-link:last-child {
+    border-bottom: 0;
+  }
+
+  .site-intro {
+    padding: 72px 0 90px;
+  }
+}
+
+@media (max-width: 480px) {
+  .site-footer-inner {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .site-footer-links {
+    flex-wrap: wrap;
+  }
+
+  .site-intro > p:not(.site-intro-eyebrow) {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* width */
 ::-webkit-scrollbar {
-    width: 5px;
+  width: 5px;
 }
- 
+
 /* Track */
 ::-webkit-scrollbar-track {
-    background: #f1f1f1;
+  background: #f1f1f1;
 }
- 
+
 /* Handle */
 ::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 2px;
+  background: #888;
+  border-radius: 2px;
 }
- 
+
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-    background: #555;
+  background: #555;
 }

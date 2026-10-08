@@ -1,11 +1,11 @@
 import type { MetadataRoute } from 'next';
 
 import { siteConfig } from '@/config';
+import { publicStaticRoutes } from '@/config/routes';
 import { getAllPosts } from '@/lib/content';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticRoutes = ['', ...siteConfig.menus.map(menu => menu.path)];
-  const staticEntries: MetadataRoute.Sitemap = staticRoutes.map(path => ({
+  const staticEntries: MetadataRoute.Sitemap = publicStaticRoutes.map(path => ({
     url: new URL(path.replace(/^\//, ''), siteConfig.url).href,
     changeFrequency: 'daily',
     priority: 0.7,

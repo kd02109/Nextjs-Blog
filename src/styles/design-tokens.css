@@ -1,0 +1,34 @@
+:root {
+  color-scheme: light;
+  --site-background: #eaf0f3;
+  --site-surface: #f8fbfc;
+  --site-white: #ffffff;
+  --site-ink: #17354e;
+  --site-heading: #102c43;
+  --site-muted: #5e7484;
+  --site-blue: #3a5ed8;
+  --site-blue-soft: #dfe8fb;
+  --site-orange: #e86843;
+  --site-line: #c7d5de;
+  --site-shadow: 0 24px 55px rgba(31, 62, 83, 0.12);
+  --site-font-display:
+    'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
+  --site-font-body:
+    'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
+  --site-font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+}
+
+html.dark {
+  color-scheme: dark;
+  --site-background: #102332;
+  --site-surface: #17354e;
+  --site-white: #1b3d55;
+  --site-ink: #eaf0f3;
+  --site-heading: #f8fbfc;
+  --site-muted: #aec1ce;
+  --site-blue: #a6baff;
+  --site-blue-soft: #2b4361;
+  --site-orange: #f39272;
+  --site-line: #36546a;
+  --site-shadow: 0 24px 55px rgba(0, 0, 0, 0.22);
+}

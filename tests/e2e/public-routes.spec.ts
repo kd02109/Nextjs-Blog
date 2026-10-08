@@ -99,6 +99,83 @@ const listingRoutes = [
   { path: '/contact', heading: 'Send Me An Email' },
 ] as const;
 
+test('the site header keeps the home logo and three primary destinations', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const header = page.locator('header').first();
+
+  await expect(header.getByRole('link', { name: /SON.*홈/ })).toHaveAttribute(
+    'href',
+    '/',
+  );
+  const links = header
+    .getByRole('navigation', { name: '주요 메뉴' })
+    .getByRole('link');
+  await expect(links).toHaveCount(3);
+  await expect(links.nth(0)).toHaveText('글');
+  await expect(links.nth(0)).toHaveAttribute('href', '/blogs');
+  await expect(links.nth(1)).toHaveText('프로젝트');
+  await expect(links.nth(1)).toHaveAttribute('href', '/projects');
+  await expect(links.nth(2)).toHaveText('소개');
+  await expect(links.nth(2)).toHaveAttribute('href', '/about');
+});
+
+test('the 320px menu opens, closes with Escape, and restores button focus', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 720 });
+  await page.goto('/');
+
+  const toggle = page.locator('button[aria-controls="mobile-navigation"]');
+  await expect(toggle).toHaveAccessibleName('메뉴 열기');
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  await toggle.focus();
+  await page.keyboard.press('Enter');
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  await expect(toggle).toHaveAccessibleName('메뉴 닫기');
+  const mobileNav = page.getByRole('navigation', { name: '모바일 메뉴' });
+  await expect(mobileNav).toBeVisible();
+  await expect(mobileNav.getByRole('link', { name: '글' })).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  await expect(toggle).toBeFocused();
+  await expect(page.locator('body')).toHaveJSProperty('scrollWidth', 320);
+
+  await toggle.click();
+  await page
+    .getByRole('navigation', { name: '모바일 메뉴' })
+    .getByRole('link', { name: '소개' })
+    .click();
+  await expect(page).toHaveURL(/\/about$/);
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+});
+
+test('the shared shell uses light and dark design tokens', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'light' });
+  await page.goto('/');
+
+  await expect(page.locator('body')).toHaveCSS(
+    'background-color',
+    'rgb(234, 240, 243)',
+  );
+  await page.getByRole('button', { name: '다크 모드로 전환' }).click();
+  await expect(page.locator('html')).toHaveClass(/dark/);
+  await expect(page.locator('body')).toHaveCSS(
+    'background-color',
+    'rgb(16, 35, 50)',
+  );
+});
+
+test('/about remains a public page with a contact route', async ({ page }) => {
+  const response = await page.goto('/about');
+  expect(response?.status()).toBe(200);
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('소개');
+  await expect(
+    page.getByRole('link', { name: /연락/ }).first(),
+  ).toHaveAttribute('href', '/contact');
+});
+
 for (const route of listingRoutes) {
   test(`${route.path} returns 200 and renders its heading`, async ({
     page,

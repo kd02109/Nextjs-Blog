@@ -1,8 +1,8 @@
 import '@/styles/globals.css';
 import type { Metadata } from 'next';
-import { nanum } from '@/font/font';
 import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
+import PageShell from '@/components/layout/PageShell';
 import NextThemeProvider from '@/components/ThemeProvider';
 import GoogleAnalytics from '@/components/layout/GoogleAnalytics';
 import { sharedOpenGraphMetadata, siteConfig } from '@/config';
@@ -113,13 +113,17 @@ export default function RootLayout({
           href="/favicon-16x16.png"
         />
       </head>
-      <body
-        className={`mx-auto max-w-3xl lg:max-w-6xl lg:px-8 ${nanum.className}`}>
+      <body>
         <GoogleAnalytics />
 
         <NextThemeProvider>
+          <a className="site-skip-link" href="#main">
+            본문으로 건너뛰기
+          </a>
           <Header />
-          <main className="px-6">{children}</main>
+          <main id="main">
+            <PageShell className="site-main-inner">{children}</PageShell>
+          </main>
           <Footer />
         </NextThemeProvider>
       </body>
