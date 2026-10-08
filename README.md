@@ -4,10 +4,6 @@
 - 해당 블로그는 serverless 블로그로서 개발 관련 글을 포스팅 하기 위해서 만들어 졌습니다.
 - 블로그에 관한 자세한 글들은 [블로그](https://sonblog.vercel.app/projects/nextjs-blog)에서 확인할 수 있습니다.
 
-## 개발 문서
-
-- [웹 기반 Markdown 어드민 CMS 구현 가이드](docs/admin-cms-implementation-guide.md)
-
 ## 로컬 환경
 
 Node.js 24와 npm 11.12.1, lockfile 기반 설치를 사용합니다. `packageManager`
