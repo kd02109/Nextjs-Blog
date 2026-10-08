@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { getAllPosts } from '@/lib/content';
 import { siteConfig } from '@/config';
+import { projectObj } from '@/util/project';
 
 type SitemapEntry = { url: string };
 
@@ -72,6 +73,39 @@ describe('App Router SEO routes', () => {
     expect(
       sitemap!.some(({ url }) => url.includes('nextjs-blog-kd02109')),
     ).toBe(false);
+  });
+
+  it('publishes each project overview page exactly once', async () => {
+    const sitemap = await loadSeoRoute<SitemapEntry[]>('./sitemap.ts');
+    expect(sitemap).toBeDefined();
+
+    for (const { link } of projectObj) {
+      const projectUrl = `https://sonblog.vercel.app/projects/${link}`;
+      expect(sitemap!.filter(({ url }) => url === projectUrl)).toHaveLength(1);
+    }
+  });
+
+  it('does not present publication dates as post modification dates', async () => {
+    const sitemap = await loadSeoRoute<SitemapEntry[]>('./sitemap.ts');
+    expect(sitemap).toBeDefined();
+
+    for (const post of getAllPosts()) {
+      const section = post.brand.trim() === 'blog' ? 'blogs' : 'projects';
+      const postUrl = new URL(`${section}/${post.url}`, siteConfig.url).href;
+      const entry = sitemap!.find(({ url }) => url === postUrl);
+      expect(entry).toBeDefined();
+      expect(entry).not.toHaveProperty('lastModified');
+    }
+  });
+
+  it('omits crawl frequency and priority hints that search engines ignore', async () => {
+    const sitemap = await loadSeoRoute<SitemapEntry[]>('./sitemap.ts');
+    expect(sitemap).toBeDefined();
+
+    for (const entry of sitemap!) {
+      expect(entry).not.toHaveProperty('changeFrequency');
+      expect(entry).not.toHaveProperty('priority');
+    }
   });
 
   it('points robots at the App Router sitemap on the canonical host', async () => {
