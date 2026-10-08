@@ -15,7 +15,7 @@ vi.mock('@/server/supabase', () => ({ incrementView }));
 vi.mock('@/server/view-visitor', () => ({ createViewVisitorHash }));
 vi.mock('next/headers', () => ({ headers: () => new Headers() }));
 
-import BlogPostPage from '@/app/blogs/[...slug]/page';
+import BlogPostPage from '@/app/blog/[category]/[slug]/page';
 import ProjectPostPage from '@/app/projects/[slug]/[detail]/page';
 
 describe('detail-page view recording', () => {
@@ -31,7 +31,8 @@ describe('detail-page view recording', () => {
   it('sends every valid article visit to the database-owned daily deduplication boundary', async () => {
     await BlogPostPage({
       params: Promise.resolve({
-        slug: ['blog', 'react', 'react-design-pattern'],
+        category: 'react',
+        slug: 'react-design-pattern',
       }),
     });
 
@@ -56,7 +57,10 @@ describe('detail-page view recording', () => {
     incrementView.mockRejectedValueOnce(new Error('metrics unavailable'));
 
     const page = await BlogPostPage({
-      params: Promise.resolve({ slug: ['blog', 'react', 'react-hook-form'] }),
+      params: Promise.resolve({
+        category: 'react',
+        slug: 'react-hook-form',
+      }),
     });
 
     expect(renderToStaticMarkup(page)).toContain('React Hook Form');

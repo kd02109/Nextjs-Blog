@@ -23,7 +23,7 @@ export default function ArticleHeader({ post, tags = post.tag }: Props) {
             <Link href={`/projects/${project.link}`}>{project.name}</Link>
           </>
         ) : (
-          <Link href="/blogs">글</Link>
+          <Link href="/blog">글</Link>
         )}
         <span aria-hidden="true">/</span>
         <span aria-current="page">{post.title}</span>

@@ -1,13 +1,10 @@
 import { getAllPosts } from '@/lib/content';
+import { getPublicPostPath } from '@/config/post-routes';
 import { projectObj } from '@/util/project';
 import { NextResponse, type NextRequest } from 'next/server';
 
 const contentPaths = new Set([
-  ...getAllPosts().map(post =>
-    post.brand.trim() === 'blog'
-      ? `/blogs/${post.url}`
-      : `/projects/${post.url}`,
-  ),
+  ...getAllPosts().map(getPublicPostPath),
   ...projectObj.map(project => `/projects/${project.link}`),
 ]);
 
@@ -20,5 +17,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/blogs/:path+', '/projects/:path+'],
+  matcher: ['/blog/:path+', '/projects/:path+'],
 };
