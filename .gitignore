@@ -50,5 +50,11 @@ next-env.d.ts
 .contentlayer
 .velite
 
+# local AI work documents and design drafts
+AGENTS.md
+CLAUDE.md
+/docs/
+/design-prototypes
+
 #husky
 .husky
