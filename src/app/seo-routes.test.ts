@@ -37,7 +37,7 @@ describe('App Router SEO routes', () => {
     const urls = new Set(sitemap!.map(entry => entry.url));
     for (const path of [
       '/',
-      '/blogs',
+      '/blog',
       '/projects',
       '/tags',
       '/about',
@@ -54,17 +54,22 @@ describe('App Router SEO routes', () => {
     expect(sitemap).toBeDefined();
 
     const sitemapUrls = new Set(sitemap!.map(entry => entry.url));
-    const expectedPostUrls = getAllPosts().map(
-      post =>
-        new URL(
-          `${post.brand.trim() === 'blog' ? 'blogs' : 'projects'}/${post.url}`,
-          siteConfig.url,
-        ).href,
-    );
+    const expectedPostUrls = getAllPosts().map(post => {
+      const path =
+        post.brand.trim() === 'blog'
+          ? `blog/${post.url.replace(/^blog\//, '')}`
+          : `projects/${post.url}`;
+      return new URL(path, siteConfig.url).href;
+    });
 
     expect(expectedPostUrls).toHaveLength(73);
+    expect(sitemap).toHaveLength(84);
+    expect(sitemapUrls.size).toBe(84);
     expect(expectedPostUrls.every(url => sitemapUrls.has(url))).toBe(true);
     expect(sitemapUrls.size).toBe(sitemap!.length);
+    expect(
+      [...sitemapUrls].some(url => new URL(url).pathname.startsWith('/blogs')),
+    ).toBe(false);
     expect(
       sitemap!.every(
         ({ url }) => new URL(url).origin === 'https://sonblog.vercel.app',
@@ -90,8 +95,11 @@ describe('App Router SEO routes', () => {
     expect(sitemap).toBeDefined();
 
     for (const post of getAllPosts()) {
-      const section = post.brand.trim() === 'blog' ? 'blogs' : 'projects';
-      const postUrl = new URL(`${section}/${post.url}`, siteConfig.url).href;
+      const path =
+        post.brand.trim() === 'blog'
+          ? `blog/${post.url.replace(/^blog\//, '')}`
+          : `projects/${post.url}`;
+      const postUrl = new URL(path, siteConfig.url).href;
       const entry = sitemap!.find(({ url }) => url === postUrl);
       expect(entry).toBeDefined();
       expect(entry).not.toHaveProperty('lastModified');

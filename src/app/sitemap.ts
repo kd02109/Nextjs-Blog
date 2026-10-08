@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next';
 
 import { siteConfig } from '@/config';
 import { publicStaticRoutes } from '@/config/routes';
+import { getPublicPostPath } from '@/config/post-routes';
 import { getAllPosts } from '@/lib/content';
 import { projectObj } from '@/util/project';
 
@@ -13,10 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: new URL(`projects/${project.link}`, siteConfig.url).href,
   }));
   const postEntries: MetadataRoute.Sitemap = getAllPosts().map(post => ({
-    url: new URL(
-      `${post.brand.trim() === 'blog' ? 'blogs' : 'projects'}/${post.url}`,
-      siteConfig.url,
-    ).href,
+    url: new URL(getPublicPostPath(post), siteConfig.url).href,
   }));
 
   return [...staticEntries, ...projectEntries, ...postEntries];

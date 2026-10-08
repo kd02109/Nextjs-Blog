@@ -61,7 +61,7 @@ export default function ProjectCollection({ projects }: Props) {
         <span className="mono" aria-live="polite">
           {filtered.length} PROJECTS
         </span>
-        <Link href="/blogs">개발 글도 살펴보기 ↗</Link>
+        <Link href="/blog">개발 글도 살펴보기 ↗</Link>
       </div>
     </section>
   );
