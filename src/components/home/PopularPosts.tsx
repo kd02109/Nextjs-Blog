@@ -9,11 +9,15 @@ export default function PopularPosts({ posts }: { posts: HomePost[] }) {
   const [viewCounts, setViewCounts] = useState<Record<string, number> | null>(
     null,
   );
+  const [loadFailed, setLoadFailed] = useState(false);
 
   useEffect(() => {
     getAllViewCounts()
       .then(setViewCounts)
-      .catch(() => setViewCounts(null));
+      .catch(() => {
+        setViewCounts(null);
+        setLoadFailed(true);
+      });
   }, []);
 
   const popularPosts = useMemo(
@@ -22,10 +26,18 @@ export default function PopularPosts({ posts }: { posts: HomePost[] }) {
   );
 
   return (
-    <HomePostList
-      posts={popularPosts}
-      viewCounts={viewCounts ?? undefined}
-      ranked
-    />
+    <>
+      {loadFailed && (
+        <p className="home-popular-status" role="status">
+          조회수 정보를 불러오지 못해 최신 글 순서로 보여드립니다.
+        </p>
+      )}
+      <HomePostList
+        posts={popularPosts}
+        ariaLabel="인기 글"
+        viewCounts={viewCounts ?? undefined}
+        ranked
+      />
+    </>
   );
 }

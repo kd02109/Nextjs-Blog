@@ -1,5 +1,6 @@
 @import './prose.css';
 @import './design-tokens.css';
+@import './content-ui.css';
 
 @tailwind base;
 @tailwind components;

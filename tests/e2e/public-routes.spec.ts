@@ -33,12 +33,25 @@ async function blockBrowserDynamicCode(page: Page) {
   });
 }
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page }, testInfo) => {
   await page.route('**/*', route => {
     const url = new URL(route.request().url());
 
     if (url.pathname.startsWith('/rest/v1/views')) {
       if (url.searchParams.get('select')?.includes('slug')) {
+        if (testInfo.title.includes('view counts cannot load')) {
+          return route.fulfill({
+            status: 400,
+            contentType: 'application/json',
+            body: JSON.stringify({
+              code: 'PGRST000',
+              message: 'View counts unavailable',
+              details: null,
+              hint: null,
+            }),
+          });
+        }
+
         return route.fulfill({
           status: 200,
           contentType: 'application/json',
@@ -75,7 +88,7 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-test('home route renders the public profile with Korean document language', async ({
+test('home route renders the field notes design with real writing', async ({
   page,
 }) => {
   await blockBrowserDynamicCode(page);
@@ -84,11 +97,57 @@ test('home route renders the public profile with Korean document language', asyn
 
   expect(response?.status()).toBe(200);
   await expect(page.locator('html')).toHaveAttribute('lang', 'ko');
-  await expect(page.getByRole('heading', { name: 'kd02109' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1 })).toContainText(
+    '만들면서 배우고',
+  );
+  await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
+  await expect(
+    page.getByRole('article', { name: '대표 글 React Hook Form' }),
+  ).toBeVisible();
   await expect(
     page.locator('section[aria-labelledby="popular-posts-title"] h3').first(),
   ).toHaveText('React의 디자인 패턴');
   await expectNoBrowserErrors(page, errors);
+});
+
+test('home topic buttons filter the four recent articles at 320px', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 720 });
+  await page.goto('/');
+
+  const filters = page.getByRole('group', { name: '글 주제 필터' });
+  const recentItems = page
+    .getByRole('list', { name: '최근 글' })
+    .getByRole('listitem');
+  await expect(recentItems).toHaveCount(4);
+  await filters.getByRole('button', { name: 'React' }).focus();
+  await page.keyboard.press('Enter');
+  await expect(filters.getByRole('button', { name: 'React' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await expect(recentItems).toHaveCount(3);
+  await filters.getByRole('button', { name: 'Next.js' }).click();
+  await expect(recentItems).toHaveCount(1);
+  await expect(page.locator('body')).toHaveJSProperty('scrollWidth', 320);
+});
+
+test('home keeps popular links usable when view counts cannot load', async ({
+  page,
+}) => {
+  await page.goto('/');
+
+  await expect(
+    page.getByText('조회수 정보를 불러오지 못해 최신 글 순서로 보여드립니다.'),
+  ).toBeVisible();
+  const popular = page.getByRole('list', { name: '인기 글' });
+  await expect(popular.getByRole('listitem').first()).toContainText(
+    'React Hook Form',
+  );
+  await expect(popular).not.toContainText('0 views');
+  await popular.getByRole('link', { name: 'React Hook Form' }).click();
+  await expect(page).toHaveURL(/\/blogs\/blog\/react\/react-hook-form$/);
 });
 
 const listingRoutes = [
