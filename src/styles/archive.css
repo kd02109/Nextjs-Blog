@@ -223,7 +223,7 @@
 
 .archive-search input::placeholder {
   color: var(--site-muted);
-  opacity: 0.85;
+  opacity: 1;
 }
 
 .archive-meta {
@@ -408,7 +408,7 @@
 }
 
 .archive-topic-index {
-  color: var(--site-orange);
+  color: var(--site-orange-text);
   font-family: var(--site-font-mono);
   font-size: 11px;
   font-weight: 700;

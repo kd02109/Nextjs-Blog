@@ -111,7 +111,7 @@
 }
 
 .ui-article-rank {
-  color: var(--site-orange);
+  color: var(--site-orange-text);
   font-size: 13px;
   font-weight: 800;
 }

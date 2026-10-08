@@ -376,7 +376,7 @@
 .contact-field input::placeholder,
 .contact-field textarea::placeholder {
   color: var(--site-muted);
-  opacity: 0.8;
+  opacity: 1;
 }
 
 .contact-field-error,

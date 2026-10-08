@@ -891,3 +891,167 @@ test('Giscus follows the resolved light and dark theme', async ({ page }) => {
   await expect(page.locator('html')).not.toHaveClass(/dark/);
   await expect(widget).toHaveAttribute('theme', 'noborder_light');
 });
+
+test('home and a wide article preserve landmarks and width in light and dark layouts', async ({
+  page,
+}) => {
+  await page.route('https://giscus.app/**', route =>
+    route.fulfill({
+      status: 200,
+      contentType: 'text/html',
+      body: '<!doctype html><html lang="ko"><body></body></html>',
+    }),
+  );
+
+  for (const path of ['/', '/blogs/blog/nextjs/csr-ssg-isr-ssr'] as const) {
+    const response = await page.goto(path);
+    expect(response?.status()).toBe(200);
+
+    for (const width of [320, 390, 768, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      for (const colorScheme of ['light', 'dark'] as const) {
+        await page.emulateMedia({ colorScheme });
+
+        await expect(page.getByRole('banner')).toHaveCount(1);
+        await expect(page.getByRole('main')).toHaveCount(1);
+        await expect(page.getByRole('contentinfo')).toHaveCount(1);
+        await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
+        await expect(page.locator('html')).toHaveClass(
+          colorScheme === 'dark' ? /dark/ : /^(?!.*dark)/,
+        );
+        await expect(page.locator('body')).toHaveCSS(
+          'background-color',
+          colorScheme === 'dark' ? 'rgb(16, 35, 50)' : 'rgb(234, 240, 243)',
+        );
+        expect(
+          await page.evaluate(() => document.documentElement.scrollWidth),
+          `${path} at ${width}px in ${colorScheme}`,
+        ).toBeLessThanOrEqual(width);
+        expect(
+          await page.evaluate(() => document.body.scrollWidth),
+          `${path} body at ${width}px in ${colorScheme}`,
+        ).toBeLessThanOrEqual(width);
+      }
+    }
+  }
+});
+
+test('a reader can move from home through writing search to the Giscus anchor', async ({
+  page,
+}) => {
+  await page.route('https://giscus.app/**', route =>
+    route.fulfill({
+      status: 200,
+      contentType: 'text/html',
+      body: '<!doctype html><html lang="ko"><body></body></html>',
+    }),
+  );
+  await page.goto('/');
+
+  await page.getByRole('link', { name: '모든 글 보기' }).click();
+  await expect(page).toHaveURL(/\/blogs$/);
+  await page
+    .getByRole('searchbox', { name: '글 검색' })
+    .fill('React Hook Form');
+  const results = page.getByRole('list', { name: '글 목록' });
+  await expect(results.getByRole('listitem')).toHaveCount(1);
+  await results.getByRole('link', { name: 'React Hook Form' }).click();
+
+  await expect(page).toHaveURL(/\/blogs\/blog\/react\/react-hook-form$/);
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'React Hook Form' }),
+  ).toBeVisible();
+  await page
+    .getByRole('navigation', { name: '글 목차' })
+    .getByRole('link', { name: /댓글로 이어가기/ })
+    .click();
+  await expect(page).toHaveURL(/\/react-hook-form#comments$/);
+  const comments = page.locator('section#comments');
+  await expect(comments).toBeInViewport();
+  await expect(comments.locator('h2#comments-title')).toContainText(
+    '읽은 뒤에 남기는 메모.',
+  );
+  await expect(comments.locator('giscus-widget')).toHaveAttribute(
+    'mapping',
+    'pathname',
+  );
+});
+
+test('a visitor can follow home projects into a real project note', async ({
+  page,
+}) => {
+  await page.route('https://giscus.app/**', route =>
+    route.fulfill({
+      status: 200,
+      contentType: 'text/html',
+      body: '<!doctype html><html lang="ko"><body></body></html>',
+    }),
+  );
+  await page.goto('/');
+
+  await page.getByRole('link', { name: '전체 프로젝트' }).click();
+  await expect(page).toHaveURL(/\/projects$/);
+  await page.locator('main a[href="/projects/nextjs-blog"]').click();
+  await expect(page).toHaveURL(/\/projects\/nextjs-blog$/);
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'NextJS Blog' }),
+  ).toBeVisible();
+
+  await page
+    .getByRole('list', { name: '프로젝트 기록' })
+    .getByRole('link', {
+      name: 'Next js 블로그 조회수 기능 만들기 with Supabase',
+    })
+    .click();
+  await expect(page).toHaveURL(/\/projects\/nextjs-blog\/nextjs-blog-veiws$/);
+  await expect(
+    page.getByRole('article', { name: '글 본문' }).getByRole('heading', {
+      level: 2,
+      name: '블로그 조회수 기록하기',
+    }),
+  ).toBeVisible();
+});
+
+test('a visitor can navigate from introduction to a working contact form', async ({
+  page,
+}) => {
+  let payload: unknown;
+  await page.route('**/api/email', route => {
+    payload = route.request().postDataJSON();
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ message: '메일을 성공적으로 보냈습니다.' }),
+    });
+  });
+  await page.goto('/');
+
+  await page
+    .getByRole('navigation', { name: '주요 메뉴' })
+    .getByRole('link', { name: '소개' })
+    .click();
+  await expect(page).toHaveURL(/\/about$/);
+  await page.getByRole('link', { name: '연락 화면으로' }).click();
+  await expect(page).toHaveURL(/\/contact$/);
+
+  const form = page.getByRole('form', { name: '문의 폼' });
+  await form
+    .getByRole('textbox', { name: '이메일' })
+    .fill('reader@example.com');
+  await form.getByRole('textbox', { name: '제목' }).fill('블로그 문의');
+  await form
+    .getByRole('textbox', { name: '메시지' })
+    .fill('글을 읽고 질문을 남깁니다.');
+  await form.getByRole('button', { name: '메시지 보내기' }).click();
+
+  await expect
+    .poll(() => payload)
+    .toEqual({
+      from: 'reader@example.com',
+      subject: '블로그 문의',
+      message: '글을 읽고 질문을 남깁니다.',
+    });
+  await expect(form.getByRole('status')).toContainText(
+    '메일을 성공적으로 보냈습니다.',
+  );
+});

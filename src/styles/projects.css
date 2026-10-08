@@ -729,7 +729,7 @@
   gap: 10px;
   padding-bottom: 14px;
   border-bottom: 1px solid #cbd8e0;
-  color: #6a8292;
+  color: #586d7c;
 }
 
 .detail-sheet-title {
@@ -885,7 +885,7 @@
 }
 
 .detail-process .mono {
-  color: var(--site-orange);
+  color: var(--site-orange-text);
 }
 
 .detail-process h3 {
@@ -974,7 +974,7 @@
 }
 
 .chapter-index {
-  color: var(--site-orange);
+  color: var(--site-orange-text);
 }
 
 .chapter-link strong {
