@@ -1,4 +1,7 @@
+import '@/styles/archive.css';
+
 import type { Metadata } from 'next';
+
 import TagPage from '@/components/page/TagPage';
 import { sharedOpenGraphMetadata } from '@/config';
 
@@ -13,12 +16,12 @@ export const metadata: Metadata = {
   },
 };
 
-const TagPages = () => {
-  return (
-    <>
-      <TagPage />
-    </>
-  );
+type Props = {
+  searchParams: Promise<{ key?: string | string[] }>;
 };
 
-export default TagPages;
+export default async function TagsPage({ searchParams }: Props) {
+  const { key } = await searchParams;
+  const selectedTag = Array.isArray(key) ? key[0] : key;
+  return <TagPage initialTag={selectedTag} />;
+}

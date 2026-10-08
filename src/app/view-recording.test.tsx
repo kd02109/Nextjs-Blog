@@ -1,11 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { renderToStaticMarkup } from 'react-dom/server';
 
 const { createViewVisitorHash, incrementView } = vi.hoisted(() => ({
   createViewVisitorHash: vi.fn(),
   incrementView: vi.fn(),
 }));
 
-vi.mock('@/components/DetailPage', () => ({ default: () => null }));
+vi.mock('@/components/DetailPage', () => ({
+  default: ({ post }: { post: { title: string } }) => (
+    <article aria-label="글 본문">{post.title}</article>
+  ),
+}));
 vi.mock('@/server/supabase', () => ({ incrementView }));
 vi.mock('@/server/view-visitor', () => ({ createViewVisitorHash }));
 vi.mock('next/headers', () => ({ headers: () => new Headers() }));
@@ -44,6 +49,31 @@ describe('detail-page view recording', () => {
     expect(incrementView).toHaveBeenCalledExactlyOnceWith(
       'a-download',
       visitorHash,
+    );
+  });
+
+  it('still renders a blog article when view recording fails', async () => {
+    incrementView.mockRejectedValueOnce(new Error('metrics unavailable'));
+
+    const page = await BlogPostPage({
+      params: Promise.resolve({ slug: ['blog', 'react', 'react-hook-form'] }),
+    });
+
+    expect(renderToStaticMarkup(page)).toContain('React Hook Form');
+  });
+
+  it('still renders a project note when view recording fails', async () => {
+    incrementView.mockRejectedValueOnce(new Error('metrics unavailable'));
+
+    const page = await ProjectPostPage({
+      params: Promise.resolve({
+        slug: 'nextjs-blog',
+        detail: 'nextjs-blog-veiws',
+      }),
+    });
+
+    expect(renderToStaticMarkup(page)).toContain(
+      'Next js 블로그 조회수 기능 만들기 with Supabase',
     );
   });
 });

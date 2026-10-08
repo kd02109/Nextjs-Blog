@@ -66,7 +66,26 @@ describe('browser Supabase reads', () => {
     );
   });
 
+  it('returns every public view count keyed by article slug', async () => {
+    select.mockResolvedValueOnce({
+      data: [
+        { slug: 'react-design-pattern', view_count: 21 },
+        { slug: 'auth-js', view_count: 8 },
+      ],
+      error: null,
+    });
+
+    await expect(browserSupabase.getAllViewCounts()).resolves.toEqual({
+      'react-design-pattern': 21,
+      'auth-js': 8,
+    });
+    expect(select).toHaveBeenCalledWith('slug, view_count');
+  });
+
   it('does not expose a browser mutation function or client', () => {
-    expect(Object.keys(browserSupabase)).toEqual(['getViewCount']);
+    expect(Object.keys(browserSupabase).sort()).toEqual([
+      'getAllViewCounts',
+      'getViewCount',
+    ]);
   });
 });

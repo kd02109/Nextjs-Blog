@@ -1,18 +1,17 @@
 import BlogComment from '@/components/BlogComment';
-import BlogMenu from '@/components/BlogMenu';
-import CodeBlock from '@/components/CodeBlock';
-import DetailProjectPageList from '@/components/DetailProjectPageList';
-import PostFooter from '@/components/PostFooter';
-import Tag from '@/components/Tag';
-import { ProjectName } from '@/types/projectType';
-import { findH } from '@/util/findH';
+import ArticleHeader from '@/components/reading/ArticleHeader';
+import ReadingBody from '@/components/reading/ReadingBody';
+import RelatedContent, {
+  type ArticleSummary,
+} from '@/components/reading/RelatedContent';
+import TableOfContents from '@/components/reading/TableOfContents';
 import type { Post } from '@/lib/content';
-import { evaluateMdx } from '@/lib/mdx-evaluator';
-import { format, parseISO } from 'date-fns';
-import Image from 'next/image';
-import { createElement } from 'react';
+import type { ProjectName } from '@/types/projectType';
+import { findH } from '@/util/findH';
+import getPosts from '@/util/getPosts';
+import '@/styles/reading.css';
 
-type Prop = {
+type Props = {
   post: Post;
   tags: string[];
   postFooter?: {
@@ -22,71 +21,80 @@ type Prop = {
   projectFooter?: ProjectName;
 };
 
-const mdxComponents = {
-  img: ({ src, alt, ...props }: { src: string; alt: string }) => {
-    return (
-      <Image
-        layout="responsive"
-        alt={alt}
-        src={src}
-        width={100}
-        height={100}
-        {...props}
-      />
-    );
-  },
-  pre: CodeBlock,
-};
-
 export default function DetailPage({
   post,
   tags,
   postFooter,
   projectFooter,
-}: Prop) {
-  const content = createElement(
-    evaluateMdx<typeof mdxComponents>(post.body.code),
-    { components: mdxComponents },
-  );
-  const slugMap = findH(post.body.raw);
+}: Props) {
+  const related: ArticleSummary[] = [];
+
+  if (postFooter) {
+    if (postFooter.prevPost) {
+      related.push({
+        href: `/blogs/${postFooter.prevPost.url}`,
+        title: postFooter.prevPost.title,
+        label: '이전 글',
+      });
+    }
+    if (postFooter.nextPost) {
+      related.push({
+        href: `/blogs/${postFooter.nextPost.url}`,
+        title: postFooter.nextPost.title,
+        label: '다음 글',
+      });
+    }
+  }
+
+  if (projectFooter) {
+    const projectPosts = getPosts('project').filter(item =>
+      item.url.startsWith(`${projectFooter}/`),
+    );
+    const currentIndex = projectPosts.findIndex(item => item.url === post.url);
+    for (const neighbor of [
+      projectPosts[currentIndex - 1],
+      projectPosts[currentIndex + 1],
+    ]) {
+      if (neighbor) {
+        related.push({
+          href: `/projects/${neighbor.url}`,
+          title: neighbor.title,
+          label: '관련 기록',
+        });
+      }
+    }
+  }
+
   return (
-    <>
-      <article className="py-8 mt-16">
-        <div className="mb-8 text-center">
-          <h1 className="text-5xl max-sm:text-3xl mb-2">{post.title}</h1>
-          <nav className="my-3">
-            <ul className="flex justify-center gap-2 py-2 max-md:flex-wrap">
-              {tags.map(item => (
-                <li key={item} className="max-md:my-2">
-                  <Tag tag={item} />
-                </li>
-              ))}
-            </ul>
-          </nav>
-          <time
-            dateTime={post.date}
-            className="mb-1 text-xs text-gray-600 dark:text-gray-300">
-            {format(parseISO(post.date), 'LLLL d, yyyy')}
-          </time>
+    <div
+      className={`reading-page reading-page--${projectFooter ? 'project' : 'blog'}`}>
+      <ArticleHeader post={post} tags={tags} />
+      <div className="reading-layout">
+        <TableOfContents toc={findH(post.body.raw)} />
+        <ReadingBody post={post} />
+      </div>
+      <RelatedContent
+        posts={related}
+        backHref={projectFooter ? `/projects/${projectFooter}` : '/blogs'}
+      />
+      <section
+        className="reading-comments"
+        id="comments"
+        aria-labelledby="comments-title">
+        <div className="reading-comments-intro">
+          <p className="reading-comments-kicker">CONVERSATION / NOTES</p>
+          <h2 id="comments-title">
+            읽은 뒤에 <span>남기는 메모.</span>
+          </h2>
+          <p>
+            질문이나 다른 경험이 있다면 이어서 남겨주세요. 좋은 대화는 다음 글의
+            출발점이 됩니다.
+          </p>
         </div>
-        <div className="flex justify-between">
-          <section className="prose lg:prose-xl md:prose-lg sm:prose-base prose-slate dark:prose-invert  w-full max-w-3xl">
-            {content}
-          </section>
-          <div className="sticky top-[135px] max-md:hidden min-w-[240px] max-w-[260px] self-start lg:block">
-            <BlogMenu toc={slugMap} />
-          </div>
+        <div className="reading-comments-embed">
+          <BlogComment />
         </div>
-        {postFooter && <PostFooter {...postFooter} />}
-        {projectFooter && (
-          <DetailProjectPageList
-            title={projectFooter}
-            param={post.url}
-            date={post.date}
-          />
-        )}
-      </article>
-      <BlogComment />
-    </>
+      </section>
+    </div>
   );
 }

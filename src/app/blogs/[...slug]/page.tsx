@@ -62,13 +62,8 @@ const PostLayout = async ({ params }: Props) => {
   const postIndex = allPostsSort.findIndex(item => item.url === post.url);
 
   const postFooter = {
-    prevPost: allPostsSort.at(postIndex - 1)
-      ? allPostsSort.at(postIndex - 1)
-      : undefined,
-
-    nextPost: allPostsSort.at(postIndex + 1)
-      ? allPostsSort.at(postIndex + 1)
-      : undefined,
+    prevPost: postIndex > 0 ? allPostsSort[postIndex - 1] : undefined,
+    nextPost: allPostsSort[postIndex + 1],
   };
   const tags = post.tag;
   return (

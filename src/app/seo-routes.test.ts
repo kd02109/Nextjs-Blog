@@ -1,12 +1,7 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { getAllPosts } from '@/lib/content';
 import { siteConfig } from '@/config';
-
-vi.mock('next/font/google', () => ({
-  Nanum_Gothic: () => ({ className: 'nanum-gothic' }),
-  Nanum_Gothic_Coding: () => ({ className: 'nanum-gothic-coding' }),
-}));
 
 type SitemapEntry = { url: string };
 
@@ -34,6 +29,25 @@ const loadModule = async <T>(filename: string): Promise<T | undefined> => {
 };
 
 describe('App Router SEO routes', () => {
+  it('keeps every public static page in the sitemap independently of the GNB', async () => {
+    const sitemap = await loadSeoRoute<SitemapEntry[]>('./sitemap.ts');
+    expect(sitemap).toBeDefined();
+
+    const urls = new Set(sitemap!.map(entry => entry.url));
+    for (const path of [
+      '/',
+      '/blogs',
+      '/projects',
+      '/tags',
+      '/about',
+      '/contact',
+    ]) {
+      expect(urls.has(new URL(path, 'https://sonblog.vercel.app').href)).toBe(
+        true,
+      );
+    }
+  });
+
   it('publishes every one of the 73 post URLs on the canonical host', async () => {
     const sitemap = await loadSeoRoute<SitemapEntry[]>('./sitemap.ts');
     expect(sitemap).toBeDefined();

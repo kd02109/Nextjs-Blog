@@ -16,24 +16,6 @@ export const siteConfig = {
       instagram: 'https://www.instagram.com/junseok.son.90/',
     },
   },
-  menus: [
-    {
-      label: 'Blog',
-      path: '/blogs',
-    },
-    {
-      label: 'Projects',
-      path: '/projects',
-    },
-    {
-      label: 'Tag',
-      path: '/tags',
-    },
-    {
-      label: 'Contact',
-      path: '/contact',
-    },
-  ],
 };
 
 export const sharedOpenGraphMetadata = {

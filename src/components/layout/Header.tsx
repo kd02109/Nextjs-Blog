@@ -1,50 +1,39 @@
 'use client';
+
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useSyncExternalStore } from 'react';
-import { siteConfig } from '@/config';
-import LinkItem from '@/components/LinkItem';
+
 import DarkSwitch from '@/components/DarkSwitch';
 import Hamburger from '@/components/Hamburger';
-import checkAgent from '@/util/checkAgent';
+import NavigationLinks from '@/components/layout/NavigationLinks';
+import PageShell from '@/components/layout/PageShell';
 
-const subscribe = () => () => undefined;
-const getServerAgent = () => '';
-
-const Header = () => {
-  const pathName = usePathname();
-  const [isOpened, setIsOpened] = useState(false);
-  const browserUser = useSyncExternalStore(
-    subscribe,
-    checkAgent,
-    getServerAgent,
-  );
+export default function Header() {
+  const pathname = usePathname();
 
   return (
-    <header
-      className={`flex justify-between items-center select-none p-6 sticky z-20 bg-white top-0  max-sm:w-[100%] ${
-        browserUser === 'Mozilla Firefox'
-          ? 'dark:bg-[#1C1B22]'
-          : 'dark:bg-[#121212]'
-      }`}>
-      <Hamburger
-        isOpened={isOpened}
-        setIsOpened={setIsOpened}
-        pathName={pathName!}
-      />
-      <nav className="flex gap-6 max-md:hidden">
-        <LinkItem href={'/'} isActive={pathName === '/'}>
-          Home
-        </LinkItem>
-        {siteConfig.menus.map(({ path, label }) => (
-          <LinkItem key={label} href={path} isActive={pathName!.includes(path)}>
-            {label}
-          </LinkItem>
-        ))}
-      </nav>
-      <nav className="ml-auto flex items-center gap-2 max-md:hidden">
-        <DarkSwitch />
-      </nav>
+    <header className="site-header" id="top">
+      <PageShell className="site-masthead">
+        <Link href="/" className="site-brand" aria-label="SON 홈으로">
+          <span className="site-brand-mark" aria-hidden="true">
+            SON<span>.</span>
+          </span>
+          <span className="site-brand-caption">
+            Junseok Son
+            <br />
+            Frontend Engineer
+          </span>
+        </Link>
+
+        <nav className="site-desktop-nav" aria-label="주요 메뉴">
+          <NavigationLinks pathname={pathname} />
+        </nav>
+
+        <div className="site-header-actions">
+          <DarkSwitch />
+          <Hamburger key={pathname} pathName={pathname} />
+        </div>
+      </PageShell>
     </header>
   );
-};
-export default Header;
+}

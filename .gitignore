@@ -7,6 +7,8 @@
 
 # testing
 /coverage
+/test-results/
+/playwright-report/
 
 # codex isolated worktrees and local audit artifacts
 /.worktrees/
@@ -58,3 +60,4 @@ CLAUDE.md
 
 #husky
 .husky
+.gstack/

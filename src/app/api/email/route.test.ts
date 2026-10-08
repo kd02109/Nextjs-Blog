@@ -56,6 +56,69 @@ describe('POST /api/email', () => {
     });
   });
 
+  it('returns the existing success response after delivery', async () => {
+    const response = await POST(
+      request({
+        from: visitorEmail,
+        subject: 'Question',
+        message: 'Can you help?',
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({
+      message: '메일을 성공적으로 보냈습니다.',
+    });
+    expect(sendMail).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    ['from', { subject: 'Question', message: 'Can you help?' }],
+    ['subject', { from: visitorEmail, message: 'Can you help?' }],
+    ['message', { from: visitorEmail, subject: 'Question' }],
+  ])('rejects a missing %s field', async (_field, body) => {
+    const response = await POST(request(body));
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({
+      message: '모든 입력 요청을 채우셔야 합니다.',
+    });
+    expect(sendMail).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['subject', { subject: ' \n\t ' }],
+    ['message', { message: ' \n\t ' }],
+  ])('rejects a whitespace-only %s field', async (_field, override) => {
+    const response = await POST(
+      request({
+        from: visitorEmail,
+        subject: 'Question',
+        message: 'Can you help?',
+        ...override,
+      }),
+    );
+
+    expect(response.status).toBe(400);
+    expect(sendMail).not.toHaveBeenCalled();
+  });
+
+  it('accepts the subject and message length limits', async () => {
+    const subject = 's'.repeat(120);
+    const message = 'm'.repeat(5000);
+    const response = await POST(
+      request({ from: visitorEmail, subject, message }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(sendMail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subject: `[NEXTJS BLOG] ${subject}`,
+        text: `${message}\n\n보낸이: ${visitorEmail}`,
+      }),
+    );
+  });
+
   it.each([
     ['a subject longer than 120 characters', { subject: 'a'.repeat(121) }],
     ['a message longer than 5,000 characters', { message: 'a'.repeat(5001) }],

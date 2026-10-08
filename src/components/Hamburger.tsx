@@ -1,110 +1,56 @@
 'use client';
 
-import { SetStateAction, useEffect } from 'react';
-import { siteConfig } from '@/config';
-import HambugerIcon from '@/components/svg/HamburgerIcon';
-import LinkItem from '@/components/LinkItem';
-import XIcon from '@/components/svg/XIcon';
-import { AnimatePresence, motion } from 'framer-motion';
-import DarkSwitch from '@/components/DarkSwitch';
-import { allowScroll, preventScroll } from '@/util/scrollControl';
+import { useEffect, useRef, useState } from 'react';
 
-type Prop = {
+import NavigationLinks from '@/components/layout/NavigationLinks';
+
+type HamburgerProps = {
   pathName: string;
-  isOpened: boolean;
-  setIsOpened: React.Dispatch<SetStateAction<boolean>>;
 };
 
-export default function Hamburger({ pathName, isOpened, setIsOpened }: Prop) {
-  const { menus } = siteConfig;
-  const handleOpen = () => {
-    setIsOpened(true);
-  };
+export default function Hamburger({ pathName }: HamburgerProps) {
+  const [isOpened, setIsOpened] = useState(false);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const navRef = useRef<HTMLElement>(null);
 
-  // 화면 이전시 UI 초기화
   useEffect(() => {
-    setIsOpened(false);
-  }, [pathName, setIsOpened]);
+    if (!isOpened) return;
 
-  //휴대폰 화면에서 햄버거를 열었을 때 scroll 동작 하는 것 막기
-  useEffect(() => {
-    if (isOpened) {
-      preventScroll();
-    }
-    return () => {
-      allowScroll();
+    navRef.current?.querySelector<HTMLAnchorElement>('a')?.focus();
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      setIsOpened(false);
+      toggleRef.current?.focus();
     };
+
+    document.addEventListener('keydown', closeOnEscape);
+    return () => document.removeEventListener('keydown', closeOnEscape);
   }, [isOpened]);
 
   return (
-    <>
-      {!isOpened && (
-        <motion.button
-          dragSnapToOrigin
-          initial={{ opacity: 0, x: -100 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -100 }}
-          transition={{ ease: 'linear', duration: 0.3 }}
-          className="hidden max-md:block"
-          onClick={handleOpen}>
-          <HambugerIcon />
-          <span className="hidden">HamburgerIcon</span>
-        </motion.button>
-      )}
-      <AnimatePresence>
-        {isOpened && (
-          <div
-            className="hidden overflow-hidden fixed w-100 h-[100%] top-0 left-0 right-0 bottom-0 z-60 max-md:block before:content-[ ] before:fixed before:top-0 before:left-0 before:right-0 before:bottom-0 before:backdrop-blur"
-            onClick={e => {
-              e.stopPropagation();
-              setIsOpened(false);
-            }}>
-            <motion.div
-              initial={{ x: -200, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -200, opacity: 0 }}
-              transition={{ ease: 'linear', duration: 0.3 }}
-              className="fixed w-60 h-100 p-4 top-0 right-0 left-0 bottom-0 overflow-hidden hidden max-md:block z-80 bg-white dark:bg-[#121212] rounded-xl">
-              <div className="flex justify-between my-4">
-                <nav>
-                  <ol>
-                    <LinkItem href={'/'} isActive={pathName === '/'}>
-                      <li
-                        className={`py-4 border-b-2 border-solid w-40 ${
-                          pathName === '/' && 'border-yellow-400'
-                        }`}>
-                        Home
-                      </li>
-                    </LinkItem>
-                    {menus.map(({ path, label }) => (
-                      <LinkItem
-                        href={path}
-                        key={label}
-                        isActive={pathName.includes(path)}>
-                        <li
-                          className={`py-4 border-b-2 border-solid w-40 ${
-                            pathName.includes(path) && 'border-yellow-400'
-                          }`}>
-                          {label}
-                        </li>
-                      </LinkItem>
-                    ))}
-                  </ol>
-                </nav>
-                <button
-                  className="self-start py-4"
-                  onClick={() => {
-                    setIsOpened(false);
-                  }}>
-                  <span className="hidden">Cancle Button</span>
-                  <XIcon />
-                </button>
-              </div>
-              <DarkSwitch />
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-    </>
+    <div className="site-mobile-navigation">
+      <button
+        ref={toggleRef}
+        type="button"
+        className="site-menu-toggle"
+        aria-label={isOpened ? '메뉴 닫기' : '메뉴 열기'}
+        aria-controls="mobile-navigation"
+        aria-expanded={isOpened}
+        onClick={() => setIsOpened(open => !open)}>
+        <span aria-hidden="true">{isOpened ? '×' : '☰'}</span>
+      </button>
+      <nav
+        ref={navRef}
+        id="mobile-navigation"
+        className="site-mobile-nav"
+        aria-label="모바일 메뉴"
+        hidden={!isOpened}>
+        <NavigationLinks
+          pathname={pathName}
+          onNavigate={() => setIsOpened(false)}
+        />
+      </nav>
+    </div>
   );
 }
