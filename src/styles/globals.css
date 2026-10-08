@@ -1,8 +1,10 @@
-@import './prose.css';
+@import 'tailwindcss';
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@config '../../tailwind.config.js';
+@plugin '@tailwindcss/typography';
+@custom-variant dark (&:where(.dark, .dark *));
+
+@import './prose.css';
 
 /* width */
 ::-webkit-scrollbar {
