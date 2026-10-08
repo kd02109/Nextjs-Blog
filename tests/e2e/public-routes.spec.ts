@@ -155,7 +155,7 @@ const listingRoutes = [
   { path: '/projects', heading: '만든 것에는 이유가 남습니다.' },
   { path: '/projects/mbtmi', heading: 'Mbti Test Project' },
   { path: '/tags', heading: '관심사를 따라 찾아보세요.' },
-  { path: '/contact', heading: 'Send Me An Email' },
+  { path: '/contact', heading: '새로운 이야기를 시작해 볼까요?' },
 ] as const;
 
 test('the site header keeps the home logo and three primary destinations', async ({
@@ -229,7 +229,9 @@ test('the shared shell uses light and dark design tokens', async ({ page }) => {
 test('/about remains a public page with a contact route', async ({ page }) => {
   const response = await page.goto('/about');
   expect(response?.status()).toBe(200);
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('소개');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText(
+    '만드는 과정까지',
+  );
   await expect(
     page.getByRole('link', { name: /연락/ }).first(),
   ).toHaveAttribute('href', '/contact');

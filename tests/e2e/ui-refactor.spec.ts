@@ -543,3 +543,234 @@ for (const path of [
     await expect(page.getByRole('article', { name: '글 본문' })).toHaveCount(0);
   });
 }
+
+test('about introduces the author, three working steps, and real destinations', async ({
+  page,
+}) => {
+  const response = await page.goto('/about');
+
+  expect(response?.status()).toBe(200);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
+  await expect(
+    page.getByRole('heading', {
+      level: 1,
+      name: /만드는 과정까지.*남기는 사람/,
+    }),
+  ).toBeVisible();
+
+  const workingMethod = page.getByRole('region', {
+    name: '어떻게 작업하나요?',
+  });
+  await expect(workingMethod.getByRole('article')).toHaveCount(3);
+  for (const title of ['문제에서 시작', '직접 구현', '다시 쓸 수 있게 기록']) {
+    await expect(
+      workingMethod.getByRole('heading', { level: 3, name: title }),
+    ).toBeVisible();
+  }
+
+  await expect(page.getByRole('link', { name: '글 읽어보기' })).toHaveAttribute(
+    'href',
+    '/blogs',
+  );
+  await expect(
+    page.getByRole('link', { name: '프로젝트 보기' }),
+  ).toHaveAttribute('href', '/projects');
+  await expect(
+    page.getByRole('link', { name: '연락 화면으로' }),
+  ).toHaveAttribute('href', '/contact');
+});
+
+test('contact has one heading and three required, labeled API fields', async ({
+  page,
+}) => {
+  const response = await page.goto('/contact');
+
+  expect(response?.status()).toBe(200);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
+  await expect(
+    page.getByRole('heading', {
+      level: 1,
+      name: /새로운 이야기를.*시작해 볼까요/,
+    }),
+  ).toBeVisible();
+
+  const form = page.getByRole('form', { name: '문의 폼' });
+  await expect(form).toBeVisible();
+  const email = form.getByRole('textbox', { name: '이메일' });
+  const subject = form.getByRole('textbox', { name: '제목' });
+  const message = form.getByRole('textbox', { name: '메시지' });
+  await expect(email).toHaveAttribute('name', 'from');
+  await expect(email).toHaveAttribute('type', 'email');
+  await expect(subject).toHaveAttribute('name', 'subject');
+  await expect(message).toHaveAttribute('name', 'message');
+  for (const field of [email, subject, message]) {
+    await expect(field).toHaveAttribute('required', '');
+  }
+  await expect(form.getByRole('textbox', { name: '이름' })).toHaveCount(0);
+  await expect(form.locator('[name="name"]')).toHaveCount(0);
+  await expect(
+    form.getByRole('button', { name: '메시지 보내기' }),
+  ).toBeVisible();
+});
+
+test('contact blocks invalid input without sending email', async ({ page }) => {
+  let requests = 0;
+  await page.route('**/api/email', route => {
+    requests += 1;
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ message: '메일을 성공적으로 보냈습니다.' }),
+    });
+  });
+  await page.goto('/contact');
+
+  const form = page.getByRole('form', { name: '문의 폼' });
+  const email = form.getByRole('textbox', { name: '이메일' });
+  const subject = form.getByRole('textbox', { name: '제목' });
+  const message = form.getByRole('textbox', { name: '메시지' });
+  const submit = form.getByRole('button', { name: '메시지 보내기' });
+
+  await submit.click();
+  expect(requests).toBe(0);
+  expect(
+    await email.evaluate(
+      input => (input as HTMLInputElement).validity.valueMissing,
+    ),
+  ).toBe(true);
+
+  await email.fill('not-an-email');
+  await subject.fill('작업 제안');
+  await message.fill('함께 만들어 볼 서비스에 관해 이야기하고 싶습니다.');
+  await submit.click();
+  expect(requests).toBe(0);
+  expect(
+    await email.evaluate(
+      input => (input as HTMLInputElement).validity.typeMismatch,
+    ),
+  ).toBe(true);
+
+  await email.fill('visitor@example.com');
+  await submit.click();
+  await expect.poll(() => requests).toBe(1);
+  await expect(form.getByRole('status')).toContainText(
+    '메일을 성공적으로 보냈습니다.',
+  );
+});
+
+test('keyboard submission posts only the API fields and shows loading and success', async ({
+  page,
+}) => {
+  let releaseResponse: () => void = () => {};
+  const responseGate = new Promise<void>(resolve => {
+    releaseResponse = resolve;
+  });
+  let requestBody: unknown;
+  let requestMethod = '';
+  let contentType = '';
+  await page.route('**/api/email', async route => {
+    requestMethod = route.request().method();
+    contentType = route.request().headers()['content-type'] ?? '';
+    requestBody = route.request().postDataJSON();
+    await responseGate;
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ message: '메일을 성공적으로 보냈습니다.' }),
+    });
+  });
+  await page.goto('/contact');
+
+  const form = page.getByRole('form', { name: '문의 폼' });
+  await form
+    .getByRole('textbox', { name: '이메일' })
+    .fill('visitor@example.com');
+  await form.getByRole('textbox', { name: '제목' }).fill('작업 제안');
+  await form
+    .getByRole('textbox', { name: '메시지' })
+    .fill('함께 만들어 볼 서비스에 관해 이야기하고 싶습니다.');
+  await form.getByRole('textbox', { name: '제목' }).press('Enter');
+
+  await expect
+    .poll(() => requestBody)
+    .toEqual({
+      from: 'visitor@example.com',
+      subject: '작업 제안',
+      message: '함께 만들어 볼 서비스에 관해 이야기하고 싶습니다.',
+    });
+  expect(requestMethod).toBe('POST');
+  expect(contentType).toContain('application/json');
+  await expect(form.getByRole('button', { name: '보내는 중' })).toBeDisabled();
+
+  releaseResponse();
+  await expect(form.getByRole('status')).toContainText(
+    '메일을 성공적으로 보냈습니다.',
+  );
+  await expect(
+    form.getByRole('button', { name: '메시지 보내기' }),
+  ).toBeEnabled();
+});
+
+for (const { status, message } of [
+  { status: 400, message: '모든 입력 요청을 채우셔야 합니다.' },
+  { status: 500, message: '메일 수신에 실패했습니다.' },
+] as const) {
+  test(`contact shows a ${status} error, keeps input, and allows retry`, async ({
+    page,
+  }) => {
+    let requests = 0;
+    await page.route('**/api/email', route => {
+      requests += 1;
+      return route.fulfill({
+        status: requests === 1 ? status : 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          message: requests === 1 ? message : '메일을 성공적으로 보냈습니다.',
+        }),
+      });
+    });
+    await page.goto('/contact');
+
+    const form = page.getByRole('form', { name: '문의 폼' });
+    const email = form.getByRole('textbox', { name: '이메일' });
+    const subject = form.getByRole('textbox', { name: '제목' });
+    const messageField = form.getByRole('textbox', { name: '메시지' });
+    const submit = form.getByRole('button', { name: '메시지 보내기' });
+    await email.fill('visitor@example.com');
+    await subject.fill('작업 제안');
+    await messageField.fill(
+      '함께 만들어 볼 서비스에 관해 이야기하고 싶습니다.',
+    );
+    await submit.click();
+
+    await expect(form.getByRole('alert')).toContainText(message);
+    await expect(email).toHaveValue('visitor@example.com');
+    await expect(subject).toHaveValue('작업 제안');
+    await expect(messageField).toHaveValue(
+      '함께 만들어 볼 서비스에 관해 이야기하고 싶습니다.',
+    );
+    await expect(submit).toBeEnabled();
+    expect(requests).toBe(1);
+
+    await submit.click();
+    await expect(form.getByRole('status')).toContainText(
+      '메일을 성공적으로 보냈습니다.',
+    );
+    expect(requests).toBe(2);
+  });
+}
+
+for (const path of ['/about', '/contact'] as const) {
+  test(`${path} fits a 320px viewport`, async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 720 });
+    await page.goto(path);
+
+    await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+    ).toBeLessThanOrEqual(320);
+    expect(
+      await page.evaluate(() => document.body.scrollWidth),
+    ).toBeLessThanOrEqual(320);
+  });
+}
