@@ -1,5 +1,8 @@
-import BlogPage from '@/components/page/BlogPage';
+import '@/styles/archive.css';
+
 import type { Metadata } from 'next';
+
+import BlogPage from '@/components/page/BlogPage';
 import { sharedOpenGraphMetadata } from '@/config';
 
 export const metadata: Metadata = {
@@ -13,12 +16,6 @@ export const metadata: Metadata = {
   },
 };
 
-const BlogPages = () => {
-  return (
-    <>
-      <BlogPage />
-    </>
-  );
-};
-
-export default BlogPages;
+export default function BlogsPage() {
+  return <BlogPage />;
+}

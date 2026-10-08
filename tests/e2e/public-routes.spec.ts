@@ -151,10 +151,10 @@ test('home keeps popular links usable when view counts cannot load', async ({
 });
 
 const listingRoutes = [
-  { path: '/blogs', heading: 'Blog' },
+  { path: '/blogs', heading: '문제를 따라 남긴 기록.' },
   { path: '/projects', heading: 'NextJS Blog' },
   { path: '/projects/mbtmi', heading: 'Mbti Test Project' },
-  { path: '/tags', heading: 'Tags' },
+  { path: '/tags', heading: '관심사를 따라 찾아보세요.' },
   { path: '/contact', heading: 'Send Me An Email' },
 ] as const;
 
@@ -304,7 +304,7 @@ for (const path of invalidRoutes) {
   });
 }
 
-test('legacy client view cookies do not bypass the database deduplication request', async ({
+test('legacy view cookies do not interrupt article links or add duplicate client increments', async ({
   context,
   page,
 }) => {
@@ -316,19 +316,20 @@ test('legacy client view cookies do not bypass the database deduplication reques
     },
   ]);
   const errors = watchBrowserErrors(page);
+  const clientIncrements: string[] = [];
+  page.on('request', request => {
+    if (request.method() === 'POST' && request.url().includes('/api/views/')) {
+      clientIncrements.push(request.url());
+    }
+  });
   await page.goto('/blogs');
-  const viewRequest = page.waitForRequest(
-    request =>
-      request.method() === 'POST' &&
-      request.url().endsWith('/api/views/react-design-pattern'),
-    { timeout: 2_000 },
-  );
-
   await page
-    .getByRole('button', { name: /React의 디자인 패턴/ })
+    .getByRole('list', { name: '글 목록' })
+    .getByRole('link', { name: 'React의 디자인 패턴' })
     .first()
     .click();
-  await viewRequest;
+  await expect(page).toHaveURL(/\/blogs\/blog\/react\/react-design-pattern$/);
+  expect(clientIncrements).toEqual([]);
   await expectNoBrowserErrors(page, errors);
 });
 
