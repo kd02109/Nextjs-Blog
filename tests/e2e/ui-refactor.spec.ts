@@ -172,3 +172,165 @@ for (const path of ['/blogs', '/tags?key=react'] as const) {
     ).toBeLessThanOrEqual(320);
   });
 }
+
+test('project archive presents five real project destinations', async ({
+  page,
+}) => {
+  const response = await page.goto('/projects');
+
+  expect(response?.status()).toBe(200);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
+  await expect(
+    page.getByRole('searchbox', {
+      name: '프로젝트 또는 기술 검색',
+    }),
+  ).toBeVisible();
+
+  const cards = page.locator('main a[href^="/projects/"]:visible');
+  await expect(cards).toHaveCount(5);
+
+  for (const slug of [
+    'nextjs-blog',
+    'sharepetment',
+    'mbtmi',
+    'solo-project',
+    'swifty',
+  ] as const) {
+    await expect(
+      page.locator(`main a[href="/projects/${slug}"]`),
+    ).toBeVisible();
+  }
+});
+
+test('project search filters names and technologies with an empty state', async ({
+  page,
+}) => {
+  await page.goto('/projects');
+
+  const search = page.getByRole('searchbox', {
+    name: '프로젝트 또는 기술 검색',
+  });
+  const cards = page.locator('main a[href^="/projects/"]:visible');
+
+  await search.fill('SharePetment');
+  await expect(cards).toHaveCount(1);
+  await expect(cards.first()).toHaveAttribute('href', '/projects/sharepetment');
+
+  await search.fill('redux');
+  await expect(cards).toHaveCount(1);
+  await expect(cards.first()).toHaveAttribute('href', '/projects/solo-project');
+
+  await search.fill('no-such-project-2026');
+  await expect(cards).toHaveCount(0);
+  await expect(page.getByText(/검색 결과가 없습니다/)).toBeVisible();
+});
+
+test('NextJS Blog detail shows seven dated notes in newest-first order', async ({
+  page,
+}) => {
+  const response = await page.goto('/projects/nextjs-blog');
+
+  expect(response?.status()).toBe(200);
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'NextJS Blog' }),
+  ).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
+
+  const notes = page.getByRole('list', { name: '프로젝트 기록' });
+  await expect(notes.getByRole('listitem')).toHaveCount(7);
+  const dates = await notes
+    .locator('time')
+    .evaluateAll(elements =>
+      elements.map(element =>
+        new Date(element.getAttribute('datetime') ?? '')
+          .toISOString()
+          .slice(0, 10),
+      ),
+    );
+  expect(dates).toEqual([
+    '2024-05-14',
+    '2024-05-07',
+    '2023-09-22',
+    '2023-09-20',
+    '2023-09-14',
+    '2023-08-28',
+    '2023-08-14',
+  ]);
+
+  const firstNote = notes.getByRole('link', {
+    name: 'Next js 블로그 조회수 기능 만들기 with Supabase',
+    exact: true,
+  });
+  await expect(firstNote).toHaveAttribute(
+    'href',
+    '/projects/nextjs-blog/nextjs-blog-veiws',
+  );
+  await firstNote.click();
+  await expect(page).toHaveURL(/\/projects\/nextjs-blog\/nextjs-blog-veiws$/);
+  await expect(
+    page.getByRole('heading', {
+      level: 1,
+      name: 'Next js 블로그 조회수 기능 만들기 with Supabase',
+    }),
+  ).toBeVisible();
+});
+
+test('project detail keeps image text and safe external destinations', async ({
+  page,
+}) => {
+  await page.goto('/projects/nextjs-blog');
+
+  await expect(page.getByRole('img', { name: 'NextJS Blog' })).toHaveAttribute(
+    'alt',
+    'NextJS Blog',
+  );
+
+  const live = page.getByRole('link', { name: '웹사이트 보기' });
+  await expect(live).toHaveAttribute('href', 'https://sonblog.vercel.app/');
+  await expect(live).toHaveAttribute('target', '_blank');
+  await expect(live).toHaveAttribute('rel', /noopener noreferrer/);
+
+  const github = page.getByRole('link', { name: 'GitHub 보기' });
+  await expect(github).toHaveAttribute(
+    'href',
+    'https://github.com/kd02109/Nextjs-Blog',
+  );
+  await expect(github).toHaveAttribute('target', '_blank');
+  await expect(github).toHaveAttribute('rel', /noopener noreferrer/);
+
+  await page.goto('/projects/swifty');
+  await expect(page.getByRole('link', { name: '웹사이트 보기' })).toHaveCount(
+    0,
+  );
+  await expect(page.locator('main a[href="#"]')).toHaveCount(0);
+});
+
+test('unknown project slug returns a 404', async ({ page }) => {
+  const response = await page.goto('/projects/not-a-real-project');
+
+  expect(response?.status()).toBe(404);
+});
+
+test('project cards and a long external URL fit 320, 390, and 1440px', async ({
+  page,
+}) => {
+  for (const width of [320, 390, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+
+    await page.goto('/projects');
+    await expect(
+      page.locator('main a[href="/projects/sharepetment"]'),
+    ).toBeVisible();
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+    ).toBeLessThanOrEqual(width);
+
+    await page.goto('/projects/sharepetment');
+    await expect(
+      page.getByRole('link', { name: 'GitHub 보기' }),
+    ).toHaveAttribute('href', 'https://github.com/SharePetment/SharePetment');
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+    ).toBeLessThanOrEqual(width);
+  }
+});

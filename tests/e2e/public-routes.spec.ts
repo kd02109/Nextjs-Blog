@@ -152,7 +152,7 @@ test('home keeps popular links usable when view counts cannot load', async ({
 
 const listingRoutes = [
   { path: '/blogs', heading: '문제를 따라 남긴 기록.' },
-  { path: '/projects', heading: 'NextJS Blog' },
+  { path: '/projects', heading: '만든 것에는 이유가 남습니다.' },
   { path: '/projects/mbtmi', heading: 'Mbti Test Project' },
   { path: '/tags', heading: '관심사를 따라 찾아보세요.' },
   { path: '/contact', heading: 'Send Me An Email' },

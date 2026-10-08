@@ -1,13 +1,11 @@
-import LinkCopy from '@/components/LinkCopy';
-import StakList from '@/components/StakList';
-import WritingList from '@/components/layout/WritingList';
-import CopyUrl from '@/components/svg/CopyUrl';
-import Github from '@/components/svg/Github';
+import ProjectDetail from '@/components/projects/ProjectDetail';
+import getPosts from '@/util/getPosts';
 import { projectObj } from '@/util/project';
-import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { sharedOpenGraphMetadata } from '@/config';
+import { projectOrder } from '@/lib/project-presentation';
+import '@/styles/projects.css';
 
 type Props = {
   params: Promise<{
@@ -42,68 +40,16 @@ export default async function ProjectDetailPages({ params }: Props) {
   const oneProject = projectObj.find(item => item.link === slug);
 
   if (!oneProject) notFound();
+  const posts = getPosts('project').filter(post =>
+    post.url.startsWith(`${oneProject.link}/`),
+  );
 
   return (
-    <article className="min-w-0 py-4">
-      <div className="flex min-w-0 items-center gap-2">
-        <h1 className="mb-5 min-w-0 break-words text-3xl font-black">
-          {oneProject.name}
-        </h1>
-        <LinkCopy />
-      </div>
-
-      <div className="flex min-w-0 flex-col gap-4 lg:flex-row">
-        <Image
-          src={oneProject.image}
-          alt={oneProject.name}
-          fill={false}
-          width={600}
-          height={600}
-          priority={true}
-          sizes="(max-width: 1023px) calc(100vw - 3rem), 75vw"
-          className="h-auto w-full min-w-0 rounded-2xl border-2 border-solid lg:basis-3/4"
-        />
-        <div className="min-w-0 rounded-2xl border-2 border-solid px-3 py-5 lg:basis-1/4">
-          <h2 className="font-bold text-xl mb-3">About</h2>
-          <nav>
-            <ul>
-              <li className="mb-3 flex min-w-0 items-center gap-2">
-                <div className="shrink-0">
-                  <Github />
-                </div>
-                <a
-                  href={oneProject.github}
-                  target="_blank"
-                  className="min-w-0 break-all text-sm font-bold hover:text-yellow-400">
-                  {oneProject.github}
-                </a>
-              </li>
-              <li className="flex min-w-0 items-center gap-2">
-                <div className="shrink-0">
-                  <CopyUrl />
-                </div>
-                <a
-                  href={oneProject.href}
-                  target="_blank"
-                  className="min-w-0 break-all text-sm font-bold hover:text-yellow-400">
-                  {oneProject.href}
-                </a>
-              </li>
-            </ul>
-            <div className="mt-4">
-              <h2 className="font-bold text-xl">Description</h2>
-              <p className="text-sm">{oneProject.description}</p>
-            </div>
-            <div className="mt-4">
-              <h2 className="font-bold text-xl">Date</h2>
-              <span className="text-sm">{oneProject.date}</span>
-            </div>
-          </nav>
-        </div>
-      </div>
-      <StakList name={oneProject.name} list={oneProject.stack} />
-      <WritingList tag={oneProject.link} />
-    </article>
+    <ProjectDetail
+      project={oneProject}
+      posts={posts}
+      index={projectOrder.indexOf(slug as (typeof projectOrder)[number])}
+    />
   );
 }
 
