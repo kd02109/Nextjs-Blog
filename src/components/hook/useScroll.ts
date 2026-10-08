@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Toc } from '@/components/BlogMenu';
+import type { Toc } from '@/util/findH';
 
 const useScroll = (tableOfContents: Toc[]) => {
   const [currentSectionSlug, setCurrentSectionSlug] = useState<
@@ -16,9 +16,12 @@ const useScroll = (tableOfContents: Toc[]) => {
     function onResize() {
       headings = Array.from(
         document.querySelectorAll<HTMLElement>(
-          '.prose h2:not(#table-of-contents),h3:not(#table-of-contents)',
+          '.reading-body h2[id], .reading-body h3[id]',
         ),
-      ).map(element => ({ id: element.id, top: element.offsetTop }));
+      ).map(element => ({
+        id: element.id,
+        top: element.getBoundingClientRect().top + window.scrollY,
+      }));
     }
 
     function onScroll() {

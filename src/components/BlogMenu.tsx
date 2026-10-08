@@ -8,8 +8,9 @@ import CopyUrl from '@/components/svg/CopyUrl';
 import Top from '@/components/svg/Top';
 import { MouseEvent } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
+import type { Toc } from '@/util/findH';
 
-export type Toc = { title: string; slug: string; id: 'sub' | 'title' };
+export type { Toc } from '@/util/findH';
 type Prop = {
   toc: Toc[];
 };

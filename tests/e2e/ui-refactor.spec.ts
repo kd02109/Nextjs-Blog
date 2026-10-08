@@ -334,3 +334,212 @@ test('project cards and a long external URL fit 320, 390, and 1440px', async ({
     ).toBeLessThanOrEqual(width);
   }
 });
+
+test('blog record has the shared reading body, related article, and canonical URL', async ({
+  page,
+}) => {
+  const response = await page.goto('/blogs/blog/react/react-hook-form');
+
+  expect(response?.status()).toBe(200);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'React Hook Form' }),
+  ).toBeVisible();
+
+  const body = page.getByRole('article', { name: '글 본문' });
+  await expect(body).toBeVisible();
+  await expect(
+    body.getByRole('heading', { level: 2, name: 'React Hook Form?' }),
+  ).toBeVisible();
+  await expect(
+    body.getByRole('heading', { level: 2, name: 'useForm' }),
+  ).toBeVisible();
+  await expect(body.locator('pre code').first()).toBeVisible();
+
+  await expect(
+    page.locator('main a[href="/blogs/blog/react/optimistic-updates"]'),
+  ).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://sonblog.vercel.app/blogs/blog/react/react-hook-form',
+  );
+});
+
+test('project record reuses the reading body and links to its project and next note', async ({
+  page,
+}) => {
+  const response = await page.goto('/projects/nextjs-blog/nextjs-blog-veiws');
+
+  expect(response?.status()).toBe(200);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
+  await expect(
+    page.getByRole('heading', {
+      level: 1,
+      name: 'Next js 블로그 조회수 기능 만들기 with Supabase',
+    }),
+  ).toBeVisible();
+
+  const body = page.getByRole('article', { name: '글 본문' });
+  await expect(body).toBeVisible();
+  await expect(
+    body.getByRole('heading', { level: 2, name: '블로그 조회수 기록하기' }),
+  ).toBeVisible();
+  await expect(
+    body.getByRole('img', { name: '조회수 이미지' }).first(),
+  ).toBeVisible();
+
+  await expect(
+    page
+      .getByRole('navigation', { name: '이어서 읽기' })
+      .getByRole('link', { name: /목록으로 돌아가기/ }),
+  ).toBeVisible();
+  await expect(
+    page.locator('main a[href="/projects/nextjs-blog/next-js-blog-review"]'),
+  ).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://sonblog.vercel.app/projects/nextjs-blog/nextjs-blog-veiws',
+  );
+});
+
+test('reading table of contents has keyboard links to real blog and project headings', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+
+  for (const { path, title, id } of [
+    {
+      path: '/blogs/blog/react/react-hook-form',
+      title: 'useForm',
+      id: 'useform',
+    },
+    {
+      path: '/projects/nextjs-blog/nextjs-blog-veiws',
+      title: '조회수 기록을 위한 로직',
+      id: '조회수-기록을-위한-로직',
+    },
+  ]) {
+    await page.goto(path);
+
+    const toc = page.getByRole('navigation', { name: '글 목차' });
+    const link = toc.getByRole('link', { name: title, exact: true });
+    const heading = page
+      .locator('article[aria-label="글 본문"]')
+      .locator(`[id="${id}"]`);
+
+    await expect(toc).toBeVisible();
+    await expect(link).toHaveAttribute('href', `#${id}`);
+    await expect(heading).toBeVisible();
+    await link.focus();
+    await expect(link).toBeFocused();
+    await link.press('Enter');
+    await expect
+      .poll(() => decodeURIComponent(new URL(page.url()).hash))
+      .toBe(`#${id}`);
+  }
+});
+
+test('reading page copies its URL and a code example with keyboard buttons', async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write'], {
+    origin: 'http://127.0.0.1:3100',
+  });
+  await page.goto('/blogs/blog/react/react-hook-form');
+
+  const copyUrl = page.getByRole('button', { name: '현재 페이지 URL 복사' });
+  await copyUrl.focus();
+  await copyUrl.press('Enter');
+  await expect
+    .poll(() => page.evaluate(() => navigator.clipboard.readText()))
+    .toBe(page.url());
+
+  const code = page
+    .getByRole('article', { name: '글 본문' })
+    .locator('pre code')
+    .first();
+  const example = await code.innerText();
+  const copyCode = page.getByRole('button', { name: '코드 복사' }).first();
+  await copyCode.focus();
+  await copyCode.press('Enter');
+  await expect
+    .poll(() => page.evaluate(() => navigator.clipboard.readText()))
+    .toBe(example);
+});
+
+test('long code remains inside the 320px reading viewport', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 800 });
+  await page.goto('/blogs/blog/react/react-hook-form');
+
+  const body = page.getByRole('article', { name: '글 본문' });
+  const code = body.locator('pre code').first();
+  await expect(code).toBeVisible();
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth),
+  ).toBeLessThanOrEqual(320);
+  expect(
+    await page.evaluate(() => document.body.scrollWidth),
+  ).toBeLessThanOrEqual(320);
+});
+
+test('wide tables and local images stay inside the 320px reading viewport', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 800 });
+  await page.goto('/blogs/blog/nextjs/csr-ssg-isr-ssr');
+
+  const body = page.getByRole('article', { name: '글 본문' });
+  const table = body.getByRole('table').first();
+  const image = body.getByRole('img', { name: 'csr-ssg-isr-ssr' }).first();
+  await expect(table).toBeVisible();
+  await expect(image).toBeVisible();
+  await expect
+    .poll(() =>
+      image.evaluate(element => (element as HTMLImageElement).naturalWidth),
+    )
+    .toBeGreaterThan(0);
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth),
+  ).toBeLessThanOrEqual(320);
+  expect(
+    await page.evaluate(() => document.body.scrollWidth),
+  ).toBeLessThanOrEqual(320);
+});
+
+test('a project note keeps code and a local image inside the 320px viewport', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 800 });
+  await page.goto('/projects/mbtmi/a-download');
+
+  const body = page.getByRole('article', { name: '글 본문' });
+  const image = body.getByRole('img', { name: '지원 범위' });
+  await expect(body.locator('pre code').first()).toBeVisible();
+  await expect(image).toBeVisible();
+  await expect
+    .poll(() =>
+      image.evaluate(element => (element as HTMLImageElement).naturalWidth),
+    )
+    .toBeGreaterThan(0);
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth),
+  ).toBeLessThanOrEqual(320);
+  expect(
+    await page.evaluate(() => document.body.scrollWidth),
+  ).toBeLessThanOrEqual(320);
+});
+
+for (const path of [
+  '/blogs/blog/react/not-a-real-article',
+  '/projects/nextjs-blog/not-a-real-project-article',
+] as const) {
+  test(`${path} returns a 404 instead of a reading page`, async ({ page }) => {
+    const response = await page.goto(path);
+
+    expect(response?.status()).toBe(404);
+    await expect(page.getByRole('article', { name: '글 본문' })).toHaveCount(0);
+  });
+}
