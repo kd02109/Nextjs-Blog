@@ -14,7 +14,7 @@ describe('home writing discovery', () => {
     const featured = html.match(
       /<article[^>]*aria-label="대표 글 React Hook Form"[\s\S]*?<\/article>/,
     )?.[0];
-    expect(featured).toContain('href="/blogs/blog/react/react-hook-form"');
+    expect(featured).toContain('href="/blog/react/react-hook-form"');
   });
 
   it('lists the four newest blog articles in the recent writing area', async () => {
@@ -26,10 +26,10 @@ describe('home writing discovery', () => {
     expect(recentList).toBeDefined();
     expect(recentList!.match(/<li\b/g)).toHaveLength(4);
     for (const url of [
-      '/blogs/blog/react/react-hook-form',
-      '/blogs/blog/react/optimistic-updates',
-      '/blogs/blog/react/storybook',
-      '/blogs/blog/nextjs/auth-js',
+      '/blog/react/react-hook-form',
+      '/blog/react/optimistic-updates',
+      '/blog/react/storybook',
+      '/blog/nextjs/auth-js',
     ]) {
       expect(recentList).toContain(`href="${url}"`);
     }
@@ -42,7 +42,7 @@ describe('home writing discovery', () => {
     expect(html).toContain('href="/projects/sharepetment"');
     expect(html).toContain('href="/tags?key=react"');
     expect(html).toContain('href="/tags?key=nextJs"');
-    expect(html).toContain('href="/blogs"');
+    expect(html).toContain('href="/blog"');
     expect(html).toContain('href="/projects"');
   });
 });

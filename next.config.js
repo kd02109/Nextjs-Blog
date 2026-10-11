@@ -18,6 +18,16 @@ const contentSecurityPolicy = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  async redirects() {
+    return [
+      { source: '/blogs', destination: '/blog', permanent: true },
+      {
+        source: '/blogs/blog/:category/:slug',
+        destination: '/blog/:category/:slug',
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

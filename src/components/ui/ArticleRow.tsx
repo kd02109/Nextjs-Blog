@@ -1,6 +1,7 @@
 import { format, parseISO } from 'date-fns';
 import Link from 'next/link';
 
+import { getPublicPostPath } from '@/config/post-routes';
 import type { Post } from '@/lib/content';
 
 export type ArticleSummary = Pick<
@@ -14,8 +15,7 @@ type ArticleRowProps = {
   viewCount?: number;
 };
 
-export const getArticleHref = (post: ArticleSummary) =>
-  post.brand.trim() === 'blog' ? `/blogs/${post.url}` : `/projects/${post.url}`;
+export const getArticleHref = (post: ArticleSummary) => getPublicPostPath(post);
 
 export default function ArticleRow({ post, rank, viewCount }: ArticleRowProps) {
   return (

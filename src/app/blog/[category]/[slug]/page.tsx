@@ -7,26 +7,27 @@ import { incrementView } from '@/server/supabase';
 import { createViewVisitorHash } from '@/server/view-visitor';
 import { headers } from 'next/headers';
 import { sharedOpenGraphMetadata } from '@/config';
+import { getBlogRouteParts, getPublicPostPath } from '@/config/post-routes';
 
 type Props = {
-  params: Promise<{ slug: string[] }>;
+  params: Promise<{ category: string; slug: string }>;
 };
 
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return getPosts('blog').map(post => ({ slug: post.url.split('/') }));
+  return getPosts('blog').map(post => getBlogRouteParts(post.url));
 }
 
 export const generateMetadata = async ({
   params,
 }: Props): Promise<Metadata> => {
-  const { slug } = await params;
-  const post = getPostBySlug(slug.join('/'));
+  const { category, slug } = await params;
+  const post = getPostBySlug(`blog/${category}/${slug}`);
 
-  if (!post) notFound();
+  if (!post || post.brand.trim() !== 'blog') notFound();
 
-  const canonicalPath = `/blogs/${post.url}`;
+  const canonicalPath = getPublicPostPath(post);
 
   return {
     title: post.title,
@@ -43,13 +44,9 @@ export const generateMetadata = async ({
 };
 
 const PostLayout = async ({ params }: Props) => {
-  const { slug: slugParts } = await params;
-  const str = slugParts.join('/');
-  const post = getPostBySlug(str);
-  if (!post) notFound();
-
-  const slug = slugParts.at(-1);
-  if (!slug) notFound();
+  const { category, slug } = await params;
+  const post = getPostBySlug(`blog/${category}/${slug}`);
+  if (!post || post.brand.trim() !== 'blog') notFound();
 
   try {
     const visitorHash = createViewVisitorHash(await headers());

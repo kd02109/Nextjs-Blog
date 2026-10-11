@@ -1,4 +1,8 @@
 import BlogComment from '@/components/BlogComment';
+import {
+  getLegacyDiscussionTerm,
+  getPublicPostPath,
+} from '@/config/post-routes';
 import ArticleHeader from '@/components/reading/ArticleHeader';
 import ReadingBody from '@/components/reading/ReadingBody';
 import RelatedContent, {
@@ -32,14 +36,14 @@ export default function DetailPage({
   if (postFooter) {
     if (postFooter.prevPost) {
       related.push({
-        href: `/blogs/${postFooter.prevPost.url}`,
+        href: getPublicPostPath(postFooter.prevPost),
         title: postFooter.prevPost.title,
         label: '이전 글',
       });
     }
     if (postFooter.nextPost) {
       related.push({
-        href: `/blogs/${postFooter.nextPost.url}`,
+        href: getPublicPostPath(postFooter.nextPost),
         title: postFooter.nextPost.title,
         label: '다음 글',
       });
@@ -57,7 +61,7 @@ export default function DetailPage({
     ]) {
       if (neighbor) {
         related.push({
-          href: `/projects/${neighbor.url}`,
+          href: getPublicPostPath(neighbor),
           title: neighbor.title,
           label: '관련 기록',
         });
@@ -75,7 +79,7 @@ export default function DetailPage({
       </div>
       <RelatedContent
         posts={related}
-        backHref={projectFooter ? `/projects/${projectFooter}` : '/blogs'}
+        backHref={projectFooter ? `/projects/${projectFooter}` : '/blog'}
       />
       <section
         className="reading-comments"
@@ -92,7 +96,7 @@ export default function DetailPage({
           </p>
         </div>
         <div className="reading-comments-embed">
-          <BlogComment />
+          <BlogComment discussionTerm={getLegacyDiscussionTerm(post)} />
         </div>
       </section>
     </div>

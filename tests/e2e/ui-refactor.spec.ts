@@ -13,7 +13,7 @@ test.beforeEach(async ({ page }) => {
 test('writing archive shows all 41 blog posts and opens a real article', async ({
   page,
 }) => {
-  const response = await page.goto('/blogs');
+  const response = await page.goto('/blog');
 
   expect(response?.status()).toBe(200);
   await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
@@ -25,12 +25,9 @@ test('writing archive shows all 41 blog posts and opens a real article', async (
   const article = page
     .getByRole('article', { name: '대표 글 React Hook Form' })
     .getByRole('link', { name: '대표 글 읽기' });
-  await expect(article).toHaveAttribute(
-    'href',
-    '/blogs/blog/react/react-hook-form',
-  );
+  await expect(article).toHaveAttribute('href', '/blog/react/react-hook-form');
   await article.click();
-  await expect(page).toHaveURL(/\/blogs\/blog\/react\/react-hook-form$/);
+  await expect(page).toHaveURL(/\/blog\/react\/react-hook-form$/);
   await expect(
     page.getByRole('heading', { level: 1, name: 'React Hook Form' }),
   ).toBeVisible();
@@ -39,7 +36,7 @@ test('writing archive shows all 41 blog posts and opens a real article', async (
 test('writing topic and search apply together with a clear empty state', async ({
   page,
 }) => {
-  await page.goto('/blogs');
+  await page.goto('/blog');
 
   const filters = page.getByRole('group', { name: '글 주제 필터' });
   const search = page.getByRole('searchbox', { name: '글 검색' });
@@ -77,7 +74,7 @@ test('topic URL selects React across blog and project notes', async ({
   await expect(notes.getByRole('listitem')).toHaveCount(22);
   await expect(
     notes.getByRole('link', { name: 'React Hook Form', exact: true }),
-  ).toHaveAttribute('href', '/blogs/blog/react/react-hook-form');
+  ).toHaveAttribute('href', '/blog/react/react-hook-form');
 
   const projectNote = notes.getByRole('link', {
     name: '에러 컴포넌트 활용하기',
@@ -158,7 +155,7 @@ test('topic filter buttons keep the URL and browser history in sync', async ({
   await expect(page.getByText('22개의 기록', { exact: true })).toBeVisible();
 });
 
-for (const path of ['/blogs', '/tags?key=react'] as const) {
+for (const path of ['/blog', '/tags?key=react'] as const) {
   test(`${path} stays within a 320px viewport`, async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 720 });
     await page.goto(path);
@@ -338,7 +335,7 @@ test('project cards and a long external URL fit 320, 390, and 1440px', async ({
 test('blog record has the shared reading body, related article, and canonical URL', async ({
   page,
 }) => {
-  const response = await page.goto('/blogs/blog/react/react-hook-form');
+  const response = await page.goto('/blog/react/react-hook-form');
 
   expect(response?.status()).toBe(200);
   await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
@@ -357,11 +354,15 @@ test('blog record has the shared reading body, related article, and canonical UR
   await expect(body.locator('pre code').first()).toBeVisible();
 
   await expect(
-    page.locator('main a[href="/blogs/blog/react/optimistic-updates"]'),
+    page.locator('main a[href="/blog/react/optimistic-updates"]'),
   ).toBeVisible();
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://sonblog.vercel.app/blogs/blog/react/react-hook-form',
+    'https://sonblog.vercel.app/blog/react/react-hook-form',
+  );
+  await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
+    'content',
+    'https://sonblog.vercel.app/blog/react/react-hook-form',
   );
 });
 
@@ -409,7 +410,7 @@ test('reading table of contents has keyboard links to real blog and project head
 
   for (const { path, title, id } of [
     {
-      path: '/blogs/blog/react/react-hook-form',
+      path: '/blog/react/react-hook-form',
       title: 'useForm',
       id: 'useform',
     },
@@ -446,7 +447,7 @@ test('reading page copies its URL and a code example with keyboard buttons', asy
   await context.grantPermissions(['clipboard-read', 'clipboard-write'], {
     origin: 'http://127.0.0.1:3100',
   });
-  await page.goto('/blogs/blog/react/react-hook-form');
+  await page.goto('/blog/react/react-hook-form');
 
   const copyUrl = page.getByRole('button', { name: '현재 페이지 URL 복사' });
   await copyUrl.focus();
@@ -472,7 +473,7 @@ test('long code remains inside the 320px reading viewport', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 320, height: 800 });
-  await page.goto('/blogs/blog/react/react-hook-form');
+  await page.goto('/blog/react/react-hook-form');
 
   const body = page.getByRole('article', { name: '글 본문' });
   const code = body.locator('pre code').first();
@@ -489,7 +490,7 @@ test('wide tables and local images stay inside the 320px reading viewport', asyn
   page,
 }) => {
   await page.setViewportSize({ width: 320, height: 800 });
-  await page.goto('/blogs/blog/nextjs/csr-ssg-isr-ssr');
+  await page.goto('/blog/nextjs/csr-ssg-isr-ssr');
 
   const body = page.getByRole('article', { name: '글 본문' });
   const table = body.getByRole('table').first();
@@ -533,7 +534,7 @@ test('a project note keeps code and a local image inside the 320px viewport', as
 });
 
 for (const path of [
-  '/blogs/blog/react/not-a-real-article',
+  '/blog/react/not-a-real-article',
   '/projects/nextjs-blog/not-a-real-project-article',
 ] as const) {
   test(`${path} returns a 404 instead of a reading page`, async ({ page }) => {
@@ -570,7 +571,7 @@ test('about introduces the author, three working steps, and real destinations', 
 
   await expect(page.getByRole('link', { name: '글 읽어보기' })).toHaveAttribute(
     'href',
-    '/blogs',
+    '/blog',
   );
   await expect(
     page.getByRole('link', { name: '프로젝트 보기' }),
@@ -777,7 +778,7 @@ for (const path of ['/about', '/contact'] as const) {
 
 for (const { path, discussionTerm } of [
   {
-    path: '/blogs/blog/react/react-hook-form',
+    path: '/blog/react/react-hook-form',
     discussionTerm: 'blogs/blog/react/react-hook-form',
   },
   {
@@ -785,9 +786,7 @@ for (const { path, discussionTerm } of [
     discussionTerm: 'projects/nextjs-blog/nextjs-blog-veiws',
   },
 ] as const) {
-  test(`${path} keeps a Giscus discussion mapped to its pathname`, async ({
-    page,
-  }) => {
+  test(`${path} keeps its legacy Giscus discussion term`, async ({ page }) => {
     await page.route('https://giscus.app/**', route =>
       route.fulfill({
         status: 200,
@@ -814,7 +813,7 @@ for (const { path, discussionTerm } of [
     await expect(widget).toHaveAttribute('repoid', 'R_kgDOKD_Xgg');
     await expect(widget).toHaveAttribute('category', 'General');
     await expect(widget).toHaveAttribute('categoryid', 'DIC_kwDOKD_Xgs4CY7-G');
-    await expect(widget).toHaveAttribute('mapping', 'pathname');
+    await expect(widget).toHaveAttribute('mapping', 'specific');
     await expect(widget).toHaveAttribute('lang', 'ko');
 
     const frame = widget.locator('iframe[title="Comments"]');
@@ -865,7 +864,7 @@ test('Giscus follows the resolved light and dark theme', async ({ page }) => {
     }),
   );
   await page.emulateMedia({ colorScheme: 'light' });
-  await page.goto('/blogs/blog/react/react-hook-form');
+  await page.goto('/blog/react/react-hook-form');
 
   const widget = page.locator('section#comments giscus-widget');
   await expect(page.locator('html')).not.toHaveClass(/dark/);
@@ -903,7 +902,7 @@ test('home and a wide article preserve landmarks and width in light and dark lay
     }),
   );
 
-  for (const path of ['/', '/blogs/blog/nextjs/csr-ssg-isr-ssr'] as const) {
+  for (const path of ['/', '/blog/nextjs/csr-ssg-isr-ssr'] as const) {
     const response = await page.goto(path);
     expect(response?.status()).toBe(200);
 
@@ -949,7 +948,7 @@ test('a reader can move from home through writing search to the Giscus anchor', 
   await page.goto('/');
 
   await page.getByRole('link', { name: '모든 글 보기' }).click();
-  await expect(page).toHaveURL(/\/blogs$/);
+  await expect(page).toHaveURL(/\/blog$/);
   await page
     .getByRole('searchbox', { name: '글 검색' })
     .fill('React Hook Form');
@@ -957,7 +956,7 @@ test('a reader can move from home through writing search to the Giscus anchor', 
   await expect(results.getByRole('listitem')).toHaveCount(1);
   await results.getByRole('link', { name: 'React Hook Form' }).click();
 
-  await expect(page).toHaveURL(/\/blogs\/blog\/react\/react-hook-form$/);
+  await expect(page).toHaveURL(/\/blog\/react\/react-hook-form$/);
   await expect(
     page.getByRole('heading', { level: 1, name: 'React Hook Form' }),
   ).toBeVisible();
@@ -973,7 +972,7 @@ test('a reader can move from home through writing search to the Giscus anchor', 
   );
   await expect(comments.locator('giscus-widget')).toHaveAttribute(
     'mapping',
-    'pathname',
+    'specific',
   );
 });
 

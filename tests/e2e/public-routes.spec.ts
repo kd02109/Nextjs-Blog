@@ -147,16 +147,74 @@ test('home keeps popular links usable when view counts cannot load', async ({
   );
   await expect(popular).not.toContainText('0 views');
   await popular.getByRole('link', { name: 'React Hook Form' }).click();
-  await expect(page).toHaveURL(/\/blogs\/blog\/react\/react-hook-form$/);
+  await expect(page).toHaveURL(/\/blog\/react\/react-hook-form$/);
 });
 
 const listingRoutes = [
-  { path: '/blogs', heading: '문제를 따라 남긴 기록.' },
+  { path: '/blog', heading: '문제를 따라 남긴 기록.' },
   { path: '/projects', heading: '만든 것에는 이유가 남습니다.' },
   { path: '/projects/mbtmi', heading: 'Mbti Test Project' },
   { path: '/tags', heading: '관심사를 따라 찾아보세요.' },
   { path: '/contact', heading: '새로운 이야기를 시작해 볼까요?' },
 ] as const;
+
+test('legacy writing URLs permanently redirect to their matching new URLs', async ({
+  request,
+}) => {
+  for (const [oldPath, newPath] of [
+    ['/blogs', '/blog'],
+    ['/blogs/blog/react/react-hook-form', '/blog/react/react-hook-form'],
+  ] as const) {
+    const response = await request.get(oldPath, { maxRedirects: 0 });
+    expect(response.status(), oldPath).toBe(308);
+
+    const location = response.headers().location;
+    expect(location, oldPath).toBeTruthy();
+    expect(new URL(location!, response.url()).pathname).toBe(newPath);
+  }
+});
+
+test('every published blog URL has a matching permanent redirect', async ({
+  request,
+}) => {
+  const sitemapResponse = await request.get('/sitemap.xml');
+  expect(sitemapResponse.status()).toBe(200);
+
+  const sitemapXml = await sitemapResponse.text();
+  const blogPaths = [...sitemapXml.matchAll(/<loc>([^<]+)<\/loc>/g)]
+    .map(match => new URL(match[1]).pathname)
+    .filter(path => path.startsWith('/blog/'));
+  expect(blogPaths).toHaveLength(41);
+
+  for (const path of blogPaths) {
+    const legacyPath = `/blogs${path}`;
+    const response = await request.get(legacyPath, { maxRedirects: 0 });
+    expect(response.status(), legacyPath).toBe(308);
+
+    const location = response.headers().location;
+    expect(location, legacyPath).toBeTruthy();
+    expect(new URL(location!, response.url()).pathname).toBe(path);
+  }
+});
+
+test('published sitemap contains only unique current URLs', async ({
+  request,
+}) => {
+  const response = await request.get('/sitemap.xml');
+  expect(response.status()).toBe(200);
+
+  const xml = await response.text();
+  const urls = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1]);
+  expect(urls).toHaveLength(84);
+  expect(new Set(urls).size).toBe(84);
+  expect(urls).toContain('https://sonblog.vercel.app/blog');
+  expect(urls).toContain(
+    'https://sonblog.vercel.app/blog/react/react-hook-form',
+  );
+  expect(urls.some(url => new URL(url).pathname.startsWith('/blogs'))).toBe(
+    false,
+  );
+});
 
 test('the site header keeps the home logo and three primary destinations', async ({
   page,
@@ -173,7 +231,7 @@ test('the site header keeps the home logo and three primary destinations', async
     .getByRole('link');
   await expect(links).toHaveCount(3);
   await expect(links.nth(0)).toHaveText('글');
-  await expect(links.nth(0)).toHaveAttribute('href', '/blogs');
+  await expect(links.nth(0)).toHaveAttribute('href', '/blog');
   await expect(links.nth(1)).toHaveText('프로젝트');
   await expect(links.nth(1)).toHaveAttribute('href', '/projects');
   await expect(links.nth(2)).toHaveText('소개');
@@ -257,7 +315,7 @@ test('known article route returns 200 and renders the article title', async ({
 }) => {
   await blockBrowserDynamicCode(page);
   const errors = watchBrowserErrors(page);
-  const response = await page.goto('/blogs/blog/react/react-design-pattern');
+  const response = await page.goto('/blog/react/react-design-pattern');
 
   expect(response?.status()).toBe(200);
   await expect(
@@ -284,7 +342,7 @@ test('known project article route returns 200 and renders the article title', as
 });
 
 const invalidRoutes = [
-  '/blogs/blog/react/not-a-real-article',
+  '/blog/react/not-a-real-article',
   '/projects/not-a-real-project',
   '/projects/mbtmi/not-a-real-project-article',
 ] as const;
@@ -324,13 +382,13 @@ test('legacy view cookies do not interrupt article links or add duplicate client
       clientIncrements.push(request.url());
     }
   });
-  await page.goto('/blogs');
+  await page.goto('/blog');
   await page
     .getByRole('list', { name: '글 목록' })
     .getByRole('link', { name: 'React의 디자인 패턴' })
     .first()
     .click();
-  await expect(page).toHaveURL(/\/blogs\/blog\/react\/react-design-pattern$/);
+  await expect(page).toHaveURL(/\/blog\/react\/react-design-pattern$/);
   expect(clientIncrements).toEqual([]);
   await expectNoBrowserErrors(page, errors);
 });
@@ -339,7 +397,7 @@ test('root and child routes render one description and complete shared metadata'
   page,
 }) => {
   const errors = watchBrowserErrors(page);
-  for (const path of ['/', '/blogs']) {
+  for (const path of ['/', '/blog']) {
     const response = await page.goto(path);
     expect(response?.status()).toBe(200);
 

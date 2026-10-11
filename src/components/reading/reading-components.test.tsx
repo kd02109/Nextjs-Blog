@@ -32,7 +32,7 @@ describe('shared article header', () => {
     expect(html.match(/<h1\b/g)).toHaveLength(1);
     expect(html).toContain('React Hook Form');
     expect(html).toContain('dateTime="2024-04-18T00:00:00.000Z"');
-    expect(html).toContain('href="/blogs"');
+    expect(html).toContain('href="/blog"');
   });
 });
 
@@ -98,7 +98,7 @@ describe('reading navigation', () => {
         posts={[
           {
             title: 'Optimistic Updates',
-            href: '/blogs/blog/react/optimistic-updates',
+            href: '/blog/react/optimistic-updates',
             label: '다음 글',
           },
           {
@@ -110,7 +110,7 @@ describe('reading navigation', () => {
       />,
     );
 
-    expect(html).toContain('href="/blogs/blog/react/optimistic-updates"');
+    expect(html).toContain('href="/blog/react/optimistic-updates"');
     expect(html).toContain('href="/projects/nextjs-blog/next-js-blog-review"');
     expect(html).toContain('href="/projects/nextjs-blog"');
   });

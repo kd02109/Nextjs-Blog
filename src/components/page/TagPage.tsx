@@ -49,7 +49,7 @@ export default function TagPage({ initialTag }: { initialTag?: string }) {
             eyebrow="TOPIC MAP / 01"
             title="기록을 묶는 네 가지 주제"
             description="카드를 누르면 아래 목록이 해당 주제로 바뀝니다."
-            action={{ href: '/blogs', label: '블로그 글만 보기' }}
+            action={{ href: '/blog', label: '블로그 글만 보기' }}
           />
         </div>
         <nav className="archive-topic-map" aria-label="주제 선택">
