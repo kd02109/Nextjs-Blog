@@ -1,6 +1,6 @@
 export const publicStaticRoutes = [
   '/',
-  '/blogs',
+  '/blog',
   '/projects',
   '/tags',
   '/about',

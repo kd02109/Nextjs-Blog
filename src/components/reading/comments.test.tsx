@@ -29,8 +29,11 @@ beforeEach(() => {
 });
 
 describe('Giscus configuration', () => {
-  it('keeps the GitHub Discussions identity and pathname mapping', () => {
-    renderToStaticMarkup(<BlogComment />);
+  it.each([
+    'blogs/blog/react/react-hook-form',
+    'projects/nextjs-blog/nextjs-blog-veiws',
+  ])('keeps the existing GitHub discussion for %s', discussionTerm => {
+    renderToStaticMarkup(<BlogComment discussionTerm={discussionTerm} />);
 
     expect(giscusProps).toHaveBeenCalledTimes(1);
     expect(giscusProps).toHaveBeenCalledWith(
@@ -39,7 +42,8 @@ describe('Giscus configuration', () => {
         repoId: 'R_kgDOKD_Xgg',
         category: 'General',
         categoryId: 'DIC_kwDOKD_Xgs4CY7-G',
-        mapping: 'pathname',
+        mapping: 'specific',
+        term: discussionTerm,
         strict: '0',
         reactionsEnabled: '1',
         emitMetadata: '0',
@@ -61,7 +65,9 @@ describe('Giscus configuration', () => {
       themeState.theme = theme;
       themeState.resolvedTheme = resolvedTheme;
 
-      renderToStaticMarkup(<BlogComment />);
+      renderToStaticMarkup(
+        <BlogComment discussionTerm="blogs/blog/react/react-hook-form" />,
+      );
 
       expect(giscusProps).toHaveBeenCalledWith(
         expect.objectContaining({ theme: expected }),
@@ -72,11 +78,21 @@ describe('Giscus configuration', () => {
 
 describe('shared article conversation', () => {
   it.each([
-    ['blog', 'blog/react/react-hook-form', undefined],
-    ['project', 'nextjs-blog/nextjs-blog-veiws', 'nextjs-blog'],
+    [
+      'blog',
+      'blog/react/react-hook-form',
+      undefined,
+      'blogs/blog/react/react-hook-form',
+    ],
+    [
+      'project',
+      'nextjs-blog/nextjs-blog-veiws',
+      'nextjs-blog',
+      'projects/nextjs-blog/nextjs-blog-veiws',
+    ],
   ])(
     'shows the same labelled Giscus area for a %s article',
-    (_kind, slug, projectFooter) => {
+    (_kind, slug, projectFooter, discussionTerm) => {
       const post = getPostBySlug(slug)!;
       const html = renderToStaticMarkup(
         <DetailPage
@@ -99,6 +115,9 @@ describe('shared article conversation', () => {
       expect(section).not.toMatch(/<form\b/);
       expect(html).toContain('href="#comments"');
       expect(giscusProps).toHaveBeenCalledTimes(1);
+      expect(giscusProps).toHaveBeenCalledWith(
+        expect.objectContaining({ mapping: 'specific', term: discussionTerm }),
+      );
     },
   );
 });

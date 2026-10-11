@@ -63,7 +63,7 @@ export default function AboutPage() {
             <strong>JUNSEOK SON</strong> / FRONTEND ENGINEER
           </p>
           <div className="about-actions">
-            <ActionLink href="/blogs" variant="primary">
+            <ActionLink href="/blog" variant="primary">
               글 읽어보기
             </ActionLink>
             <ActionLink href="/projects">프로젝트 보기</ActionLink>

@@ -4,7 +4,11 @@ import Giscus from '@giscus/react';
 import { useTheme } from 'next-themes';
 import { useEffect, useRef } from 'react';
 
-export default function BlogComment() {
+type Props = {
+  discussionTerm: string;
+};
+
+export default function BlogComment({ discussionTerm }: Props) {
   const { resolvedTheme } = useTheme();
   const hostRef = useRef<HTMLDivElement>(null);
   const giscusTheme =
@@ -22,7 +26,8 @@ export default function BlogComment() {
       <Giscus
         repo="kd02109/Nextjs-Blog"
         repoId="R_kgDOKD_Xgg"
-        mapping="pathname"
+        mapping="specific"
+        term={discussionTerm}
         category="General"
         categoryId="DIC_kwDOKD_Xgs4CY7-G"
         strict="0"

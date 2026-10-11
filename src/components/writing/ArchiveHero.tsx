@@ -17,7 +17,7 @@ export default function ArchiveHero({ kind, count }: ArchiveHeroProps) {
           <span>WRITING</span>
         ) : (
           <>
-            <Link href="/blogs">WRITING</Link>
+            <Link href="/blog">WRITING</Link>
             <span aria-hidden="true">/</span>
             <span>TOPICS</span>
           </>

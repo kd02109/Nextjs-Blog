@@ -148,7 +148,7 @@ export default function ProjectDetail({ project, posts, index }: Props) {
       </div>
       <div className="detail-next">
         <Link href="/projects">← 모든 프로젝트</Link>
-        <Link href="/blogs">개발 글 더 읽기 ↗</Link>
+        <Link href="/blog">개발 글 더 읽기 ↗</Link>
       </div>
     </article>
   );

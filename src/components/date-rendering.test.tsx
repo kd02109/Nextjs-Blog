@@ -15,7 +15,7 @@ describe('post date rendering', () => {
             id: 'date-formatting',
             tag: ['test'],
             title: 'Date formatting',
-            url: 'blog/date-formatting',
+            url: 'blog/test/date-formatting',
           },
         ]}
       />,
@@ -36,7 +36,7 @@ describe('post date rendering', () => {
             id: 'date-formatting',
             tag: ['test'],
             title: 'Date formatting',
-            url: 'blog/date-formatting',
+            url: 'blog/test/date-formatting',
           },
         ]}
       />,

@@ -14,7 +14,7 @@ describe('/about', () => {
     expect(html).toContain('문제에서 시작');
     expect(html).toContain('직접 구현');
     expect(html).toContain('다시 쓸 수 있게 기록');
-    expect(html).toContain('href="/blogs"');
+    expect(html).toContain('href="/blog"');
     expect(html).toContain('href="/projects"');
     expect(html).toContain('id="contact"');
     expect(html).toContain('href="/contact"');

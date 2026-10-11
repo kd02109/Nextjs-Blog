@@ -114,7 +114,7 @@ export default function ArchiveView({
       )}
       <div className="archive-bottom">
         <p>글과 프로젝트 기록은 최신 발행일 순서로 정렬됩니다.</p>
-        <Link href={scope === 'blog' ? '/tags' : '/blogs'}>
+        <Link href={scope === 'blog' ? '/tags' : '/blog'}>
           {scope === 'blog' ? '주제별 모아보기' : '블로그 글만 보기'} ↗
         </Link>
       </div>

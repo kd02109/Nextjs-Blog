@@ -77,7 +77,7 @@ export default function Home() {
           eyebrow="WRITING / NOTES FROM THE WORK"
           title="차곡차곡 쌓인 기록"
           description="실제로 부딪힌 문제에서 출발한 글을 주제별로 찾아볼 수 있습니다."
-          action={{ href: '/blogs', label: '모든 글 보기' }}
+          action={{ href: '/blog', label: '모든 글 보기' }}
         />
         <RecentWriting posts={recentPosts} />
       </section>
